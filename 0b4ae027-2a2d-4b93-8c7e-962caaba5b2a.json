@@ -27,7 +27,7 @@
                 "suppressionEnabled": false,
                 "startTimeUtc": null,
                 "tactics": ["DefenseEvasion", "CredentialAccess"],
-                "techniques": ["T1218", "T1003.001"],
+                "techniques": ["T1218", "T1003"],
                 "alertRuleTemplateName": "0b4ae027-2a2d-4b93-8c7e-962caaba5b2a",
                 "incidentConfiguration": {
                     "createIncident": true,
