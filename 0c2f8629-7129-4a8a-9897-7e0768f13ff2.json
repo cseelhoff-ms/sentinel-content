@@ -1,0 +1,74 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/0c2f8629-7129-4a8a-9897-7e0768f13ff2')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/0c2f8629-7129-4a8a-9897-7e0768f13ff2')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Execution via Diskshadow.exe",
+                "description": "Detects using Diskshadow.exe to execute arbitrary code in text file; Author: Ivan Dyachkov, oscd.community; Source URL: process_creation/proc_creation_win_lolbin_diskshadow.yml; Status: test; False Positives: False postitve can be if administrators use diskshadow tool in their infrastructure as a main backup tool with scripts.; References: https://bohops.com/2018/03/26/diskshadow-the-return-of-vss-evasion-persistence-and-active-directory-database-extraction/, https://www.ired.team/offensive-security/credential-access-and-credential-dumping/ntds.dit-enumeration",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\diskshadow.exe\" and (TargetProcessCommandLine contains \"/s\" or TargetProcessCommandLine contains \"-s\"))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["execution"],
+                "techniques": ["t1218"],
+                "alertRuleTemplateName": "0c2f8629-7129-4a8a-9897-7e0768f13ff2",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

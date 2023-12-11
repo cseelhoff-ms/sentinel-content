@@ -1,0 +1,74 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/0afbd410-de03-4078-8491-f132303cb67d')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/0afbd410-de03-4078-8491-f132303cb67d')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Renamed NetSupport RAT Execution",
+                "description": "Detects the execution of a renamed \"client32.exe\" (NetSupport RAT) via Imphash, Product and OriginalFileName strings; Author: Nasreddine Bencherchali (Nextron Systems); Source URL: process_creation/proc_creation_win_renamed_netsupport_rat.yml; Status: experimental; False Positives: Unknown; References: https://redcanary.com/blog/misbehaving-rats/",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where ((Product contains \"NetSupport Remote Control\" or TargetProcessFilename contains \"client32.exe\" or Imphash =~ \"a9d50692e95b79723f3e76fcf70d023e\" or Hashes contains \"IMPHASH=A9D50692E95B79723F3E76FCF70D023E\") and (not TargetProcessName endswith \"\\\\client32.exe\"))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["defense_evasion"],
+                "techniques": [],
+                "alertRuleTemplateName": "0afbd410-de03-4078-8491-f132303cb67d",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

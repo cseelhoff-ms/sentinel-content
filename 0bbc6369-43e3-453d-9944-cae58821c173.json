@@ -1,0 +1,74 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/0bbc6369-43e3-453d-9944-cae58821c173')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/0bbc6369-43e3-453d-9944-cae58821c173')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Execution via WorkFolders.exe",
+                "description": "Detects using WorkFolders.exe to execute an arbitrary control.exe; Author: Maxime Thiebaut (@0xThiebaut); Source URL: process_creation/proc_creation_win_susp_workfolders.yml; Status: test; False Positives: Legitimate usage of the uncommon Windows Work Folders feature.; References: https://twitter.com/elliotkillick/status/1449812843772227588",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\control.exe\" and ActingProcessName endswith \"\\\\WorkFolders.exe\") and (not TargetProcessName =~ \"C:\\\\Windows\\\\System32\\\\control.exe\"))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["defense_evasion"],
+                "techniques": ["t1218"],
+                "alertRuleTemplateName": "0bbc6369-43e3-453d-9944-cae58821c173",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

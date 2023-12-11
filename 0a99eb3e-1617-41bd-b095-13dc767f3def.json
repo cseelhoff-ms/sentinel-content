@@ -1,0 +1,74 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/0a99eb3e-1617-41bd-b095-13dc767f3def')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/0a99eb3e-1617-41bd-b095-13dc767f3def')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "HackTool - Jlaive In-Memory Assembly Execution",
+                "description": "Detects the use of Jlaive to execute assemblies in a copied PowerShell; Author: Jose Luis Sanchez Martinez (@Joseliyo_Jstnk); Source URL: process_creation/proc_creation_win_hktl_jlaive_batch_execution.yml; Status: experimental; False Positives: Unknown; References: https://jstnk9.github.io/jstnk9/research/Jlaive-Antivirus-Evasion-Tool, https://web.archive.org/web/20220514073704/https://github.com/ch2sh/Jlaive",
+                "severity": "medium",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where ((ActingProcessName endswith \"\\\\cmd.exe\" and ActingProcessCommandLine endswith \".bat\") and ((TargetProcessName endswith \"\\\\xcopy.exe\" and (TargetProcessCommandLine contains \"powershell.exe\" and TargetProcessCommandLine contains \".bat.exe\")) or (TargetProcessName endswith \"\\\\xcopy.exe\" and (TargetProcessCommandLine contains \"pwsh.exe\" and TargetProcessCommandLine contains \".bat.exe\")) or (TargetProcessName endswith \"\\\\attrib.exe\" and (TargetProcessCommandLine contains \"+s\" and TargetProcessCommandLine contains \"+h\" and TargetProcessCommandLine contains \".bat.exe\"))))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["execution", "t1059.003"],
+                "techniques": [],
+                "alertRuleTemplateName": "0a99eb3e-1617-41bd-b095-13dc767f3def",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

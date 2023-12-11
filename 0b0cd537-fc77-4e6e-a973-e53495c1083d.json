@@ -1,0 +1,74 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/0b0cd537-fc77-4e6e-a973-e53495c1083d')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/0b0cd537-fc77-4e6e-a973-e53495c1083d')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Renamed Office Binary Execution",
+                "description": "Detects the execution of a renamed office binary; Author: Nasreddine Bencherchali (Nextron Systems); Source URL: process_creation/proc_creation_win_renamed_office_processes.yml; Status: test; False Positives: Unknown; References: https://infosec.exchange/@sbousseaden/109542254124022664",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where (((TargetProcessFilename =~ \"Excel.exe\" or TargetProcessFilename =~ \"MSACCESS.EXE\" or TargetProcessFilename =~ \"OneNote.exe\" or TargetProcessFilename =~ \"POWERPNT.EXE\" or TargetProcessFilename =~ \"WinWord.exe\") or (TargetProcessFileDescription =~ \"Microsoft Access\" or TargetProcessFileDescription =~ \"Microsoft Excel\" or TargetProcessFileDescription =~ \"Microsoft OneNote\" or TargetProcessFileDescription =~ \"Microsoft PowerPoint\" or TargetProcessFileDescription =~ \"Microsoft Word\")) and (not (TargetProcessName endswith \"\\\\EXCEL.exe\" or TargetProcessName endswith \"\\\\MSACCESS.exe\" or TargetProcessName endswith \"\\\\ONENOTE.EXE\" or TargetProcessName endswith \"\\\\POWERPNT.EXE\" or TargetProcessName endswith \"\\\\WINWORD.exe\")))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["defense_evasion"],
+                "techniques": [],
+                "alertRuleTemplateName": "0b0cd537-fc77-4e6e-a973-e53495c1083d",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

@@ -1,0 +1,74 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/0b7163dc-7eee-4960-af17-c0cd517f92da')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/0b7163dc-7eee-4960-af17-c0cd517f92da')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Service Started/Stopped Via Wmic.EXE",
+                "description": "Detects usage of wmic to start or stop a service; Author: Nasreddine Bencherchali (Nextron Systems); Source URL: process_creation/proc_creation_win_wmic_service_manipulation.yml; Status: experimental; False Positives: Unknown; References: https://sushant747.gitbooks.io/total-oscp-guide/content/privilege_escalation_windows.html",
+                "severity": "medium",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where ((TargetProcessFilename =~ \"wmic.exe\" or TargetProcessName endswith \"\\\\WMIC.exe\") and ((TargetProcessCommandLine contains \" service \" and TargetProcessCommandLine contains \" call \") and (TargetProcessCommandLine contains \"stopservice\" or TargetProcessCommandLine contains \"startservice\")))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["execution"],
+                "techniques": ["t1047"],
+                "alertRuleTemplateName": "0b7163dc-7eee-4960-af17-c0cd517f92da",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

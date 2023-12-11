@@ -1,0 +1,74 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/0e0255bf-2548-47b8-9582-c0955c9283f5')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/0e0255bf-2548-47b8-9582-c0955c9283f5')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Suspicious Reg Add BitLocker",
+                "description": "Detects suspicious addition to BitLocker related registry keys via the reg.exe utility; Author: frack113; Source URL: process_creation/proc_creation_win_reg_bitlocker.yml; Status: test; False Positives: Unlikely; References: https://thedfirreport.com/2021/11/15/exchange-exploit-leads-to-domain-wide-ransomware/",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \"REG\" and TargetProcessCommandLine contains \"ADD\" and TargetProcessCommandLine contains \"\\\\SOFTWARE\\\\Policies\\\\Microsoft\\\\FVE\" and TargetProcessCommandLine contains \"/v\" and TargetProcessCommandLine contains \"/f\") and (TargetProcessCommandLine contains \"EnableBDEWithNoTPM\" or TargetProcessCommandLine contains \"UseAdvancedStartup\" or TargetProcessCommandLine contains \"UseTPM\" or TargetProcessCommandLine contains \"UseTPMKey\" or TargetProcessCommandLine contains \"UseTPMKeyPIN\" or TargetProcessCommandLine contains \"RecoveryKeyMessageSource\" or TargetProcessCommandLine contains \"UseTPMPIN\" or TargetProcessCommandLine contains \"RecoveryKeyMessage\"))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["impact"],
+                "techniques": ["t1486"],
+                "alertRuleTemplateName": "0e0255bf-2548-47b8-9582-c0955c9283f5",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

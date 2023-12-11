@@ -1,0 +1,74 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/0a13e132-651d-11eb-ae93-0242ac130002')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/0a13e132-651d-11eb-ae93-0242ac130002')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Audit Policy Tampering Via Auditpol",
+                "description": "Threat actors can use auditpol binary to change audit policy configuration to impair detection capability.\nThis can be carried out by selectively disabling/removing certain audit policies as well as restoring a custom policy owned by the threat actor.\n; Author: Janantha Marasinghe (https://github.com/blueteam0ps); Source URL: process_creation/proc_creation_win_auditpol_susp_execution.yml; Status: test; False Positives: Administrator or administrator scripts might leverage the flags mentioned in the detection section. Either way, it should always be monitored; References: https://www.microsoft.com/security/blog/2021/01/20/deep-dive-into-the-solorigate-second-stage-activation-from-sunburst-to-teardrop-and-raindrop/",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\auditpol.exe\" or TargetProcessFilename =~ \"AUDITPOL.EXE\") and (TargetProcessCommandLine contains \"disable\" or TargetProcessCommandLine contains \"clear\" or TargetProcessCommandLine contains \"remove\" or TargetProcessCommandLine contains \"restore\"))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["defense_evasion", "t1562.002"],
+                "techniques": [],
+                "alertRuleTemplateName": "0a13e132-651d-11eb-ae93-0242ac130002",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

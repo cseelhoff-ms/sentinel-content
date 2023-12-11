@@ -1,0 +1,74 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/0ba863e6-def5-4e50-9cea-4dd8c7dc46a4')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/0ba863e6-def5-4e50-9cea-4dd8c7dc46a4')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Control Panel Items",
+                "description": "Detects the malicious use of a control panel item; Author: Kyaw Min Thein, Furkan Caliskan (@caliskanfurkan_); Source URL: process_creation/proc_creation_win_control_panel_item.yml; Status: test; False Positives: Unknown; References: https://ired.team/offensive-security/code-execution/code-execution-through-control-panel-add-ins",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\reg.exe\" or TargetProcessFilename =~ \"reg.exe\") and (TargetProcessCommandLine contains \"add\" and TargetProcessCommandLine contains \"CurrentVersion\\\\Control Panel\\\\CPLs\")) or (TargetProcessCommandLine endswith \".cpl\" and (not ((TargetProcessCommandLine contains \"\\\\System32\\\\\" or TargetProcessCommandLine contains \"%System%\" or TargetProcessCommandLine contains \"|C:\\\\Windows\\\\system32|\") or (TargetProcessCommandLine contains \"regsvr32 \" and TargetProcessCommandLine contains \" /s \" and TargetProcessCommandLine contains \"igfxCPL.cpl\")))))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["execution", "defense_evasion", "t1218.002", "persistence"],
+                "techniques": ["t1546"],
+                "alertRuleTemplateName": "0ba863e6-def5-4e50-9cea-4dd8c7dc46a4",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

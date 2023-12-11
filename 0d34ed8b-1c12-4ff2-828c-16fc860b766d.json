@@ -1,0 +1,74 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/0d34ed8b-1c12-4ff2-828c-16fc860b766d')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/0d34ed8b-1c12-4ff2-828c-16fc860b766d')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Suspicious Shells Spawned by Java",
+                "description": "Detects suspicious shell spawned from Java host process (e.g. log4j exploitation); Author: Andreas Hunkeler (@Karneades), Florian Roth; Source URL: process_creation/proc_creation_win_java_susp_child_process.yml; Status: experimental; False Positives: Legitimate calls to system binaries, Company specific internal usage; References: ",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where (ActingProcessName endswith \"\\\\java.exe\" and (TargetProcessName endswith \"\\\\sh.exe\" or TargetProcessName endswith \"\\\\bash.exe\" or TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\" or TargetProcessName endswith \"\\\\schtasks.exe\" or TargetProcessName endswith \"\\\\certutil.exe\" or TargetProcessName endswith \"\\\\whoami.exe\" or TargetProcessName endswith \"\\\\bitsadmin.exe\" or TargetProcessName endswith \"\\\\wscript.exe\" or TargetProcessName endswith \"\\\\cscript.exe\" or TargetProcessName endswith \"\\\\scrcons.exe\" or TargetProcessName endswith \"\\\\regsvr32.exe\" or TargetProcessName endswith \"\\\\hh.exe\" or TargetProcessName endswith \"\\\\wmic.exe\" or TargetProcessName endswith \"\\\\mshta.exe\" or TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessName endswith \"\\\\forfiles.exe\" or TargetProcessName endswith \"\\\\scriptrunner.exe\" or TargetProcessName endswith \"\\\\mftrace.exe\" or TargetProcessName endswith \"\\\\AppVLP.exe\" or TargetProcessName endswith \"\\\\curl.exe\" or TargetProcessName endswith \"\\\\systeminfo.exe\" or TargetProcessName endswith \"\\\\net.exe\" or TargetProcessName endswith \"\\\\net1.exe\" or TargetProcessName endswith \"\\\\reg.exe\" or TargetProcessName endswith \"\\\\query.exe\"))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["initial_access", "persistence", "privilege_escalation"],
+                "techniques": [],
+                "alertRuleTemplateName": "0d34ed8b-1c12-4ff2-828c-16fc860b766d",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}
