@@ -15,7 +15,7 @@
             "apiVersion": "2022-11-01-preview",
             "properties": {
                 "displayName": "Execution via Diskshadow.exe",
-                "description": "Detects using Diskshadow.exe to execute arbitrary code in text file; Author: Ivan Dyachkov, oscd.community; Source URL: process_creation/proc_creation_win_lolbin_diskshadow.yml; Status: test; False Positives: False postitve can be if administrators use diskshadow tool in their infrastructure as a main backup tool with scripts.; References: https://bohops.com/2018/03/26/diskshadow-the-return-of-vss-evasion-persistence-and-active-directory-database-extraction/, https://www.ired.team/offensive-security/credential-access-and-credential-dumping/ntds.dit-enumeration",
+                "description": "Detects using Diskshadow.exe to execute arbitrary code in text file\n\nAuthor: Ivan Dyachkov, oscd.community\n\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_diskshadow.yml\n\nStatus: test\n\nFalse Positives: False postitve can be if administrators use diskshadow tool in their infrastructure as a main backup tool with scripts.\n\nReferences: https://bohops.com/2018/03/26/diskshadow-the-return-of-vss-evasion-persistence-and-active-directory-database-extraction/, https://www.ired.team/offensive-security/credential-access-and-credential-dumping/ntds.dit-enumeration",
                 "severity": "high",
                 "enabled": true,
                 "query": "_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\diskshadow.exe\" and (TargetProcessCommandLine contains \"/s\" or TargetProcessCommandLine contains \"-s\"))",
@@ -62,6 +62,62 @@
                             {
                                 "identifier": "FullName",
                                 "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
                             }
                         ]
                     }

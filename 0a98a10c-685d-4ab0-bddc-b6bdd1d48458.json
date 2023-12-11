@@ -15,10 +15,10 @@
             "apiVersion": "2022-11-01-preview",
             "properties": {
                 "displayName": "Uncommon Userinit Child Process",
-                "description": "Detects uncommon \"userinit.exe\" child processes, which could be a sign of uncommon shells or login scripts used for persistence.; Author: Tom Ueltschi (@c_APT_ure), Tim Shelton; Source URL: process_creation/proc_creation_win_userinit_uncommon_child_processes.yml; Status: test; False Positives: Legitimate logon scripts or custom shells may trigger false positives. Apply additional filters accordingly.; References: https://cocomelonc.github.io/persistence/2022/12/09/malware-pers-20.html, https://learn.microsoft.com/en-us/windows-server/administration/server-core/server-core-sconfig#powershell-is-the-default-shell-on-server-core",
+                "description": "Detects uncommon \"userinit.exe\" child processes, which could be a sign of uncommon shells or login scripts used for persistence.\n\nAuthor: Tom Ueltschi (@c_APT_ure), Tim Shelton\n\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_userinit_uncommon_child_processes.yml\n\nStatus: test\n\nFalse Positives: Legitimate logon scripts or custom shells may trigger false positives. Apply additional filters accordingly.\n\nReferences: https://cocomelonc.github.io/persistence/2022/12/09/malware-pers-20.html, https://learn.microsoft.com/en-us/windows-server/administration/server-core/server-core-sconfig#powershell-is-the-default-shell-on-server-core",
                 "severity": "high",
                 "enabled": true,
-                "query": "_Im_ProcessCreate\n| where (ActingProcessName endswith \"\\\\userinit.exe\" and (not TargetProcessName =~ \"C:\\\\WINDOWS\\\\explorer.exe\") and (not ((TargetProcessCommandLine contains \"netlogon.bat\" or TargetProcessCommandLine contains \"UsrLogon.cmd\") or TargetProcessCommandLine =~ \"PowerShell.exe\" or (TargetProcessName =~ \"C:\\\\Windows\\\\System32\\\\proquota.exe\" or TargetProcessName =~ \"C:\\\\Windows\\\\SysWOW64\\\\proquota.exe\") or TargetProcessName endswith \"\\\\Citrix\\\\System32\\\\icast.exe\" or isnull(TargetProcessName))))",
+                "query": "_Im_ProcessCreate\n| where (ActingProcessName endswith \"\\\\userinit.exe\" and (not(TargetProcessName =~ \"C:\\\\WINDOWS\\\\explorer.exe\")) and (not(((TargetProcessCommandLine contains \"netlogon.bat\" or TargetProcessCommandLine contains \"UsrLogon.cmd\") or TargetProcessCommandLine =~ \"PowerShell.exe\" or (TargetProcessName =~ \"C:\\\\Windows\\\\System32\\\\proquota.exe\" or TargetProcessName =~ \"C:\\\\Windows\\\\SysWOW64\\\\proquota.exe\") or TargetProcessName endswith \"\\\\Citrix\\\\System32\\\\icast.exe\" or isnull(TargetProcessName)))))",
                 "queryFrequency": "P1D",
                 "queryPeriod": "P1D",
                 "triggerOperator": "GreaterThan",
@@ -62,6 +62,62 @@
                             {
                                 "identifier": "FullName",
                                 "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
                             }
                         ]
                     }

@@ -15,10 +15,10 @@
             "apiVersion": "2022-11-01-preview",
             "properties": {
                 "displayName": "Suspicious GUP Usage",
-                "description": "Detects execution of the Notepad++ updater in a suspicious directory, which is often used in DLL side-loading attacks; Author: Florian Roth (Nextron Systems); Source URL: process_creation/proc_creation_win_gup_suspicious_execution.yml; Status: test; False Positives: Execution of tools named GUP.exe and located in folders different than Notepad++\\updater; References: https://www.fireeye.com/blog/threat-research/2018/09/apt10-targeting-japanese-corporations-using-updated-ttps.html",
+                "description": "Detects execution of the Notepad++ updater in a suspicious directory, which is often used in DLL side-loading attacks\n\nAuthor: Florian Roth (Nextron Systems)\n\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_gup_suspicious_execution.yml\n\nStatus: test\n\nFalse Positives: Execution of tools named GUP.exe and located in folders different than Notepad++\\updater\n\nReferences: https://www.fireeye.com/blog/threat-research/2018/09/apt10-targeting-japanese-corporations-using-updated-ttps.html",
                 "severity": "high",
                 "enabled": true,
-                "query": "_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\GUP.exe\" and (not ((TargetProcessName endswith \"\\\\Program Files\\\\Notepad++\\\\updater\\\\GUP.exe\" or TargetProcessName endswith \"\\\\Program Files (x86)\\\\Notepad++\\\\updater\\\\GUP.exe\") or (TargetProcessName contains \"\\\\Users\\\\\" and (TargetProcessName endswith \"\\\\AppData\\\\Local\\\\Notepad++\\\\updater\\\\GUP.exe\" or TargetProcessName endswith \"\\\\AppData\\\\Roaming\\\\Notepad++\\\\updater\\\\GUP.exe\")))))",
+                "query": "_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\GUP.exe\" and (not(((TargetProcessName endswith \"\\\\Program Files\\\\Notepad++\\\\updater\\\\GUP.exe\" or TargetProcessName endswith \"\\\\Program Files (x86)\\\\Notepad++\\\\updater\\\\GUP.exe\") or (TargetProcessName contains \"\\\\Users\\\\\" and (TargetProcessName endswith \"\\\\AppData\\\\Local\\\\Notepad++\\\\updater\\\\GUP.exe\" or TargetProcessName endswith \"\\\\AppData\\\\Roaming\\\\Notepad++\\\\updater\\\\GUP.exe\"))))))",
                 "queryFrequency": "P1D",
                 "queryPeriod": "P1D",
                 "triggerOperator": "GreaterThan",
@@ -62,6 +62,62 @@
                             {
                                 "identifier": "FullName",
                                 "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
                             }
                         ]
                     }

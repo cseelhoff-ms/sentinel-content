@@ -15,7 +15,7 @@
             "apiVersion": "2022-11-01-preview",
             "properties": {
                 "displayName": "Suspicious Shells Spawned by Java",
-                "description": "Detects suspicious shell spawned from Java host process (e.g. log4j exploitation); Author: Andreas Hunkeler (@Karneades), Florian Roth; Source URL: process_creation/proc_creation_win_java_susp_child_process.yml; Status: experimental; False Positives: Legitimate calls to system binaries, Company specific internal usage; References: ",
+                "description": "Detects suspicious shell spawned from Java host process (e.g. log4j exploitation)\n\nAuthor: Andreas Hunkeler (@Karneades), Florian Roth\n\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_java_susp_child_process.yml\n\nStatus: experimental\n\nFalse Positives: Legitimate calls to system binaries, Company specific internal usage\n\nReferences: ",
                 "severity": "high",
                 "enabled": true,
                 "query": "_Im_ProcessCreate\n| where (ActingProcessName endswith \"\\\\java.exe\" and (TargetProcessName endswith \"\\\\sh.exe\" or TargetProcessName endswith \"\\\\bash.exe\" or TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\" or TargetProcessName endswith \"\\\\schtasks.exe\" or TargetProcessName endswith \"\\\\certutil.exe\" or TargetProcessName endswith \"\\\\whoami.exe\" or TargetProcessName endswith \"\\\\bitsadmin.exe\" or TargetProcessName endswith \"\\\\wscript.exe\" or TargetProcessName endswith \"\\\\cscript.exe\" or TargetProcessName endswith \"\\\\scrcons.exe\" or TargetProcessName endswith \"\\\\regsvr32.exe\" or TargetProcessName endswith \"\\\\hh.exe\" or TargetProcessName endswith \"\\\\wmic.exe\" or TargetProcessName endswith \"\\\\mshta.exe\" or TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessName endswith \"\\\\forfiles.exe\" or TargetProcessName endswith \"\\\\scriptrunner.exe\" or TargetProcessName endswith \"\\\\mftrace.exe\" or TargetProcessName endswith \"\\\\AppVLP.exe\" or TargetProcessName endswith \"\\\\curl.exe\" or TargetProcessName endswith \"\\\\systeminfo.exe\" or TargetProcessName endswith \"\\\\net.exe\" or TargetProcessName endswith \"\\\\net1.exe\" or TargetProcessName endswith \"\\\\reg.exe\" or TargetProcessName endswith \"\\\\query.exe\"))",
@@ -26,7 +26,7 @@
                 "suppressionDuration": "PT1H",
                 "suppressionEnabled": false,
                 "startTimeUtc": null,
-                "tactics": ["InitialAccess", "PrivilegeEscalation", "Persistence"],
+                "tactics": ["InitialAccess", "Persistence", "PrivilegeEscalation"],
                 "techniques": [],
                 "alertRuleTemplateName": "0d34ed8b-1c12-4ff2-828c-16fc860b766d",
                 "incidentConfiguration": {
@@ -62,6 +62,62 @@
                             {
                                 "identifier": "FullName",
                                 "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
                             }
                         ]
                     }

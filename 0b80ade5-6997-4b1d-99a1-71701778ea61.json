@@ -15,10 +15,10 @@
             "apiVersion": "2022-11-01-preview",
             "properties": {
                 "displayName": "Imports Registry Key From an ADS",
-                "description": "Detects the import of a alternate datastream to the registry with regedit.exe.; Author: Oddvar Moe, Sander Wiebing, oscd.community; Source URL: process_creation/proc_creation_win_regedit_import_keys_ads.yml; Status: test; False Positives: Unknown; References: https://lolbas-project.github.io/lolbas/Binaries/Regedit/, https://gist.github.com/api0cradle/cdd2d0d0ec9abb686f0e89306e277b8f",
+                "description": "Detects the import of a alternate datastream to the registry with regedit.exe.\n\nAuthor: Oddvar Moe, Sander Wiebing, oscd.community\n\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_regedit_import_keys_ads.yml\n\nStatus: test\n\nFalse Positives: Unknown\n\nReferences: https://lolbas-project.github.io/lolbas/Binaries/Regedit/, https://gist.github.com/api0cradle/cdd2d0d0ec9abb686f0e89306e277b8f",
                 "severity": "high",
                 "enabled": true,
-                "query": "_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\regedit.exe\" or TargetProcessFilename =~ \"REGEDIT.EXE\") and ((TargetProcessCommandLine contains \" /i \" or TargetProcessCommandLine contains \".reg\") and TargetProcessCommandLine matches regex \":[^ \\\\\\\\]\")) and (not (TargetProcessCommandLine contains \" /e \" or TargetProcessCommandLine contains \" /a \" or TargetProcessCommandLine contains \" /c \" or TargetProcessCommandLine contains \" -e \" or TargetProcessCommandLine contains \" -a \" or TargetProcessCommandLine contains \" -c \")))",
+                "query": "_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\regedit.exe\" or TargetProcessFilename =~ \"REGEDIT.EXE\") and ((TargetProcessCommandLine contains \" /i \" or TargetProcessCommandLine contains \".reg\") and TargetProcessCommandLine matches regex \":[^ \\\\\\\\]\")) and (not((TargetProcessCommandLine contains \" /e \" or TargetProcessCommandLine contains \" /a \" or TargetProcessCommandLine contains \" /c \" or TargetProcessCommandLine contains \" -e \" or TargetProcessCommandLine contains \" -a \" or TargetProcessCommandLine contains \" -c \"))))",
                 "queryFrequency": "P1D",
                 "queryPeriod": "P1D",
                 "triggerOperator": "GreaterThan",
@@ -62,6 +62,62 @@
                             {
                                 "identifier": "FullName",
                                 "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
                             }
                         ]
                     }

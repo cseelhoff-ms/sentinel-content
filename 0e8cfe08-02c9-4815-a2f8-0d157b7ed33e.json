@@ -15,7 +15,7 @@
             "apiVersion": "2022-11-01-preview",
             "properties": {
                 "displayName": "File Download with Headless Browser",
-                "description": "Detects execution of chromium based browser in headless mode using the \"dump-dom\" command line to download files; Author: Sreeman, Florian Roth (Nextron Systems); Source URL: process_creation/proc_creation_win_browsers_chromium_headless_file_download.yml; Status: test; False Positives: Unknown; References: https://twitter.com/mrd0x/status/1478234484881436672?s=12, https://www.trendmicro.com/en_us/research/23/e/managed-xdr-investigation-of-ducktail-in-trend-micro-vision-one.html",
+                "description": "Detects execution of chromium based browser in headless mode using the \"dump-dom\" command line to download files\n\nAuthor: Sreeman, Florian Roth (Nextron Systems)\n\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_browsers_chromium_headless_file_download.yml\n\nStatus: test\n\nFalse Positives: Unknown\n\nReferences: https://twitter.com/mrd0x/status/1478234484881436672?s=12, https://www.trendmicro.com/en_us/research/23/e/managed-xdr-investigation-of-ducktail-in-trend-micro-vision-one.html",
                 "severity": "high",
                 "enabled": true,
                 "query": "_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\brave.exe\" or TargetProcessName endswith \"\\\\chrome.exe\" or TargetProcessName endswith \"\\\\msedge.exe\" or TargetProcessName endswith \"\\\\opera.exe\" or TargetProcessName endswith \"\\\\vivaldi.exe\") and (TargetProcessCommandLine contains \"--headless\" and TargetProcessCommandLine contains \"dump-dom\" and TargetProcessCommandLine contains \"http\"))",
@@ -62,6 +62,62 @@
                             {
                                 "identifier": "FullName",
                                 "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
                             }
                         ]
                     }

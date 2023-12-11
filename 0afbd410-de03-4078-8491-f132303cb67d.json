@@ -15,10 +15,10 @@
             "apiVersion": "2022-11-01-preview",
             "properties": {
                 "displayName": "Renamed NetSupport RAT Execution",
-                "description": "Detects the execution of a renamed \"client32.exe\" (NetSupport RAT) via Imphash, Product and OriginalFileName strings; Author: Nasreddine Bencherchali (Nextron Systems); Source URL: process_creation/proc_creation_win_renamed_netsupport_rat.yml; Status: experimental; False Positives: Unknown; References: https://redcanary.com/blog/misbehaving-rats/",
+                "description": "Detects the execution of a renamed \"client32.exe\" (NetSupport RAT) via Imphash, Product and OriginalFileName strings\n\nAuthor: Nasreddine Bencherchali (Nextron Systems)\n\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_renamed_netsupport_rat.yml\n\nStatus: experimental\n\nFalse Positives: Unknown\n\nReferences: https://redcanary.com/blog/misbehaving-rats/",
                 "severity": "high",
                 "enabled": true,
-                "query": "_Im_ProcessCreate\n| where ((Product contains \"NetSupport Remote Control\" or TargetProcessFilename contains \"client32.exe\" or Imphash =~ \"a9d50692e95b79723f3e76fcf70d023e\" or Hashes contains \"IMPHASH=A9D50692E95B79723F3E76FCF70D023E\") and (not TargetProcessName endswith \"\\\\client32.exe\"))",
+                "query": "_Im_ProcessCreate\n| where ((TargetProcessFileProduct contains \"NetSupport Remote Control\" or TargetProcessFilename contains \"client32.exe\" or Imphash =~ \"a9d50692e95b79723f3e76fcf70d023e\" or Hashes contains \"IMPHASH=A9D50692E95B79723F3E76FCF70D023E\") and (not(TargetProcessName endswith \"\\\\client32.exe\")))",
                 "queryFrequency": "P1D",
                 "queryPeriod": "P1D",
                 "triggerOperator": "GreaterThan",
@@ -62,6 +62,62 @@
                             {
                                 "identifier": "FullName",
                                 "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
                             }
                         ]
                     }

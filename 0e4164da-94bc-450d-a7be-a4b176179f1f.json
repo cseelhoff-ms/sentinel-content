@@ -15,7 +15,7 @@
             "apiVersion": "2022-11-01-preview",
             "properties": {
                 "displayName": "Suspicious Firewall Configuration Discovery Via Netsh.EXE",
-                "description": "Adversaries may look for details about the network configuration and settings of systems they access or through information discovery of remote systems; Author: frack113, Christopher Peacock '@securepeacock', SCYTHE '@scythe_io'; Source URL: process_creation/proc_creation_win_netsh_fw_rules_discovery.yml; Status: experimental; False Positives: Administrative activity; References: https://github.com/redcanaryco/atomic-red-team/blob/f339e7da7d05f6057fdfcdd3742bfcf365fee2a9/atomics/T1016/T1016.md#atomic-test-2---list-windows-firewall-rules, https://ss64.com/nt/netsh.html",
+                "description": "Adversaries may look for details about the network configuration and settings of systems they access or through information discovery of remote systems\n\nAuthor: frack113, Christopher Peacock '@securepeacock', SCYTHE '@scythe_io'\n\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_netsh_fw_rules_discovery.yml\n\nStatus: experimental\n\nFalse Positives: Administrative activity\n\nReferences: https://github.com/redcanaryco/atomic-red-team/blob/f339e7da7d05f6057fdfcdd3742bfcf365fee2a9/atomics/T1016/T1016.md#atomic-test-2---list-windows-firewall-rules, https://ss64.com/nt/netsh.html",
                 "severity": "low",
                 "enabled": true,
                 "query": "_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\netsh.exe\" or TargetProcessFilename =~ \"netsh.exe\") and ((TargetProcessCommandLine contains \"netsh \" and TargetProcessCommandLine contains \"show \" and TargetProcessCommandLine contains \"firewall \") and (TargetProcessCommandLine contains \"config \" or TargetProcessCommandLine contains \"state \" or TargetProcessCommandLine contains \"rule \" or TargetProcessCommandLine contains \"name=all\")))",
@@ -62,6 +62,62 @@
                             {
                                 "identifier": "FullName",
                                 "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
                             }
                         ]
                     }

@@ -15,7 +15,7 @@
             "apiVersion": "2022-11-01-preview",
             "properties": {
                 "displayName": "Suspicious Download from Office Domain",
-                "description": "Detects suspicious ways to download files from Microsoft domains that are used to store attachments in Emails or OneNote documents; Author: Florian Roth (Nextron Systems), Nasreddine Bencherchali (Nextron Systems); Source URL: process_creation/proc_creation_win_susp_download_office_domain.yml; Status: test; False Positives: Scripts or tools that download attachments from these domains (OneNote, Outlook 365); References: https://twitter.com/an0n_r0/status/1474698356635193346?s=12, https://twitter.com/mrd0x/status/1475085452784844803?s=12",
+                "description": "Detects suspicious ways to download files from Microsoft domains that are used to store attachments in Emails or OneNote documents\n\nAuthor: Florian Roth (Nextron Systems), Nasreddine Bencherchali (Nextron Systems)\n\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_download_office_domain.yml\n\nStatus: test\n\nFalse Positives: Scripts or tools that download attachments from these domains (OneNote, Outlook 365)\n\nReferences: https://twitter.com/an0n_r0/status/1474698356635193346?s=12, https://twitter.com/mrd0x/status/1475085452784844803?s=12",
                 "severity": "high",
                 "enabled": true,
                 "query": "_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\curl.exe\" or TargetProcessName endswith \"\\\\wget.exe\") or (TargetProcessCommandLine contains \"Invoke-WebRequest\" or TargetProcessCommandLine contains \"iwr \" or TargetProcessCommandLine contains \"curl \" or TargetProcessCommandLine contains \"wget \" or TargetProcessCommandLine contains \"Start-BitsTransfer\" or TargetProcessCommandLine contains \".DownloadFile(\" or TargetProcessCommandLine contains \".DownloadString(\")) and (TargetProcessCommandLine contains \"https://attachment.outlook.live.net/owa/\" or TargetProcessCommandLine contains \"https://onenoteonlinesync.onenote.com/onenoteonlinesync/\"))",
@@ -26,8 +26,8 @@
                 "suppressionDuration": "PT1H",
                 "suppressionEnabled": false,
                 "startTimeUtc": null,
-                "tactics": ["ResourceDevelopment", "CommandAndControl"],
-                "techniques": ["T1105", "T1608"],
+                "tactics": ["CommandAndControl", "ResourceDevelopment"],
+                "techniques": ["T1608", "T1105"],
                 "alertRuleTemplateName": "00d49ed5-4491-4271-a8db-650a4ef6f8c1",
                 "incidentConfiguration": {
                     "createIncident": true,
@@ -62,6 +62,62 @@
                             {
                                 "identifier": "FullName",
                                 "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
                             }
                         ]
                     }

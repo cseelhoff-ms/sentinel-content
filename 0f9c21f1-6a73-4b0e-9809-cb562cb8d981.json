@@ -15,7 +15,7 @@
             "apiVersion": "2022-11-01-preview",
             "properties": {
                 "displayName": "Potential Privilege Escalation via Service Permissions Weakness",
-                "description": "Detect modification of services configuration (ImagePath, FailureCommand and ServiceDLL) in registry by processes with Medium integrity level; Author: Teymur Kheirkhabarov; Source URL: process_creation/proc_creation_win_registry_privilege_escalation_via_service_key.yml; Status: test; False Positives: Unknown; References: https://speakerdeck.com/heirhabarov/hunting-for-privilege-escalation-in-windows-environment, https://pentestlab.blog/2017/03/31/insecure-registry-permissions/",
+                "description": "Detect modification of services configuration (ImagePath, FailureCommand and ServiceDLL) in registry by processes with Medium integrity level\n\nAuthor: Teymur Kheirkhabarov\n\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_registry_privilege_escalation_via_service_key.yml\n\nStatus: test\n\nFalse Positives: Unknown\n\nReferences: https://speakerdeck.com/heirhabarov/hunting-for-privilege-escalation-in-windows-environment, https://pentestlab.blog/2017/03/31/insecure-registry-permissions/",
                 "severity": "high",
                 "enabled": true,
                 "query": "_Im_ProcessCreate\n| where (TargetProcessIntegrityLevel =~ \"Medium\" and (TargetProcessCommandLine contains \"ControlSet\" and TargetProcessCommandLine contains \"services\") and (TargetProcessCommandLine contains \"\\\\ImagePath\" or TargetProcessCommandLine contains \"\\\\FailureCommand\" or TargetProcessCommandLine contains \"\\\\ServiceDll\"))",
@@ -62,6 +62,62 @@
                             {
                                 "identifier": "FullName",
                                 "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
                             }
                         ]
                     }

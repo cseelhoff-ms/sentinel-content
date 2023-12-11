@@ -15,10 +15,10 @@
             "apiVersion": "2022-11-01-preview",
             "properties": {
                 "displayName": "PUA - Potential PE Metadata Tamper Using Rcedit",
-                "description": "Detects the use of rcedit to potentially alter executable PE metadata properties, which could conceal efforts to rename system utilities for defense evasion.; Author: Micah Babinski; Source URL: process_creation/proc_creation_win_pua_rcedit_execution.yml; Status: experimental; False Positives: Legitimate use of the tool by administrators or users to update metadata of a binary; References: https://security.stackexchange.com/questions/210843/is-it-possible-to-change-original-filename-of-an-exe, https://www.virustotal.com/gui/file/02e8e8c5d430d8b768980f517b62d7792d690982b9ba0f7e04163cbc1a6e7915, https://github.com/electron/rcedit",
+                "description": "Detects the use of rcedit to potentially alter executable PE metadata properties, which could conceal efforts to rename system utilities for defense evasion.\n\nAuthor: Micah Babinski\n\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_pua_rcedit_execution.yml\n\nStatus: experimental\n\nFalse Positives: Legitimate use of the tool by administrators or users to update metadata of a binary\n\nReferences: https://security.stackexchange.com/questions/210843/is-it-possible-to-change-original-filename-of-an-exe, https://www.virustotal.com/gui/file/02e8e8c5d430d8b768980f517b62d7792d690982b9ba0f7e04163cbc1a6e7915, https://github.com/electron/rcedit",
                 "severity": "medium",
                 "enabled": true,
-                "query": "_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\rcedit-x64.exe\" or TargetProcessName endswith \"\\\\rcedit-x86.exe\") or TargetProcessFileDescription =~ \"Edit resources of exe\" or Product =~ \"rcedit\") and TargetProcessCommandLine contains \"--set-\" and (TargetProcessCommandLine contains \"OriginalFileName\" or TargetProcessCommandLine contains \"CompanyName\" or TargetProcessCommandLine contains \"FileDescription\" or TargetProcessCommandLine contains \"ProductName\" or TargetProcessCommandLine contains \"ProductVersion\" or TargetProcessCommandLine contains \"LegalCopyright\"))",
+                "query": "_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\rcedit-x64.exe\" or TargetProcessName endswith \"\\\\rcedit-x86.exe\") or TargetProcessFileDescription =~ \"Edit resources of exe\" or TargetProcessFileProduct =~ \"rcedit\") and TargetProcessCommandLine contains \"--set-\" and (TargetProcessCommandLine contains \"OriginalFileName\" or TargetProcessCommandLine contains \"CompanyName\" or TargetProcessCommandLine contains \"FileDescription\" or TargetProcessCommandLine contains \"ProductName\" or TargetProcessCommandLine contains \"ProductVersion\" or TargetProcessCommandLine contains \"LegalCopyright\"))",
                 "queryFrequency": "P1D",
                 "queryPeriod": "P1D",
                 "triggerOperator": "GreaterThan",
@@ -62,6 +62,62 @@
                             {
                                 "identifier": "FullName",
                                 "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
                             }
                         ]
                     }
