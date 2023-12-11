@@ -27,7 +27,7 @@
                 "suppressionEnabled": false,
                 "startTimeUtc": null,
                 "tactics": ["Persistence", "PrivilegeEscalation"],
-                "techniques": ["T1037.001"],
+                "techniques": ["T1037"],
                 "alertRuleTemplateName": "0a98a10c-685d-4ab0-bddc-b6bdd1d48458",
                 "incidentConfiguration": {
                     "createIncident": true,
