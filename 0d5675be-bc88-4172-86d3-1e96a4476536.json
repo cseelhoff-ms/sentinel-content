@@ -26,8 +26,8 @@
                 "suppressionDuration": "PT1H",
                 "suppressionEnabled": false,
                 "startTimeUtc": null,
-                "tactics": ["defense_evasion", "lateral_movement", "t1021.001"],
-                "techniques": ["t1112"],
+                "tactics": ["DefenseEvasion", "LateralMovement"],
+                "techniques": ["T1021.001", "T1112"],
                 "alertRuleTemplateName": "0d5675be-bc88-4172-86d3-1e96a4476536",
                 "incidentConfiguration": {
                     "createIncident": true,

@@ -26,8 +26,8 @@
                 "suppressionDuration": "PT1H",
                 "suppressionEnabled": false,
                 "startTimeUtc": null,
-                "tactics": ["discovery"],
-                "techniques": ["t1016"],
+                "tactics": ["Discovery"],
+                "techniques": ["T1016"],
                 "alertRuleTemplateName": "0e4164da-94bc-450d-a7be-a4b176179f1f",
                 "incidentConfiguration": {
                     "createIncident": true,

@@ -26,8 +26,8 @@
                 "suppressionDuration": "PT1H",
                 "suppressionEnabled": false,
                 "startTimeUtc": null,
-                "tactics": ["execution"],
-                "techniques": ["t1047"],
+                "tactics": ["Execution"],
+                "techniques": ["T1047"],
                 "alertRuleTemplateName": "0b7163dc-7eee-4960-af17-c0cd517f92da",
                 "incidentConfiguration": {
                     "createIncident": true,
