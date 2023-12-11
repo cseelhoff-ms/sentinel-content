@@ -27,7 +27,7 @@
                 "suppressionEnabled": false,
                 "startTimeUtc": null,
                 "tactics": ["Execution"],
-                "techniques": ["T1059"],
+                "techniques": ["T1059.003"],
                 "alertRuleTemplateName": "0a99eb3e-1617-41bd-b095-13dc767f3def",
                 "incidentConfiguration": {
                     "createIncident": true,
