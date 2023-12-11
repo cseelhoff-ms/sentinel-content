@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/d38d2fa4-98e6-4a24-aff1-410b0c9ad177')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/d38d2fa4-98e6-4a24-aff1-410b0c9ad177')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "HackTool - UACMe Akagi Execution",
+                "description": "Detects the execution of UACMe, a tool used for UAC bypasses, via default PE metadata\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_hktl_uacme.yml\nAuthor: Christian Burkard (Nextron Systems), Florian Roth (Nextron Systems)\nDate Modified: 2022-11-19\nStatus: test\nReferences: https://github.com/hfiref0x/UACME\nFalse Positives: Unknown",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where ((TargetProcessFileProduct =~ \"UACMe\" or (Company =~ \"REvol Corp\" or Company =~ \"APT 92\" or Company =~ \"UG North\" or Company =~ \"Hazardous Environments\" or Company =~ \"CD Project Rekt\") or (TargetProcessFileDescription =~ \"UACMe main module\" or TargetProcessFileDescription =~ \"Pentesting utility\") or (TargetProcessFilename =~ \"Akagi.exe\" or TargetProcessFilename =~ \"Akagi64.exe\")) or (TargetProcessName endswith \"\\\\Akagi64.exe\" or TargetProcessName endswith \"\\\\Akagi.exe\") or (Hashes contains \"IMPHASH=767637C23BB42CD5D7397CF58B0BE688\" or Hashes contains \"IMPHASH=14C4E4C72BA075E9069EE67F39188AD8\" or Hashes contains \"IMPHASH=3C782813D4AFCE07BBFC5A9772ACDBDC\" or Hashes contains \"IMPHASH=7D010C6BB6A3726F327F7E239166D127\" or Hashes contains \"IMPHASH=89159BA4DD04E4CE5559F132A9964EB3\" or Hashes contains \"IMPHASH=6F33F4A5FC42B8CEC7314947BD13F30F\" or Hashes contains \"IMPHASH=5834ED4291BDEB928270428EBBAF7604\" or Hashes contains \"IMPHASH=5A8A8A43F25485E7EE1B201EDCBC7A38\" or Hashes contains \"IMPHASH=DC7D30B90B2D8ABF664FBED2B1B59894\" or Hashes contains \"IMPHASH=41923EA1F824FE63EA5BEB84DB7A3E74\" or Hashes contains \"IMPHASH=3DE09703C8E79ED2CA3F01074719906B\") or (TargetProcessIMPHASH =~ \"767637c23bb42cd5d7397cf58b0be688\" or TargetProcessIMPHASH =~ \"14c4e4c72ba075e9069ee67f39188ad8\" or TargetProcessIMPHASH =~ \"3c782813d4afce07bbfc5a9772acdbdc\" or TargetProcessIMPHASH =~ \"7d010c6bb6a3726f327f7e239166d127\" or TargetProcessIMPHASH =~ \"89159ba4dd04e4ce5559f132a9964eb3\" or TargetProcessIMPHASH =~ \"6f33f4a5fc42b8cec7314947bd13f30f\" or TargetProcessIMPHASH =~ \"5834ed4291bdeb928270428ebbaf7604\" or TargetProcessIMPHASH =~ \"5a8a8a43f25485e7ee1b201edcbc7a38\" or TargetProcessIMPHASH =~ \"dc7d30b90b2d8abf664fbed2b1b59894\" or TargetProcessIMPHASH =~ \"41923ea1f824fe63ea5beb84db7a3e74\" or TargetProcessIMPHASH =~ \"3de09703c8e79ed2ca3f01074719906b\"))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion", "PrivilegeEscalation"],
+                "techniques": ["T1548"],
+                "alertRuleTemplateName": "d38d2fa4-98e6-4a24-aff1-410b0c9ad177",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

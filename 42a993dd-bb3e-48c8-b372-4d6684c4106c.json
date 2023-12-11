@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/42a993dd-bb3e-48c8-b372-4d6684c4106c')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/42a993dd-bb3e-48c8-b372-4d6684c4106c')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "HackTool - CrackMapExec Execution",
+                "description": "This rule detect common flag combinations used by CrackMapExec in order to detect its use even if the binary has been replaced.\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_hktl_crackmapexec_execution.yml\nAuthor: Florian Roth (Nextron Systems)\nDate Modified: 2023-03-08\nStatus: test\nReferences: https://mpgn.gitbook.io/crackmapexec/smb-protocol/authentication/checking-credentials-local, https://www.mandiant.com/resources/telegram-malware-iranian-espionage, https://www.infosecmatter.com/crackmapexec-module-library/?cmem=mssql-mimikatz, https://www.infosecmatter.com/crackmapexec-module-library/?cmem=smb-pe_inject\nFalse Positives: Unknown",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\crackmapexec.exe\" or TargetProcessCommandLine contains \" -M pe_inject \" or (TargetProcessCommandLine contains \" --local-auth\" and TargetProcessCommandLine contains \" -u \" and TargetProcessCommandLine contains \" -x \") or (TargetProcessCommandLine contains \" --local-auth\" and TargetProcessCommandLine contains \" -u \" and TargetProcessCommandLine contains \" -p \" and TargetProcessCommandLine contains \" -H 'NTHASH'\") or (TargetProcessCommandLine contains \" mssql \" and TargetProcessCommandLine contains \" -u \" and TargetProcessCommandLine contains \" -p \" and TargetProcessCommandLine contains \" -M \" and TargetProcessCommandLine contains \" -d \") or (TargetProcessCommandLine contains \" smb \" and TargetProcessCommandLine contains \" -u \" and TargetProcessCommandLine contains \" -H \" and TargetProcessCommandLine contains \" -M \" and TargetProcessCommandLine contains \" -o \") or (TargetProcessCommandLine contains \" smb \" and TargetProcessCommandLine contains \" -u \" and TargetProcessCommandLine contains \" -p \" and TargetProcessCommandLine contains \" --local-auth\")) or ((TargetProcessCommandLine contains \" --local-auth\" and TargetProcessCommandLine contains \" -u \" and TargetProcessCommandLine contains \" -p \") and (TargetProcessCommandLine contains \" 10.\" and TargetProcessCommandLine contains \" 192.168.\" and TargetProcessCommandLine contains \"/24 \")))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["Persistence", "CredentialAccess", "Execution", "Discovery", "PrivilegeEscalation"],
+                "techniques": ["T1201", "T1059", "T1047", "T1053", "T1110"],
+                "alertRuleTemplateName": "42a993dd-bb3e-48c8-b372-4d6684c4106c",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

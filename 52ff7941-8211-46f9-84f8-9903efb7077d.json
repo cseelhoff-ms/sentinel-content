@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/52ff7941-8211-46f9-84f8-9903efb7077d')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/52ff7941-8211-46f9-84f8-9903efb7077d')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "HackTool - PPID Spoofing SelectMyParent Tool Execution",
+                "description": "Detects the use of parent process ID spoofing tools like Didier Stevens tool SelectMyParent\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_hktl_selectmyparent.yml\nAuthor: Florian Roth (Nextron Systems)\nDate Modified: 2023-03-07\nStatus: test\nReferences: https://pentestlab.blog/2020/02/24/parent-pid-spoofing/, https://www.picussecurity.com/resource/blog/how-to-detect-parent-pid-ppid-spoofing-attacks, https://www.ired.team/offensive-security/defense-evasion/parent-process-id-ppid-spoofing, https://www.virustotal.com/gui/search/filename%253A*spoof*%2520filename%253A*ppid*/files\nFalse Positives: Unlikely",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\SelectMyParent.exe\" or (TargetProcessCommandLine contains \"PPID-spoof\" or TargetProcessCommandLine contains \"ppid_spoof\" or TargetProcessCommandLine contains \"spoof-ppid\" or TargetProcessCommandLine contains \"spoof_ppid\" or TargetProcessCommandLine contains \"ppidspoof\" or TargetProcessCommandLine contains \"spoofppid\" or TargetProcessCommandLine contains \"spoofedppid\" or TargetProcessCommandLine contains \" -spawnto \") or (TargetProcessFilename contains \"PPID-spoof\" or TargetProcessFilename contains \"ppid_spoof\" or TargetProcessFilename contains \"spoof-ppid\" or TargetProcessFilename contains \"spoof_ppid\" or TargetProcessFilename contains \"ppidspoof\" or TargetProcessFilename contains \"spoofppid\" or TargetProcessFilename contains \"spoofedppid\") or TargetProcessFileDescription =~ \"SelectMyParent\" or (TargetProcessIMPHASH =~ \"04d974875bd225f00902b4cad9af3fbc\" or TargetProcessIMPHASH =~ \"a782af154c9e743ddf3f3eb2b8f3d16e\" or TargetProcessIMPHASH =~ \"89059503d7fbf470e68f7e63313da3ad\" or TargetProcessIMPHASH =~ \"ca28337632625c8281ab8a130b3d6bad\") or (Hashes contains \"IMPHASH=04D974875BD225F00902B4CAD9AF3FBC\" or Hashes contains \"IMPHASH=A782AF154C9E743DDF3F3EB2B8F3D16E\" or Hashes contains \"IMPHASH=89059503D7FBF470E68F7E63313DA3AD\" or Hashes contains \"IMPHASH=CA28337632625C8281AB8A130B3D6BAD\"))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion"],
+                "techniques": ["T1134"],
+                "alertRuleTemplateName": "52ff7941-8211-46f9-84f8-9903efb7077d",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

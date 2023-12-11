@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/754ed792-634f-40ae-b3bc-e0448d33f695')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/754ed792-634f-40ae-b3bc-e0448d33f695')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Suspicious PowerShell Parent Process",
+                "description": "Detects a suspicious or uncommon parent processes of PowerShell\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_susp_parent_process.yml\nAuthor: Teymur Kheirkhabarov, Harish Segar\nDate Modified: 2023-02-04\nStatus: test\nReferences: https://speakerdeck.com/heirhabarov/hunting-for-powershell-abuse?slide=26\nFalse Positives: Other scripts",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where ((ActingProcessName contains \"tomcat\" or (ActingProcessName endswith \"\\\\amigo.exe\" or ActingProcessName endswith \"\\\\browser.exe\" or ActingProcessName endswith \"\\\\chrome.exe\" or ActingProcessName endswith \"\\\\firefox.exe\" or ActingProcessName endswith \"\\\\httpd.exe\" or ActingProcessName endswith \"\\\\iexplore.exe\" or ActingProcessName endswith \"\\\\jbosssvc.exe\" or ActingProcessName endswith \"\\\\microsoftedge.exe\" or ActingProcessName endswith \"\\\\microsoftedgecp.exe\" or ActingProcessName endswith \"\\\\MicrosoftEdgeSH.exe\" or ActingProcessName endswith \"\\\\mshta.exe\" or ActingProcessName endswith \"\\\\nginx.exe\" or ActingProcessName endswith \"\\\\outlook.exe\" or ActingProcessName endswith \"\\\\php-cgi.exe\" or ActingProcessName endswith \"\\\\regsvr32.exe\" or ActingProcessName endswith \"\\\\rundll32.exe\" or ActingProcessName endswith \"\\\\safari.exe\" or ActingProcessName endswith \"\\\\services.exe\" or ActingProcessName endswith \"\\\\sqlagent.exe\" or ActingProcessName endswith \"\\\\sqlserver.exe\" or ActingProcessName endswith \"\\\\sqlservr.exe\" or ActingProcessName endswith \"\\\\vivaldi.exe\" or ActingProcessName endswith \"\\\\w3wp.exe\")) and ((TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\") or (TargetProcessCommandLine contains \"/c powershell\" or TargetProcessCommandLine contains \"/c pwsh\") or TargetProcessFileDescription =~ \"Windows PowerShell\" or TargetProcessFileProduct =~ \"PowerShell Core 6\" or (TargetProcessFilename =~ \"PowerShell.EXE\" or TargetProcessFilename =~ \"pwsh.dll\")))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["Execution"],
+                "techniques": ["T1059"],
+                "alertRuleTemplateName": "754ed792-634f-40ae-b3bc-e0448d33f695",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/bed2a484-9348-4143-8a8a-b801c979301c')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/bed2a484-9348-4143-8a8a-b801c979301c')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Webshell Detection With Command Line Keywords",
+                "description": "Detects certain command line parameters often used during reconnaissance activity via web shells\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_webshell_detection.yml\nAuthor: Florian Roth (Nextron Systems), Jonhnathan Ribeiro, Anton Kutepov, oscd.community\nDate Modified: 2022-05-13\nStatus: test\nReferences: https://www.fireeye.com/blog/threat-research/2013/08/breaking-down-the-china-chopper-web-shell-part-ii.html, https://unit42.paloaltonetworks.com/bumblebee-webshell-xhunt-campaign/\nFalse Positives: Unknown",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where (((ActingProcessName endswith \"\\\\w3wp.exe\" or ActingProcessName endswith \"\\\\php-cgi.exe\" or ActingProcessName endswith \"\\\\nginx.exe\" or ActingProcessName endswith \"\\\\httpd.exe\" or ActingProcessName endswith \"\\\\caddy.exe\" or ActingProcessName endswith \"\\\\ws_tomcatservice.exe\") or ((ActingProcessName endswith \"\\\\java.exe\" or ActingProcessName endswith \"\\\\javaw.exe\") and (ActingProcessName contains \"-tomcat-\" or ActingProcessName contains \"\\\\tomcat\")) or ((ActingProcessName endswith \"\\\\java.exe\" or ActingProcessName endswith \"\\\\javaw.exe\") and (TargetProcessCommandLine contains \"catalina.jar\" or TargetProcessCommandLine contains \"CATALINA_HOME\"))) and (((TargetProcessFilename =~ \"net.exe\" or TargetProcessFilename =~ \"net1.exe\") and (TargetProcessCommandLine contains \" user \" or TargetProcessCommandLine contains \" use \" or TargetProcessCommandLine contains \" group \")) or (TargetProcessFilename =~ \"ping.exe\" and TargetProcessCommandLine contains \" -n \") or (TargetProcessCommandLine contains \"&cd&echo\" or TargetProcessCommandLine contains \"cd /d \") or (TargetProcessFilename =~ \"wmic.exe\" and TargetProcessCommandLine contains \" /node:\") or ((TargetProcessName endswith \"\\\\whoami.exe\" or TargetProcessName endswith \"\\\\systeminfo.exe\" or TargetProcessName endswith \"\\\\quser.exe\" or TargetProcessName endswith \"\\\\ipconfig.exe\" or TargetProcessName endswith \"\\\\pathping.exe\" or TargetProcessName endswith \"\\\\tracert.exe\" or TargetProcessName endswith \"\\\\netstat.exe\" or TargetProcessName endswith \"\\\\schtasks.exe\" or TargetProcessName endswith \"\\\\vssadmin.exe\" or TargetProcessName endswith \"\\\\wevtutil.exe\" or TargetProcessName endswith \"\\\\tasklist.exe\") or (TargetProcessFilename =~ \"whoami.exe\" or TargetProcessFilename =~ \"sysinfo.exe\" or TargetProcessFilename =~ \"quser.exe\" or TargetProcessFilename =~ \"ipconfig.exe\" or TargetProcessFilename =~ \"pathping.exe\" or TargetProcessFilename =~ \"tracert.exe\" or TargetProcessFilename =~ \"netstat.exe\" or TargetProcessFilename =~ \"schtasks.exe\" or TargetProcessFilename =~ \"VSSADMIN.EXE\" or TargetProcessFilename =~ \"wevtutil.exe\" or TargetProcessFilename =~ \"tasklist.exe\")) or (TargetProcessCommandLine contains \" Test-NetConnection \" or TargetProcessCommandLine contains \"dir \\\\\")))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["Persistence", "Discovery"],
+                "techniques": ["T1033", "T1087", "T1505", "T1018"],
+                "alertRuleTemplateName": "bed2a484-9348-4143-8a8a-b801c979301c",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

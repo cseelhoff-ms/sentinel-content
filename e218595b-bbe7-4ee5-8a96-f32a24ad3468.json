@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/e218595b-bbe7-4ee5-8a96-f32a24ad3468')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/e218595b-bbe7-4ee5-8a96-f32a24ad3468')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Suspicious Curl.EXE Download",
+                "description": "Detects a suspicious curl process start on Windows and outputs the requested document to a local file\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_curl_susp_download.yml\nAuthor: Florian Roth (Nextron Systems), Nasreddine Bencherchali (Nextron Systems)\nDate Modified: 2023-02-21\nStatus: experimental\nReferences: https://twitter.com/max_mal_/status/1542461200797163522, https://web.archive.org/web/20200128160046/https://twitter.com/reegun21/status/1222093798009790464, https://github.com/pr0xylife/Qakbot/blob/4f0795d79dabee5bc9dd69f17a626b48852e7869/Qakbot_AA_23.06.2022.txt, https://www.volexity.com/blog/2022/07/28/sharptongue-deploys-clever-mail-stealing-browser-extension-sharpext/, https://github.com/redcanaryco/atomic-red-team/blob/0f229c0e42bfe7ca736a14023836d65baa941ed2/atomics/T1105/T1105.md#atomic-test-18---curl-download-file\nFalse Positives: Unknown",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\curl.exe\" or TargetProcessFileProduct =~ \"The curl executable\") and ((TargetProcessCommandLine contains \"%AppData%\" or TargetProcessCommandLine contains \"%Public%\" or TargetProcessCommandLine contains \"%Temp%\" or TargetProcessCommandLine contains \"%tmp%\" or TargetProcessCommandLine contains \"\\\\AppData\\\\\" or TargetProcessCommandLine contains \"\\\\Desktop\\\\\" or TargetProcessCommandLine contains \"\\\\Temp\\\\\" or TargetProcessCommandLine contains \"\\\\Users\\\\Public\\\\\" or TargetProcessCommandLine contains \"C:\\\\PerfLogs\\\\\" or TargetProcessCommandLine contains \"C:\\\\ProgramData\\\\\" or TargetProcessCommandLine contains \"C:\\\\Windows\\\\Temp\\\\\") or (TargetProcessCommandLine endswith \".dll\" or TargetProcessCommandLine endswith \".gif\" or TargetProcessCommandLine endswith \".jpeg\" or TargetProcessCommandLine endswith \".jpg\" or TargetProcessCommandLine endswith \".png\" or TargetProcessCommandLine endswith \".temp\" or TargetProcessCommandLine endswith \".tmp\" or TargetProcessCommandLine endswith \".txt\" or TargetProcessCommandLine endswith \".vbe\" or TargetProcessCommandLine endswith \".vbs\")) and (not((ActingProcessName =~ \"C:\\\\Program Files\\\\Git\\\\usr\\\\bin\\\\sh.exe\" and TargetProcessName =~ \"C:\\\\Program Files\\\\Git\\\\mingw64\\\\bin\\\\curl.exe\" and (TargetProcessCommandLine contains \"--silent --show-error --output \" and TargetProcessCommandLine contains \"gfw-httpget-\" and TargetProcessCommandLine contains \"AppData\")))))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["CommandAndControl"],
+                "techniques": ["T1105"],
+                "alertRuleTemplateName": "e218595b-bbe7-4ee5-8a96-f32a24ad3468",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

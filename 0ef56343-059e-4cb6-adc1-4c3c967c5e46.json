@@ -15,7 +15,7 @@
             "apiVersion": "2022-11-01-preview",
             "properties": {
                 "displayName": "Suspicious Execution of Systeminfo",
-                "description": "Detects usage of the \"systeminfo\" command to retrieve information\n\nAuthor: frack113\n\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_systeminfo_execution.yml\n\nStatus: test\n\nFalse Positives: Unknown\n\nReferences: https://github.com/redcanaryco/atomic-red-team/blob/f339e7da7d05f6057fdfcdd3742bfcf365fee2a9/atomics/T1082/T1082.md#atomic-test-1---system-information-discovery, https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/systeminfo",
+                "description": "Detects usage of the \"systeminfo\" command to retrieve information\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_systeminfo_execution.yml\nAuthor: frack113\nDate Modified: 2022-07-14\nStatus: test\nReferences: https://github.com/redcanaryco/atomic-red-team/blob/f339e7da7d05f6057fdfcdd3742bfcf365fee2a9/atomics/T1082/T1082.md#atomic-test-1---system-information-discovery, https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/systeminfo\nFalse Positives: Unknown",
                 "severity": "low",
                 "enabled": true,
                 "query": "_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\systeminfo.exe\" or TargetProcessFilename =~ \"sysinfo.exe\")",

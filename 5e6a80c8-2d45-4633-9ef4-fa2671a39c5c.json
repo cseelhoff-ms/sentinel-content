@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5e6a80c8-2d45-4633-9ef4-fa2671a39c5c')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5e6a80c8-2d45-4633-9ef4-fa2671a39c5c')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Suspicious Parent Double Extension File Execution",
+                "description": "Detect execution of suspicious double extension files in ParentCommandLine\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_double_extension_parent.yml\nAuthor: frack113, Nasreddine Bencherchali (Nextron Systems)\nDate Modified: 2023-02-28\nStatus: experimental\nReferences: https://www.virustotal.com/gui/file/7872d8845a332dce517adae9c3389fde5313ff2fed38c2577f3b498da786db68/behavior, https://symantec-enterprise-blogs.security.com/blogs/threat-intelligence/bluebottle-banks-targeted-africa\nFalse Positives: Unknown",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where ((ActingProcessName endswith \".doc.lnk\" or ActingProcessName endswith \".docx.lnk\" or ActingProcessName endswith \".xls.lnk\" or ActingProcessName endswith \".xlsx.lnk\" or ActingProcessName endswith \".ppt.lnk\" or ActingProcessName endswith \".pptx.lnk\" or ActingProcessName endswith \".rtf.lnk\" or ActingProcessName endswith \".pdf.lnk\" or ActingProcessName endswith \".txt.lnk\" or ActingProcessName endswith \".doc.js\" or ActingProcessName endswith \".docx.js\" or ActingProcessName endswith \".xls.js\" or ActingProcessName endswith \".xlsx.js\" or ActingProcessName endswith \".ppt.js\" or ActingProcessName endswith \".pptx.js\" or ActingProcessName endswith \".rtf.js\" or ActingProcessName endswith \".pdf.js\" or ActingProcessName endswith \".txt.js\") or (ActingProcessCommandLine contains \".doc.lnk\" or ActingProcessCommandLine contains \".docx.lnk\" or ActingProcessCommandLine contains \".xls.lnk\" or ActingProcessCommandLine contains \".xlsx.lnk\" or ActingProcessCommandLine contains \".ppt.lnk\" or ActingProcessCommandLine contains \".pptx.lnk\" or ActingProcessCommandLine contains \".rtf.lnk\" or ActingProcessCommandLine contains \".pdf.lnk\" or ActingProcessCommandLine contains \".txt.lnk\" or ActingProcessCommandLine contains \".doc.js\" or ActingProcessCommandLine contains \".docx.js\" or ActingProcessCommandLine contains \".xls.js\" or ActingProcessCommandLine contains \".xlsx.js\" or ActingProcessCommandLine contains \".ppt.js\" or ActingProcessCommandLine contains \".pptx.js\" or ActingProcessCommandLine contains \".rtf.js\" or ActingProcessCommandLine contains \".pdf.js\" or ActingProcessCommandLine contains \".txt.js\"))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion"],
+                "techniques": ["T1036"],
+                "alertRuleTemplateName": "5e6a80c8-2d45-4633-9ef4-fa2671a39c5c",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/c6fb44c6-71f5-49e6-9462-1425d328aee3')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/c6fb44c6-71f5-49e6-9462-1425d328aee3')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Powershell Base64 Encoded MpPreference Cmdlet",
+                "description": "Detects base64 encoded \"MpPreference\" PowerShell cmdlet code that tries to modifies or tamper with Windows Defender AV\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_base64_mppreference.yml\nAuthor: Florian Roth (Nextron Systems)\nDate Modified: 2023-01-30\nStatus: experimental\nReferences: https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/configure-process-opened-file-exclusions-microsoft-defender-antivirus, https://github.com/redcanaryco/atomic-red-team/blob/f339e7da7d05f6057fdfcdd3742bfcf365fee2a9/atomics/T1562.001/T1562.001.md, https://twitter.com/AdamTheAnalyst/status/1483497517119590403\nFalse Positives: Unknown",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where TargetProcessCommandLine contains \"QWRkLU1wUHJlZmVyZW5jZS\"\n| where TargetProcessCommandLine contains \"FkZC1NcFByZWZlcmVuY2Ug\"\n| where TargetProcessCommandLine contains \"BZGQtTXBQcmVmZXJlbmNlI\"\n| where TargetProcessCommandLine contains \"U2V0LU1wUHJlZmVyZW5jZS\"\n| where TargetProcessCommandLine contains \"NldC1NcFByZWZlcmVuY2Ug\"\n| where TargetProcessCommandLine contains \"TZXQtTXBQcmVmZXJlbmNlI\"\n| where TargetProcessCommandLine contains \"YWRkLW1wcHJlZmVyZW5jZS\"\n| where TargetProcessCommandLine contains \"FkZC1tcHByZWZlcmVuY2Ug\"\n| where TargetProcessCommandLine contains \"hZGQtbXBwcmVmZXJlbmNlI\"\n| where TargetProcessCommandLine contains \"c2V0LW1wcHJlZmVyZW5jZS\"\n| where TargetProcessCommandLine contains \"NldC1tcHByZWZlcmVuY2Ug\"\n| where TargetProcessCommandLine contains \"zZXQtbXBwcmVmZXJlbmNlI\"\n| where (( or  or  or ) or (TargetProcessCommandLine contains \"QQBkAGQALQBNAHAAUAByAGUAZgBlAHIAZQBuAGMAZQAgA\" or TargetProcessCommandLine contains \"EAZABkAC0ATQBwAFAAcgBlAGYAZQByAGUAbgBjAGUAIA\" or TargetProcessCommandLine contains \"BAGQAZAAtAE0AcABQAHIAZQBmAGUAcgBlAG4AYwBlACAA\" or TargetProcessCommandLine contains \"UwBlAHQALQBNAHAAUAByAGUAZgBlAHIAZQBuAGMAZQAgA\" or TargetProcessCommandLine contains \"MAZQB0AC0ATQBwAFAAcgBlAGYAZQByAGUAbgBjAGUAIA\" or TargetProcessCommandLine contains \"TAGUAdAAtAE0AcABQAHIAZQBmAGUAcgBlAG4AYwBlACAA\" or TargetProcessCommandLine contains \"YQBkAGQALQBtAHAAcAByAGUAZgBlAHIAZQBuAGMAZQAgA\" or TargetProcessCommandLine contains \"EAZABkAC0AbQBwAHAAcgBlAGYAZQByAGUAbgBjAGUAIA\" or TargetProcessCommandLine contains \"hAGQAZAAtAG0AcABwAHIAZQBmAGUAcgBlAG4AYwBlACAA\" or TargetProcessCommandLine contains \"cwBlAHQALQBtAHAAcAByAGUAZgBlAHIAZQBuAGMAZQAgA\" or TargetProcessCommandLine contains \"MAZQB0AC0AbQBwAHAAcgBlAGYAZQByAGUAbgBjAGUAIA\" or TargetProcessCommandLine contains \"zAGUAdAAtAG0AcABwAHIAZQBmAGUAcgBlAG4AYwBlACAA\"))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion"],
+                "techniques": ["T1562"],
+                "alertRuleTemplateName": "c6fb44c6-71f5-49e6-9462-1425d328aee3",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

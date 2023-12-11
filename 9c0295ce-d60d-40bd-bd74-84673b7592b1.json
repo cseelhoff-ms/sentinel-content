@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/9c0295ce-d60d-40bd-bd74-84673b7592b1')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/9c0295ce-d60d-40bd-bd74-84673b7592b1')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Suspicious Encoded And Obfuscated Reflection Assembly Load Function Call",
+                "description": "Detects suspicious base64 encoded and obfuscated \"LOAD\" keyword used in .NET \"reflection.assembly\"\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_base64_reflection_assembly_load_obfusc.yml\nAuthor: pH-T (Nextron Systems)\nDate Modified: 2023-04-06\nStatus: test\nReferences: https://github.com/Neo23x0/Raccine/blob/20a569fa21625086433dcce8bb2765d0ea08dcb6/yara/mal_revil.yar, https://thedfirreport.com/2022/05/09/seo-poisoning-a-gootloader-story/, https://learn.microsoft.com/en-us/dotnet/api/system.appdomain.load?view=net-7.0\nFalse Positives: Unlikely",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"OgA6ACgAIgBMACIAKwAiAG8AYQBkACIAKQ\" or TargetProcessCommandLine contains \"oAOgAoACIATAAiACsAIgBvAGEAZAAiACkA\" or TargetProcessCommandLine contains \"6ADoAKAAiAEwAIgArACIAbwBhAGQAIgApA\" or TargetProcessCommandLine contains \"OgA6ACgAIgBMAG8AIgArACIAYQBkACIAKQ\" or TargetProcessCommandLine contains \"oAOgAoACIATABvACIAKwAiAGEAZAAiACkA\" or TargetProcessCommandLine contains \"6ADoAKAAiAEwAbwAiACsAIgBhAGQAIgApA\" or TargetProcessCommandLine contains \"OgA6ACgAIgBMAG8AYQAiACsAIgBkACIAKQ\" or TargetProcessCommandLine contains \"oAOgAoACIATABvAGEAIgArACIAZAAiACkA\" or TargetProcessCommandLine contains \"6ADoAKAAiAEwAbwBhACIAKwAiAGQAIgApA\" or TargetProcessCommandLine contains \"OgA6ACgAJwBMACcAKwAnAG8AYQBkACcAKQ\" or TargetProcessCommandLine contains \"oAOgAoACcATAAnACsAJwBvAGEAZAAnACkA\" or TargetProcessCommandLine contains \"6ADoAKAAnAEwAJwArACcAbwBhAGQAJwApA\" or TargetProcessCommandLine contains \"OgA6ACgAJwBMAG8AJwArACcAYQBkACcAKQ\" or TargetProcessCommandLine contains \"oAOgAoACcATABvACcAKwAnAGEAZAAnACkA\" or TargetProcessCommandLine contains \"6ADoAKAAnAEwAbwAnACsAJwBhAGQAJwApA\" or TargetProcessCommandLine contains \"OgA6ACgAJwBMAG8AYQAnACsAJwBkACcAKQ\" or TargetProcessCommandLine contains \"oAOgAoACcATABvAGEAJwArACcAZAAnACkA\" or TargetProcessCommandLine contains \"6ADoAKAAnAEwAbwBhACcAKwAnAGQAJwApA\")",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion", "Execution"],
+                "techniques": ["T1059", "T1027"],
+                "alertRuleTemplateName": "9c0295ce-d60d-40bd-bd74-84673b7592b1",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

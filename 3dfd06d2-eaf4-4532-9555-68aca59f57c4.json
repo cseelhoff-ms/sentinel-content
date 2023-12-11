@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/3dfd06d2-eaf4-4532-9555-68aca59f57c4')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/3dfd06d2-eaf4-4532-9555-68aca59f57c4')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Execution from Suspicious Folder",
+                "description": "Detects a suspicious execution from an uncommon folder\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_execution_path.yml\nAuthor: Florian Roth (Nextron Systems), Tim Shelton\nDate Modified: 2023-01-10\nStatus: experimental\nReferences: https://github.com/mbevilacqua/appcompatprocessor/blob/6c847937c5a836e2ce2fe2b915f213c345a3c389/AppCompatSearch.txt, https://www.secureworks.com/research/bronze-butler-targets-japanese-businesses, https://www.crowdstrike.com/resources/reports/2019-crowdstrike-global-threat-report/, https://github.com/ThreatHuntingProject/ThreatHunting/blob/cb22598bb70651f88e0285abc8d835757d2cb596/hunts/suspicious_process_creation_via_windows_event_logs.md\nFalse Positives: Unknown",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where (((TargetProcessName contains \"\\\\$Recycle.bin\\\\\" or TargetProcessName contains \"\\\\config\\\\systemprofile\\\\\" or TargetProcessName contains \"\\\\Intel\\\\Logs\\\\\" or TargetProcessName contains \"\\\\RSA\\\\MachineKeys\\\\\" or TargetProcessName contains \"\\\\Users\\\\All Users\\\\\" or TargetProcessName contains \"\\\\Users\\\\Default\\\\\" or TargetProcessName contains \"\\\\Users\\\\NetworkService\\\\\" or TargetProcessName contains \"\\\\Users\\\\Public\\\\\" or TargetProcessName contains \"\\\\Windows\\\\addins\\\\\" or TargetProcessName contains \"\\\\Windows\\\\debug\\\\\" or TargetProcessName contains \"\\\\Windows\\\\Fonts\\\\\" or TargetProcessName contains \"\\\\Windows\\\\Help\\\\\" or TargetProcessName contains \"\\\\Windows\\\\IME\\\\\" or TargetProcessName contains \"\\\\Windows\\\\Media\\\\\" or TargetProcessName contains \"\\\\Windows\\\\repair\\\\\" or TargetProcessName contains \"\\\\Windows\\\\security\\\\\" or TargetProcessName contains \"\\\\Windows\\\\System32\\\\Tasks\\\\\" or TargetProcessName contains \"\\\\Windows\\\\Tasks\\\\\") or TargetProcessName startswith \"C:\\\\Perflogs\\\\\") and (not((TargetProcessName startswith \"C:\\\\Users\\\\Public\\\\IBM\\\\ClientSolutions\\\\Start_Programs\\\\\" or (TargetProcessName startswith \"C:\\\\Windows\\\\SysWOW64\\\\config\\\\systemprofile\\\\Citrix\\\\UpdaterBinaries\\\\\" and TargetProcessName endswith \"\\\\CitrixReceiverUpdater.exe\")))))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion"],
+                "techniques": ["T1036"],
+                "alertRuleTemplateName": "3dfd06d2-eaf4-4532-9555-68aca59f57c4",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/4b991083-3d0e-44ce-8fc4-b254025d8d4b')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/4b991083-3d0e-44ce-8fc4-b254025d8d4b')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Unusual Parent Process For Cmd.EXE",
+                "description": "Detects suspicious parent process for cmd.exe\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_cmd_unusual_parent.yml\nAuthor: Tim Rauch\nDate Modified: 2023-03-07\nStatus: experimental\nReferences: https://www.elastic.co/guide/en/security/current/unusual-parent-process-for-cmd.exe.html\nFalse Positives: Unknown",
+                "severity": "medium",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\cmd.exe\" and (ActingProcessName endswith \"\\\\csrss.exe\" or ActingProcessName endswith \"\\\\ctfmon.exe\" or ActingProcessName endswith \"\\\\dllhost.exe\" or ActingProcessName endswith \"\\\\epad.exe\" or ActingProcessName endswith \"\\\\FlashPlayerUpdateService.exe\" or ActingProcessName endswith \"\\\\GoogleUpdate.exe\" or ActingProcessName endswith \"\\\\jucheck.exe\" or ActingProcessName endswith \"\\\\jusched.exe\" or ActingProcessName endswith \"\\\\LogonUI.exe\" or ActingProcessName endswith \"\\\\lsass.exe\" or ActingProcessName endswith \"\\\\regsvr32.exe\" or ActingProcessName endswith \"\\\\SearchIndexer.exe\" or ActingProcessName endswith \"\\\\SearchProtocolHost.exe\" or ActingProcessName endswith \"\\\\SIHClient.exe\" or ActingProcessName endswith \"\\\\sihost.exe\" or ActingProcessName endswith \"\\\\slui.exe\" or ActingProcessName endswith \"\\\\spoolsv.exe\" or ActingProcessName endswith \"\\\\sppsvc.exe\" or ActingProcessName endswith \"\\\\taskhostw.exe\" or ActingProcessName endswith \"\\\\unsecapp.exe\" or ActingProcessName endswith \"\\\\WerFault.exe\" or ActingProcessName endswith \"\\\\wergmgr.exe\" or ActingProcessName endswith \"\\\\wlanext.exe\" or ActingProcessName endswith \"\\\\WUDFHost.exe\"))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["Execution"],
+                "techniques": ["T1059"],
+                "alertRuleTemplateName": "4b991083-3d0e-44ce-8fc4-b254025d8d4b",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

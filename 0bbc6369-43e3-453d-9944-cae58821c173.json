@@ -15,7 +15,7 @@
             "apiVersion": "2022-11-01-preview",
             "properties": {
                 "displayName": "Execution via WorkFolders.exe",
-                "description": "Detects using WorkFolders.exe to execute an arbitrary control.exe\n\nAuthor: Maxime Thiebaut (@0xThiebaut)\n\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_workfolders.yml\n\nStatus: test\n\nFalse Positives: Legitimate usage of the uncommon Windows Work Folders feature.\n\nReferences: https://twitter.com/elliotkillick/status/1449812843772227588",
+                "description": "Detects using WorkFolders.exe to execute an arbitrary control.exe\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_workfolders.yml\nAuthor: Maxime Thiebaut (@0xThiebaut)\nDate Modified: 2022-12-25\nStatus: test\nReferences: https://twitter.com/elliotkillick/status/1449812843772227588\nFalse Positives: Legitimate usage of the uncommon Windows Work Folders feature.",
                 "severity": "high",
                 "enabled": true,
                 "query": "_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\control.exe\" and ActingProcessName endswith \"\\\\WorkFolders.exe\") and (not(TargetProcessName =~ \"C:\\\\Windows\\\\System32\\\\control.exe\")))",

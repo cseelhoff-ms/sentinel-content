@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5b80a791-ad9b-4b75-bcc1-ad4e1e89c200')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5b80a791-ad9b-4b75-bcc1-ad4e1e89c200')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "File With Suspicious Extension Downloaded Via Bitsadmin",
+                "description": "Detects usage of bitsadmin downloading a file with a suspicious extension\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_bitsadmin_download_susp_extensions.yml\nAuthor: Florian Roth (Nextron Systems), Nasreddine Bencherchali (Nextron Systems)\nDate Modified: 2023-05-30\nStatus: experimental\nReferences: https://blog.netspi.com/15-ways-to-download-a-file/#bitsadmin, https://isc.sans.edu/diary/22264, https://lolbas-project.github.io/lolbas/Binaries/Bitsadmin/\nFalse Positives: Unknown",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\bitsadmin.exe\" or TargetProcessFilename =~ \"bitsadmin.exe\") and (TargetProcessCommandLine contains \" /transfer \" or TargetProcessCommandLine contains \" /create \" or TargetProcessCommandLine contains \" /addfile \") and (TargetProcessCommandLine contains \".7z\" or TargetProcessCommandLine contains \".asax\" or TargetProcessCommandLine contains \".ashx\" or TargetProcessCommandLine contains \".asmx\" or TargetProcessCommandLine contains \".asp\" or TargetProcessCommandLine contains \".aspx\" or TargetProcessCommandLine contains \".bat\" or TargetProcessCommandLine contains \".cfm\" or TargetProcessCommandLine contains \".cgi\" or TargetProcessCommandLine contains \".chm\" or TargetProcessCommandLine contains \".cmd\" or TargetProcessCommandLine contains \".dll\" or TargetProcessCommandLine contains \".gif\" or TargetProcessCommandLine contains \".jpeg\" or TargetProcessCommandLine contains \".jpg\" or TargetProcessCommandLine contains \".jsp\" or TargetProcessCommandLine contains \".jspx\" or TargetProcessCommandLine contains \".log\" or TargetProcessCommandLine contains \".png\" or TargetProcessCommandLine contains \".ps1\" or TargetProcessCommandLine contains \".psm1\" or TargetProcessCommandLine contains \".rar\" or TargetProcessCommandLine contains \".scf\" or TargetProcessCommandLine contains \".sct\" or TargetProcessCommandLine contains \".txt\" or TargetProcessCommandLine contains \".vbe\" or TargetProcessCommandLine contains \".vbs\" or TargetProcessCommandLine contains \".war\" or TargetProcessCommandLine contains \".wsf\" or TargetProcessCommandLine contains \".wsh\" or TargetProcessCommandLine contains \".xll\" or TargetProcessCommandLine contains \".zip\"))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion", "Persistence"],
+                "techniques": ["T1197", "T1036"],
+                "alertRuleTemplateName": "5b80a791-ad9b-4b75-bcc1-ad4e1e89c200",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

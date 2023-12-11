@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/7d1aaf3d-4304-425c-b7c3-162055e0b3ab')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/7d1aaf3d-4304-425c-b7c3-162055e0b3ab')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Potential Data Exfiltration Activity Via CommandLine Tools",
+                "description": "Detects the use of various CLI utilities exfiltrating data via web requests\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_data_exfiltration_via_cli.yml\nAuthor: Nasreddine Bencherchali (Nextron Systems)\nDate Modified: 2023-07-27\nStatus: experimental\nReferences: https://www.sentinelone.com/blog/living-off-windows-defender-lockbit-ransomware-sideloads-cobalt-strike-through-microsoft-security-tool/\nFalse Positives: Unlikely",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where ((((TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\" or TargetProcessName endswith \"\\\\cmd.exe\") and (TargetProcessCommandLine contains \"Invoke-WebRequest\" or TargetProcessCommandLine contains \"iwr \" or TargetProcessCommandLine contains \"wget \" or TargetProcessCommandLine contains \"curl \") and (TargetProcessCommandLine contains \" -ur\" and TargetProcessCommandLine contains \" -me\" and TargetProcessCommandLine contains \" -b\" and TargetProcessCommandLine contains \" POST \")) or ((TargetProcessName endswith \"\\\\curl.exe\" and TargetProcessCommandLine contains \"--ur\") and (TargetProcessCommandLine contains \" -d \" or TargetProcessCommandLine contains \" --data \")) or (TargetProcessName endswith \"\\\\wget.exe\" and (TargetProcessCommandLine contains \"--post-data\" or TargetProcessCommandLine contains \"--post-file\"))) and ((TargetProcessCommandLine contains \"Get-Content\" or TargetProcessCommandLine contains \"GetBytes\" or TargetProcessCommandLine contains \"hostname\" or TargetProcessCommandLine contains \"ifconfig\" or TargetProcessCommandLine contains \"ipconfig\" or TargetProcessCommandLine contains \"net view\" or TargetProcessCommandLine contains \"netstat\" or TargetProcessCommandLine contains \"nltest\" or TargetProcessCommandLine contains \"qprocess\" or TargetProcessCommandLine contains \"sc query\" or TargetProcessCommandLine contains \"systeminfo\" or TargetProcessCommandLine contains \"tasklist\" or TargetProcessCommandLine contains \"ToBase64String\" or TargetProcessCommandLine contains \"whoami\") or (TargetProcessCommandLine contains \"type \" and TargetProcessCommandLine contains \" > \" and TargetProcessCommandLine contains \" C:\\\\\")))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["Execution"],
+                "techniques": ["T1059"],
+                "alertRuleTemplateName": "7d1aaf3d-4304-425c-b7c3-162055e0b3ab",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

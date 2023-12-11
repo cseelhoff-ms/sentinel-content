@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/8834e2f7-6b4b-4f09-8906-d2276470ee23')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/8834e2f7-6b4b-4f09-8906-d2276470ee23')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "PsExec/PAExec Escalation to LOCAL SYSTEM",
+                "description": "Detects suspicious commandline flags used by PsExec and PAExec to escalate a command line to LOCAL_SYSTEM rights\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sysinternals_psexec_paexec_escalate_system.yml\nAuthor: Florian Roth (Nextron Systems), Nasreddine Bencherchali (Nextron Systems)\nDate Modified: 2023-02-28\nStatus: experimental\nReferences: https://docs.microsoft.com/en-us/sysinternals/downloads/psexec, https://www.poweradmin.com/paexec/, https://www.fireeye.com/blog/threat-research/2020/10/kegtap-and-singlemalt-with-a-ransomware-chaser.html\nFalse Positives: Admins that use PsExec or PAExec to escalate to the SYSTEM account for maintenance purposes (rare), Users that debug Microsoft Intune issues using the commands mentioned in the official documentation; see https://learn.microsoft.com/en-us/mem/intune/apps/intune-management-extension",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \" -s cmd\" or TargetProcessCommandLine contains \" /s cmd\" or TargetProcessCommandLine contains \" -s -i cmd\" or TargetProcessCommandLine contains \" /s /i cmd\" or TargetProcessCommandLine contains \" /s -i cmd\" or TargetProcessCommandLine contains \" -s /i cmd\" or TargetProcessCommandLine contains \" -i -s cmd\" or TargetProcessCommandLine contains \" /i /s cmd\" or TargetProcessCommandLine contains \" -i /s cmd\" or TargetProcessCommandLine contains \" /i -s cmd\" or TargetProcessCommandLine contains \" -s pwsh\" or TargetProcessCommandLine contains \" /s pwsh\" or TargetProcessCommandLine contains \" -s -i pwsh\" or TargetProcessCommandLine contains \" /s /i pwsh\" or TargetProcessCommandLine contains \" /s -i pwsh\" or TargetProcessCommandLine contains \" -s /i pwsh\" or TargetProcessCommandLine contains \" -i -s pwsh\" or TargetProcessCommandLine contains \" /i /s pwsh\" or TargetProcessCommandLine contains \" -i /s pwsh\" or TargetProcessCommandLine contains \" /i -s pwsh\" or TargetProcessCommandLine contains \" -s powershell\" or TargetProcessCommandLine contains \" /s powershell\" or TargetProcessCommandLine contains \" -s -i powershell\" or TargetProcessCommandLine contains \" /s /i powershell\" or TargetProcessCommandLine contains \" /s -i powershell\" or TargetProcessCommandLine contains \" -s /i powershell\" or TargetProcessCommandLine contains \" -i -s powershell\" or TargetProcessCommandLine contains \" /i /s powershell\" or TargetProcessCommandLine contains \" -i /s powershell\" or TargetProcessCommandLine contains \" /i -s powershell\") and (TargetProcessCommandLine contains \"psexec\" or TargetProcessCommandLine contains \"paexec\" or TargetProcessCommandLine contains \"accepteula\"))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["ResourceDevelopment"],
+                "techniques": ["T1587"],
+                "alertRuleTemplateName": "8834e2f7-6b4b-4f09-8906-d2276470ee23",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

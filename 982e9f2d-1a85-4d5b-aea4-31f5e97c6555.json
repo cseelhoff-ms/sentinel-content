@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/982e9f2d-1a85-4d5b-aea4-31f5e97c6555')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/982e9f2d-1a85-4d5b-aea4-31f5e97c6555')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Suspicious WebDav Client Execution Via Rundll32.EXE",
+                "description": "Detects \"svchost.exe\" spawning \"rundll32.exe\" with command arguments like C:\\windows\\system32\\davclnt.dll,DavSetCookie. This could be an indicator of exfiltration or use of WebDav to launch code (hosted on WebDav Server) or potentially a sign of exploitation of CVE-2023-23397\n\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_webdav_client_susp_execution.yml\nAuthor: Nasreddine Bencherchali (Nextron Systems), Florian Roth (Nextron Systems)\nDate Modified: 2023-09-18\nStatus: experimental\nReferences: https://twitter.com/aceresponder/status/1636116096506818562, https://www.mdsec.co.uk/2023/03/exploiting-cve-2023-23397-microsoft-outlook-elevation-of-privilege-vulnerability/, https://www.pwndefend.com/2023/03/15/the-long-game-persistent-hash-theft/, https://www.microsoft.com/en-us/security/blog/wp-content/uploads/2023/03/Figure-7-sample-webdav-process-create-event.png, https://www.microsoft.com/en-us/security/blog/2023/03/24/guidance-for-investigating-attacks-using-cve-2023-23397/\nFalse Positives: Unknown",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where ((ActingProcessName endswith \"\\\\svchost.exe\" and ActingProcessCommandLine contains \"-s WebClient\" and TargetProcessName endswith \"\\\\rundll32.exe\" and TargetProcessCommandLine contains \"C:\\\\windows\\\\system32\\\\davclnt.dll,DavSetCookie\" and TargetProcessCommandLine matches regex \"://\\\\d{1,3}\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}\") and (not((TargetProcessCommandLine contains \"://10.\" or TargetProcessCommandLine contains \"://192.168.\" or TargetProcessCommandLine contains \"://172.16.\" or TargetProcessCommandLine contains \"://172.17.\" or TargetProcessCommandLine contains \"://172.18.\" or TargetProcessCommandLine contains \"://172.19.\" or TargetProcessCommandLine contains \"://172.20.\" or TargetProcessCommandLine contains \"://172.21.\" or TargetProcessCommandLine contains \"://172.22.\" or TargetProcessCommandLine contains \"://172.23.\" or TargetProcessCommandLine contains \"://172.24.\" or TargetProcessCommandLine contains \"://172.25.\" or TargetProcessCommandLine contains \"://172.26.\" or TargetProcessCommandLine contains \"://172.27.\" or TargetProcessCommandLine contains \"://172.28.\" or TargetProcessCommandLine contains \"://172.29.\" or TargetProcessCommandLine contains \"://172.30.\" or TargetProcessCommandLine contains \"://172.31.\" or TargetProcessCommandLine contains \"://127.\" or TargetProcessCommandLine contains \"://169.254.\"))))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["Exfiltration"],
+                "techniques": ["T1048"],
+                "alertRuleTemplateName": "982e9f2d-1a85-4d5b-aea4-31f5e97c6555",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

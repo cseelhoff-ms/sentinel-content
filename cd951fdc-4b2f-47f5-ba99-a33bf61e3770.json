@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/cd951fdc-4b2f-47f5-ba99-a33bf61e3770')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/cd951fdc-4b2f-47f5-ba99-a33bf61e3770')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Always Install Elevated Windows Installer",
+                "description": "Detects Windows Installer service (msiexec.exe) trying to install MSI packages with SYSTEM privilege\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_always_install_elevated_windows_installer.yml\nAuthor: Teymur Kheirkhabarov (idea), Mangatas Tondang (rule), oscd.community\nDate Modified: 2023-03-23\nStatus: experimental\nReferences: https://image.slidesharecdn.com/kheirkhabarovoffzonefinal-181117201458/95/hunting-for-privilege-escalation-in-windows-environment-48-638.jpg\nFalse Positives: System administrator usage, Anti virus products, WindowsApps located in \"C:\\Program Files\\WindowsApps\\\"",
+                "severity": "medium",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where ((((TargetProcessName contains \"\\\\Windows\\\\Installer\\\\\" and TargetProcessName contains \"msi\") and TargetProcessName endswith \"tmp\") or (TargetProcessName endswith \"\\\\msiexec.exe\" and TargetProcessIntegrityLevel =~ \"System\")) and (TargetUsername contains \"AUTHORI\" or TargetUsername contains \"AUTORI\") and (not((ActingProcessName =~ \"C:\\\\Windows\\\\System32\\\\services.exe\" or (TargetProcessCommandLine endswith \"\\\\system32\\\\msiexec.exe /V\" or ActingProcessCommandLine endswith \"\\\\system32\\\\msiexec.exe /V\") or ActingProcessName startswith \"C:\\\\ProgramData\\\\Sophos\\\\\" or ActingProcessName startswith \"C:\\\\ProgramData\\\\Avira\\\\\" or (ActingProcessName startswith \"C:\\\\Program Files\\\\Avast Software\\\\\" or ActingProcessName startswith \"C:\\\\Program Files (x86)\\\\Avast Software\\\\\") or (ActingProcessName startswith \"C:\\\\Program Files\\\\Google\\\\Update\\\\\" or ActingProcessName startswith \"C:\\\\Program Files (x86)\\\\Google\\\\Update\\\\\")))))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion", "PrivilegeEscalation"],
+                "techniques": ["T1548"],
+                "alertRuleTemplateName": "cd951fdc-4b2f-47f5-ba99-a33bf61e3770",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

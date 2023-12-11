@@ -15,7 +15,7 @@
             "apiVersion": "2022-11-01-preview",
             "properties": {
                 "displayName": "Suspicious LOLBIN AccCheckConsole",
-                "description": "Detects suspicious LOLBIN AccCheckConsole execution with parameters as used to load an arbitrary DLL\n\nAuthor: Florian Roth (Nextron Systems)\n\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_susp_acccheckconsole.yml\n\nStatus: test\n\nFalse Positives: Legitimate use of the UI Accessibility Checker\n\nReferences: https://gist.github.com/bohops/2444129419c8acf837aedda5f0e7f340, https://twitter.com/bohops/status/1477717351017680899?s=12, https://lolbas-project.github.io/lolbas/OtherMSBinaries/AccCheckConsole/",
+                "description": "Detects suspicious LOLBIN AccCheckConsole execution with parameters as used to load an arbitrary DLL\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_susp_acccheckconsole.yml\nAuthor: Florian Roth (Nextron Systems)\nDate Modified: None\nStatus: test\nReferences: https://gist.github.com/bohops/2444129419c8acf837aedda5f0e7f340, https://twitter.com/bohops/status/1477717351017680899?s=12, https://lolbas-project.github.io/lolbas/OtherMSBinaries/AccCheckConsole/\nFalse Positives: Legitimate use of the UI Accessibility Checker",
                 "severity": "high",
                 "enabled": true,
                 "query": "_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\AccCheckConsole.exe\" or TargetProcessFilename =~ \"AccCheckConsole.exe\") and (TargetProcessCommandLine contains \" -window \" and TargetProcessCommandLine contains \".dll\"))",

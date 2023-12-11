@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/c4e49831-1496-40cf-8ce1-b53f942b02f9')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/c4e49831-1496-40cf-8ce1-b53f942b02f9')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Renamed PAExec Execution",
+                "description": "Detects execution of renamed version of PAExec. Often used by attackers\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_renamed_paexec.yml\nAuthor: Florian Roth (Nextron Systems), Jason Lynch\nDate Modified: 2023-02-14\nStatus: test\nReferences: https://www.poweradmin.com/paexec/, https://summit.fireeye.com/content/dam/fireeye-www/summit/cds-2018/presentations/cds18-technical-s05-att&cking-fin7.pdf\nFalse Positives: Weird admins that rename their tools, Software companies that bundle PAExec with their software and rename it, so that it is less embarrassing, When executed with the \"-s\" flag. PAExec will copy itself to the \"C:\\Windows\\\" directory with a different name. Usually like this \"PAExec-[XXXXX]-[ComputerName]\"",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where ((TargetProcessFileDescription =~ \"PAExec Application\" or TargetProcessFilename =~ \"PAExec.exe\" or TargetProcessFileProduct contains \"PAExec\" or (TargetProcessIMPHASH =~ \"11D40A7B7876288F919AB819CC2D9802\" or TargetProcessIMPHASH =~ \"6444f8a34e99b8f7d9647de66aabe516\" or TargetProcessIMPHASH =~ \"dfd6aa3f7b2b1035b76b718f1ddc689f\" or TargetProcessIMPHASH =~ \"1a6cca4d5460b1710a12dea39e4a592c\") or (Hashes contains \"IMPHASH=11D40A7B7876288F919AB819CC2D9802\" or Hashes contains \"IMPHASH=6444f8a34e99b8f7d9647de66aabe516\" or Hashes contains \"IMPHASH=dfd6aa3f7b2b1035b76b718f1ddc689f\" or Hashes contains \"IMPHASH=1a6cca4d5460b1710a12dea39e4a592c\")) and (not((TargetProcessName endswith \"\\\\paexec.exe\" or TargetProcessName startswith \"C:\\\\Windows\\\\PAExec-\"))))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion"],
+                "techniques": ["T1202"],
+                "alertRuleTemplateName": "c4e49831-1496-40cf-8ce1-b53f942b02f9",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

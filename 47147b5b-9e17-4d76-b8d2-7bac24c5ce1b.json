@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/47147b5b-9e17-4d76-b8d2-7bac24c5ce1b')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/47147b5b-9e17-4d76-b8d2-7bac24c5ce1b')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Potential Browser Data Stealing",
+                "description": "Adversaries may acquire credentials from web browsers by reading files specific to the target browser.\nWeb browsers commonly save credentials such as website usernames and passwords so that they do not need to be entered manually in the future.\nWeb browsers typically store the credentials in an encrypted format within a credential store.\n\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_copy_browser_data.yml\nAuthor: Nasreddine Bencherchali (Nextron Systems)\nDate Modified: 2023-08-29\nStatus: experimental\nReferences: https://github.com/redcanaryco/atomic-red-team/blob/f339e7da7d05f6057fdfcdd3742bfcf365fee2a9/atomics/T1555.003/T1555.003.md\nFalse Positives: Unknown",
+                "severity": "medium",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where (((TargetProcessCommandLine contains \"copy-item\" or TargetProcessCommandLine contains \"copy \" or TargetProcessCommandLine contains \"cpi \" or TargetProcessCommandLine contains \" cp \" or TargetProcessCommandLine contains \"move \" or TargetProcessCommandLine contains \"move-item\" or TargetProcessCommandLine contains \" mi \" or TargetProcessCommandLine contains \" mv \") or (TargetProcessName endswith \"\\\\xcopy.exe\" or TargetProcessName endswith \"\\\\robocopy.exe\") or (TargetProcessFilename =~ \"XCOPY.EXE\" or TargetProcessFilename =~ \"robocopy.exe\")) and (TargetProcessCommandLine contains \"\\\\Amigo\\\\User Data\" or TargetProcessCommandLine contains \"\\\\BraveSoftware\\\\Brave-Browser\\\\User Data\" or TargetProcessCommandLine contains \"\\\\CentBrowser\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Chromium\\\\User Data\" or TargetProcessCommandLine contains \"\\\\CocCoc\\\\Browser\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Comodo\\\\Dragon\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Elements Browser\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Epic Privacy Browser\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Google\\\\Chrome Beta\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Google\\\\Chrome SxS\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Google\\\\Chrome\\\\User Data\\\\\" or TargetProcessCommandLine contains \"\\\\Kometa\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Maxthon5\\\\Users\" or TargetProcessCommandLine contains \"\\\\Microsoft\\\\Edge\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Mozilla\\\\Firefox\\\\Profiles\" or TargetProcessCommandLine contains \"\\\\Nichrome\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Opera Software\\\\Opera GX Stable\\\\\" or TargetProcessCommandLine contains \"\\\\Opera Software\\\\Opera Neon\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Opera Software\\\\Opera Stable\\\\\" or TargetProcessCommandLine contains \"\\\\Orbitum\\\\User Data\" or TargetProcessCommandLine contains \"\\\\QIP Surf\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Sputnik\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Torch\\\\User Data\" or TargetProcessCommandLine contains \"\\\\uCozMedia\\\\Uran\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Vivaldi\\\\User Data\"))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["CredentialAccess"],
+                "techniques": ["T1555"],
+                "alertRuleTemplateName": "47147b5b-9e17-4d76-b8d2-7bac24c5ce1b",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

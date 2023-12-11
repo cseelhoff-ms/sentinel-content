@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/178e615d-e666-498b-9630-9ed363038101')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/178e615d-e666-498b-9630-9ed363038101')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Elevated System Shell Spawned",
+                "description": "Detects when a shell program such as the Windows command prompt or PowerShell is launched with system privileges.\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_elevated_system_shell.yml\nAuthor: frack113, Tim Shelton (update fp)\nDate Modified: 2023-10-11\nStatus: experimental\nReferences: https://github.com/Wh04m1001/SysmonEoP\nFalse Positives: Unknown",
+                "severity": "medium",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where ((((TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\" or TargetProcessName endswith \"\\\\cmd.exe\") or (TargetProcessFilename =~ \"PowerShell.EXE\" or TargetProcessFilename =~ \"pwsh.dll\" or TargetProcessFilename =~ \"Cmd.Exe\")) and ((TargetUsername contains \"AUTHORI\" or TargetUsername contains \"AUTORI\") and LogonId =~ \"0x3e7\")) and (not((((ActingProcessName contains \":\\\\Windows\\\\System32\\\\\" or ActingProcessName contains \":\\\\Program Files (x86)\\\\\" or ActingProcessName contains \":\\\\Program Files\\\\\") and (TargetProcessName endswith \"\\\\cmd.exe\" or TargetProcessName endswith \"\\\\powershell.exe\")) or ((ActingProcessName contains \":\\\\Windows\\\\System32\" or ActingProcessName contains \":\\\\Windows\\\\WinSxS\\\\\") and ActingProcessName endswith \"\\\\CompatTelRunner.exe\" and ActingProcessCommandLine contains \":\\\\Windows\\\\system32\\\\CompatTelRunner.exe -m:appraiser.dll -f:DoScheduledTelemetryRun\") or (ActingProcessName endswith \":\\\\Windows\\\\SysWOW64\\\\msiexec.exe\" and ActingProcessCommandLine contains \":\\\\Windows\\\\syswow64\\\\MsiExec.exe -Embedding\" and TargetProcessCommandLine contains \"\\\\RegisterMicrosoftUpdate.ps1\") or ((TargetProcessCommandLine startswith \"powershell.exe -ExecutionPolicy Restricted -Command  $res = 0; \" or TargetProcessCommandLine startswith \"powershell.exe -ExecutionPolicy Restricted -Command Write-Host \") and (TargetProcessCommandLine endswith \"Write-Host 'Final result:', $Res;\" or TargetProcessCommandLine endswith \"Write-Host \\\"Final result:\\\", $res\" or TargetProcessCommandLine endswith \"Write-Host 'Final result: 1';\")) or (TargetProcessName endswith \"\\\\cmd.exe\" and TargetProcessCommandLine contains \"/d /c C:\\\\Windows\\\\system32\\\\silcollector.cmd\") or (TargetProcessName endswith \"\\\\cmd.exe\" and (TargetProcessCommandLine endswith \"cmd.exe /c btool server list replication_port --no-log\" or TargetProcessCommandLine endswith \"cmd.exe /c btool server list general --no-log\")) or (TargetProcessName endswith \"\\\\cmd.exe\" and TargetProcessCommandLine contains \":\\\\Windows\\\\system32\\\\reg.exe query hklm\\\\software\\\\microsoft\\\\windows\\\\softwareinventorylogging /v collectionstate /reg:64\") or (TargetProcessName endswith \":\\\\Windows\\\\System32\\\\cmd.exe\" and TargetProcessCommandLine endswith \":\\\\Windows\\\\system32\\\\cmd.exe /c PAUSE\")))) and (not(((ActingProcessName endswith \":\\\\ManageEngine\\\\ADManager Plus\\\\pgsql\\\\bin\\\\postgres.exe\" and TargetProcessName endswith \"\\\\cmd.exe\") or (ActingProcessName contains \":\\\\Windows\\\\SysWOW64\\\\config\\\\systemprofile\\\\Citrix\\\\UpdaterBinaries\\\\\" and ActingProcessName endswith \"\\\\CitrixReceiverUpdater.exe\" and TargetProcessName endswith \"\\\\cmd.exe\") or (TargetProcessCommandLine contains \":\\\\WINDOWS\\\\system32\\\\cmd.exe /c \\\"\" and TargetProcessCurrentDirectory contains \":\\\\WINDOWS\\\\Temp\\\\asgard2-agent\\\\\") or (ActingProcessName contains \":\\\\Windows\\\\Temp\" and ActingProcessName endswith \"\\\\invcol.exe\" and ActingProcessCommandLine contains \":\\\\ProgramData\\\\Dell\\\\UpdateService\\\\\" and TargetProcessName endswith \"\\\\cmd.exe\") or (ActingProcessName contains \":\\\\IBM\\\\SpectrumProtect\\\\webserver\\\\scripts\\\\\" and TargetProcessCommandLine contains \":\\\\IBM\\\\SpectrumProtect\\\\webserver\\\\scripts\\\\\") or TargetProcessCommandLine contains \":\\\\Windows\\\\system32\\\\cmd.exe\\\" /C copy \\\"C:\\\\ProgramData\\\\Avira\\\\SystemSpeedup\\\\Update\\\\avira_speedup_setup_update.exe\\\"\" or (ActingProcessName =~ \"\" and TargetProcessCommandLine contains \":\\\\IBM\\\\SpectrumProtect\\\\webserver\\\\scripts\\\\\") or (isnull(ActingProcessName) and TargetProcessCommandLine contains \":\\\\IBM\\\\SpectrumProtect\\\\webserver\\\\scripts\\\\\")))))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion", "PrivilegeEscalation", "Execution"],
+                "techniques": ["T1059"],
+                "alertRuleTemplateName": "178e615d-e666-498b-9630-9ed363038101",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

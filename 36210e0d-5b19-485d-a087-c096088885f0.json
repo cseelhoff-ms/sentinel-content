@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/36210e0d-5b19-485d-a087-c096088885f0')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/36210e0d-5b19-485d-a087-c096088885f0')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Suspicious PowerShell Parameter Substring",
+                "description": "Detects suspicious PowerShell invocation with a parameter substring\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_susp_parameter_variation.yml\nAuthor: Florian Roth (Nextron Systems), Daniel Bohannon (idea), Roberto Rodriguez (Fix)\nDate Modified: 2022-07-14\nStatus: test\nReferences: http://www.danielbohannon.com/blog-1/2017/3/12/powershell-execution-argument-obfuscation-how-it-can-make-detection-easier\nFalse Positives: Unknown",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\") and (TargetProcessCommandLine contains \" -windowstyle h \" or TargetProcessCommandLine contains \" -windowstyl h\" or TargetProcessCommandLine contains \" -windowsty h\" or TargetProcessCommandLine contains \" -windowst h\" or TargetProcessCommandLine contains \" -windows h\" or TargetProcessCommandLine contains \" -windo h\" or TargetProcessCommandLine contains \" -wind h\" or TargetProcessCommandLine contains \" -win h\" or TargetProcessCommandLine contains \" -wi h\" or TargetProcessCommandLine contains \" -win h \" or TargetProcessCommandLine contains \" -win hi \" or TargetProcessCommandLine contains \" -win hid \" or TargetProcessCommandLine contains \" -win hidd \" or TargetProcessCommandLine contains \" -win hidde \" or TargetProcessCommandLine contains \" -NoPr \" or TargetProcessCommandLine contains \" -NoPro \" or TargetProcessCommandLine contains \" -NoProf \" or TargetProcessCommandLine contains \" -NoProfi \" or TargetProcessCommandLine contains \" -NoProfil \" or TargetProcessCommandLine contains \" -nonin \" or TargetProcessCommandLine contains \" -nonint \" or TargetProcessCommandLine contains \" -noninte \" or TargetProcessCommandLine contains \" -noninter \" or TargetProcessCommandLine contains \" -nonintera \" or TargetProcessCommandLine contains \" -noninterac \" or TargetProcessCommandLine contains \" -noninteract \" or TargetProcessCommandLine contains \" -noninteracti \" or TargetProcessCommandLine contains \" -noninteractiv \" or TargetProcessCommandLine contains \" -ec \" or TargetProcessCommandLine contains \" -encodedComman \" or TargetProcessCommandLine contains \" -encodedComma \" or TargetProcessCommandLine contains \" -encodedComm \" or TargetProcessCommandLine contains \" -encodedCom \" or TargetProcessCommandLine contains \" -encodedCo \" or TargetProcessCommandLine contains \" -encodedC \" or TargetProcessCommandLine contains \" -encoded \" or TargetProcessCommandLine contains \" -encode \" or TargetProcessCommandLine contains \" -encod \" or TargetProcessCommandLine contains \" -enco \" or TargetProcessCommandLine contains \" -en \" or TargetProcessCommandLine contains \" -executionpolic \" or TargetProcessCommandLine contains \" -executionpoli \" or TargetProcessCommandLine contains \" -executionpol \" or TargetProcessCommandLine contains \" -executionpo \" or TargetProcessCommandLine contains \" -executionp \" or TargetProcessCommandLine contains \" -execution bypass\" or TargetProcessCommandLine contains \" -executio bypass\" or TargetProcessCommandLine contains \" -executi bypass\" or TargetProcessCommandLine contains \" -execut bypass\" or TargetProcessCommandLine contains \" -execu bypass\" or TargetProcessCommandLine contains \" -exec bypass\" or TargetProcessCommandLine contains \" -exe bypass\" or TargetProcessCommandLine contains \" -ex bypass\" or TargetProcessCommandLine contains \" -ep bypass\" or TargetProcessCommandLine contains \" /windowstyle h \" or TargetProcessCommandLine contains \" /windowstyl h\" or TargetProcessCommandLine contains \" /windowsty h\" or TargetProcessCommandLine contains \" /windowst h\" or TargetProcessCommandLine contains \" /windows h\" or TargetProcessCommandLine contains \" /windo h\" or TargetProcessCommandLine contains \" /wind h\" or TargetProcessCommandLine contains \" /win h\" or TargetProcessCommandLine contains \" /wi h\" or TargetProcessCommandLine contains \" /win h \" or TargetProcessCommandLine contains \" /win hi \" or TargetProcessCommandLine contains \" /win hid \" or TargetProcessCommandLine contains \" /win hidd \" or TargetProcessCommandLine contains \" /win hidde \" or TargetProcessCommandLine contains \" /NoPr \" or TargetProcessCommandLine contains \" /NoPro \" or TargetProcessCommandLine contains \" /NoProf \" or TargetProcessCommandLine contains \" /NoProfi \" or TargetProcessCommandLine contains \" /NoProfil \" or TargetProcessCommandLine contains \" /nonin \" or TargetProcessCommandLine contains \" /nonint \" or TargetProcessCommandLine contains \" /noninte \" or TargetProcessCommandLine contains \" /noninter \" or TargetProcessCommandLine contains \" /nonintera \" or TargetProcessCommandLine contains \" /noninterac \" or TargetProcessCommandLine contains \" /noninteract \" or TargetProcessCommandLine contains \" /noninteracti \" or TargetProcessCommandLine contains \" /noninteractiv \" or TargetProcessCommandLine contains \" /ec \" or TargetProcessCommandLine contains \" /encodedComman \" or TargetProcessCommandLine contains \" /encodedComma \" or TargetProcessCommandLine contains \" /encodedComm \" or TargetProcessCommandLine contains \" /encodedCom \" or TargetProcessCommandLine contains \" /encodedCo \" or TargetProcessCommandLine contains \" /encodedC \" or TargetProcessCommandLine contains \" /encoded \" or TargetProcessCommandLine contains \" /encode \" or TargetProcessCommandLine contains \" /encod \" or TargetProcessCommandLine contains \" /enco \" or TargetProcessCommandLine contains \" /en \" or TargetProcessCommandLine contains \" /executionpolic \" or TargetProcessCommandLine contains \" /executionpoli \" or TargetProcessCommandLine contains \" /executionpol \" or TargetProcessCommandLine contains \" /executionpo \" or TargetProcessCommandLine contains \" /executionp \" or TargetProcessCommandLine contains \" /execution bypass\" or TargetProcessCommandLine contains \" /executio bypass\" or TargetProcessCommandLine contains \" /executi bypass\" or TargetProcessCommandLine contains \" /execut bypass\" or TargetProcessCommandLine contains \" /execu bypass\" or TargetProcessCommandLine contains \" /exec bypass\" or TargetProcessCommandLine contains \" /exe bypass\" or TargetProcessCommandLine contains \" /ex bypass\" or TargetProcessCommandLine contains \" /ep bypass\"))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["Execution"],
+                "techniques": ["T1059"],
+                "alertRuleTemplateName": "36210e0d-5b19-485d-a087-c096088885f0",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

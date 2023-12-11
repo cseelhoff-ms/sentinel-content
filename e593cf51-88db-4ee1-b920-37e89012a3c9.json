@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/e593cf51-88db-4ee1-b920-37e89012a3c9')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/e593cf51-88db-4ee1-b920-37e89012a3c9')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Potentially Suspicious Rundll32 Activity",
+                "description": "Detects suspicious execution of rundll32, with specific calls to some DLLs with known LOLBIN functionalities\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_susp_activity.yml\nAuthor: juju4, Jonhnathan Ribeiro, oscd.community, Nasreddine Bencherchali (Nextron Systems)\nDate Modified: 2023-05-17\nStatus: test\nReferences: http://www.hexacorn.com/blog/2017/05/01/running-programs-via-proxy-jumping-on-a-edr-bypass-trampoline/, https://twitter.com/Hexacorn/status/885258886428725250, https://gist.github.com/ryhanson/227229866af52e2d963cf941af135a52, https://twitter.com/nas_bench/status/1433344116071583746, https://twitter.com/eral4m/status/1479106975967240209, https://twitter.com/eral4m/status/1479080793003671557\nFalse Positives: False positives depend on scripts and administrative tools used in the monitored environment",
+                "severity": "medium",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where (((TargetProcessCommandLine contains \"javascript:\" and TargetProcessCommandLine contains \".RegisterXLL\") or (TargetProcessCommandLine contains \"url.dll\" and TargetProcessCommandLine contains \"OpenURL\") or (TargetProcessCommandLine contains \"url.dll\" and TargetProcessCommandLine contains \"OpenURLA\") or (TargetProcessCommandLine contains \"url.dll\" and TargetProcessCommandLine contains \"FileProtocolHandler\") or (TargetProcessCommandLine contains \"zipfldr.dll\" and TargetProcessCommandLine contains \"RouteTheCall\") or (TargetProcessCommandLine contains \"shell32.dll\" and TargetProcessCommandLine contains \"Control_RunDLL\") or (TargetProcessCommandLine contains \"shell32.dll\" and TargetProcessCommandLine contains \"ShellExec_RunDLL\") or (TargetProcessCommandLine contains \"mshtml.dll\" and TargetProcessCommandLine contains \"PrintHTML\") or (TargetProcessCommandLine contains \"advpack.dll\" and TargetProcessCommandLine contains \"LaunchINFSection\") or (TargetProcessCommandLine contains \"advpack.dll\" and TargetProcessCommandLine contains \"RegisterOCX\") or (TargetProcessCommandLine contains \"ieadvpack.dll\" and TargetProcessCommandLine contains \"LaunchINFSection\") or (TargetProcessCommandLine contains \"ieadvpack.dll\" and TargetProcessCommandLine contains \"RegisterOCX\") or (TargetProcessCommandLine contains \"ieframe.dll\" and TargetProcessCommandLine contains \"OpenURL\") or (TargetProcessCommandLine contains \"shdocvw.dll\" and TargetProcessCommandLine contains \"OpenURL\") or (TargetProcessCommandLine contains \"syssetup.dll\" and TargetProcessCommandLine contains \"SetupInfObjectInstallAction\") or (TargetProcessCommandLine contains \"setupapi.dll\" and TargetProcessCommandLine contains \"InstallHinfSection\") or (TargetProcessCommandLine contains \"pcwutl.dll\" and TargetProcessCommandLine contains \"LaunchApplication\") or (TargetProcessCommandLine contains \"dfshim.dll\" and TargetProcessCommandLine contains \"ShOpenVerbApplication\") or (TargetProcessCommandLine contains \"dfshim.dll\" and TargetProcessCommandLine contains \"ShOpenVerbShortcut\") or (TargetProcessCommandLine contains \"scrobj.dll\" and TargetProcessCommandLine contains \"GenerateTypeLib\" and TargetProcessCommandLine contains \"http\") or (TargetProcessCommandLine contains \"shimgvw.dll\" and TargetProcessCommandLine contains \"ImageView_Fullscreen\" and TargetProcessCommandLine contains \"http\") or (TargetProcessCommandLine contains \"comsvcs.dll\" and TargetProcessCommandLine contains \"MiniDump\")) and (not((TargetProcessCommandLine contains \"shell32.dll,Control_RunDLL desk.cpl,screensaver,@screensaver\" or (ActingProcessName =~ \"C:\\\\Windows\\\\System32\\\\control.exe\" and ActingProcessCommandLine contains \".cpl\" and (TargetProcessCommandLine contains \"Shell32.dll\" and TargetProcessCommandLine contains \"Control_RunDLL\" and TargetProcessCommandLine contains \".cpl\")) or (ActingProcessName =~ \"C:\\\\Windows\\\\System32\\\\control.exe\" and TargetProcessCommandLine startswith \"\\\"C:\\\\Windows\\\\system32\\\\rundll32.exe\\\" Shell32.dll,Control_RunDLL \\\"C:\\\\Windows\\\\System32\\\\\" and TargetProcessCommandLine endswith \".cpl\\\",\")))))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion"],
+                "techniques": ["T1218"],
+                "alertRuleTemplateName": "e593cf51-88db-4ee1-b920-37e89012a3c9",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

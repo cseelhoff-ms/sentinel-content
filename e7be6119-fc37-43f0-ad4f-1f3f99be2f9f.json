@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/e7be6119-fc37-43f0-ad4f-1f3f99be2f9f')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/e7be6119-fc37-43f0-ad4f-1f3f99be2f9f')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Copying Sensitive Files with Credential Data",
+                "description": "Files with well-known filenames (sensitive files with credential data) copying\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_esentutl_sensitive_file_copy.yml\nAuthor: Teymur Kheirkhabarov, Daniil Yugoslavskiy, oscd.community\nDate Modified: 2022-11-11\nStatus: test\nReferences: https://room362.com/post/2013/2013-06-10-volume-shadow-copy-ntdsdit-domain-hashes-remotely-part-1/, https://www.slideshare.net/heirhabarov/hunting-for-credentials-dumping-in-windows-environment, https://dfironthemountain.wordpress.com/2018/12/06/locked-file-access-using-esentutl-exe/\nFalse Positives: Copying sensitive files for legitimate use (eg. backup) or forensic investigation by legitimate incident responder or forensic invetigator",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\esentutl.exe\" or TargetProcessFilename =~ \"\\\\esentutl.exe\") and (TargetProcessCommandLine contains \"vss\" or TargetProcessCommandLine contains \" /m \" or TargetProcessCommandLine contains \" /y \")) or (TargetProcessCommandLine contains \"\\\\windows\\\\ntds\\\\ntds.dit\" or TargetProcessCommandLine contains \"\\\\config\\\\sam\" or TargetProcessCommandLine contains \"\\\\config\\\\security\" or TargetProcessCommandLine contains \"\\\\config\\\\system \" or TargetProcessCommandLine contains \"\\\\repair\\\\sam\" or TargetProcessCommandLine contains \"\\\\repair\\\\system\" or TargetProcessCommandLine contains \"\\\\repair\\\\security\" or TargetProcessCommandLine contains \"\\\\config\\\\RegBack\\\\sam\" or TargetProcessCommandLine contains \"\\\\config\\\\RegBack\\\\system\" or TargetProcessCommandLine contains \"\\\\config\\\\RegBack\\\\security\"))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["CredentialAccess"],
+                "techniques": ["T1003"],
+                "alertRuleTemplateName": "e7be6119-fc37-43f0-ad4f-1f3f99be2f9f",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

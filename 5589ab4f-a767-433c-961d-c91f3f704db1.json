@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5589ab4f-a767-433c-961d-c91f3f704db1')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5589ab4f-a767-433c-961d-c91f3f704db1')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Potential SMB Relay Attack Tool Execution",
+                "description": "Detects different hacktools used for relay attacks on Windows for privilege escalation\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_hktl_relay_attacks_tools.yml\nAuthor: Florian Roth (Nextron Systems)\nDate Modified: 2023-02-14\nStatus: test\nReferences: https://foxglovesecurity.com/2016/09/26/rotten-potato-privilege-escalation-from-service-accounts-to-system/, https://pentestlab.blog/2017/04/13/hot-potato/, https://github.com/ohpe/juicy-potato, https://hunter2.gitbook.io/darthsidious/other/war-stories/domain-admin-in-30-minutes, https://hunter2.gitbook.io/darthsidious/execution/responder-with-ntlm-relay-and-empire, https://www.localpotato.com/\nFalse Positives: Legitimate files with these rare hacktool names",
+                "severity": "critical",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where (((TargetProcessName contains \"PetitPotam\" or TargetProcessName contains \"RottenPotato\" or TargetProcessName contains \"HotPotato\" or TargetProcessName contains \"JuicyPotato\" or TargetProcessName contains \"\\\\just_dce_\" or TargetProcessName contains \"Juicy Potato\" or TargetProcessName contains \"\\\\temp\\\\rot.exe\" or TargetProcessName contains \"\\\\Potato.exe\" or TargetProcessName contains \"\\\\SpoolSample.exe\" or TargetProcessName contains \"\\\\Responder.exe\" or TargetProcessName contains \"\\\\smbrelayx\" or TargetProcessName contains \"\\\\ntlmrelayx\" or TargetProcessName contains \"\\\\LocalPotato\") or (TargetProcessCommandLine contains \"Invoke-Tater\" or TargetProcessCommandLine contains \" smbrelay\" or TargetProcessCommandLine contains \" ntlmrelay\" or TargetProcessCommandLine contains \"cme smb \" or TargetProcessCommandLine contains \" /ntlm:NTLMhash \" or TargetProcessCommandLine contains \"Invoke-PetitPotam\" or TargetProcessCommandLine match \".exe -t  -p \") or (TargetProcessCommandLine contains \".exe -c \\\"{\" and TargetProcessCommandLine endswith \"}\\\" -z\")) and (not((TargetProcessName contains \"HotPotatoes6\" or TargetProcessName contains \"HotPotatoes7\" or TargetProcessName contains \"HotPotatoes \"))))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["Collection", "Execution"],
+                "techniques": ["T1557"],
+                "alertRuleTemplateName": "5589ab4f-a767-433c-961d-c91f3f704db1",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

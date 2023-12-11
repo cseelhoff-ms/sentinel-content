@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/e1693bc8-7168-4eab-8718-cdcaa68a1738')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/e1693bc8-7168-4eab-8718-cdcaa68a1738')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Suspicious WMIC Execution Via Office Process",
+                "description": "Office application called wmic to proxye execution through a LOLBIN process. This is often used to break suspicious parent-child chain (Office app spawns LOLBin).\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wmic_susp_execution_via_office_process.yml\nAuthor: Vadim Khrykov, Cyb3rEng\nDate Modified: 2023-02-14\nStatus: experimental\nReferences: https://thedfirreport.com/2021/03/29/sodinokibi-aka-revil-ransomware/, https://github.com/vadim-hunter/Detection-Ideas-Rules/blob/02bcbfc2bfb8b4da601bb30de0344ae453aa1afe/Threat%20Intelligence/The%20DFIR%20Report/20210329_Sodinokibi_(aka_REvil)_Ransomware.yaml\nFalse Positives: Unknown",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where ((ActingProcessName endswith \"\\\\WINWORD.EXE\" or ActingProcessName endswith \"\\\\EXCEL.EXE\" or ActingProcessName endswith \"\\\\POWERPNT.exe\" or ActingProcessName endswith \"\\\\MSPUB.exe\" or ActingProcessName endswith \"\\\\VISIO.exe\" or ActingProcessName endswith \"\\\\MSACCESS.EXE\" or ActingProcessName endswith \"\\\\EQNEDT32.EXE\" or ActingProcessName endswith \"\\\\ONENOTE.EXE\" or ActingProcessName endswith \"\\\\wordpad.exe\" or ActingProcessName endswith \"\\\\wordview.exe\") and (TargetProcessName endswith \"\\\\wbem\\\\WMIC.exe\" or TargetProcessFilename =~ \"wmic.exe\") and ((TargetProcessCommandLine contains \"process\" and TargetProcessCommandLine contains \"create\" and TargetProcessCommandLine contains \"call\") and (TargetProcessCommandLine contains \"regsvr32\" or TargetProcessCommandLine contains \"rundll32\" or TargetProcessCommandLine contains \"msiexec\" or TargetProcessCommandLine contains \"mshta\" or TargetProcessCommandLine contains \"verclsid\" or TargetProcessCommandLine contains \"wscript\" or TargetProcessCommandLine contains \"cscript\")))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion", "Execution"],
+                "techniques": ["T1218", "T1204", "T1047"],
+                "alertRuleTemplateName": "e1693bc8-7168-4eab-8718-cdcaa68a1738",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

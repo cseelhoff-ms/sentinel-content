@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/b2317cfa-4a47-4ead-b3ff-297438c0bc2d')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/b2317cfa-4a47-4ead-b3ff-297438c0bc2d')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "HackTool - SharpView Execution",
+                "description": "Adversaries may look for details about the network configuration and settings of systems they access or through information discovery of remote systems\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_hktl_sharpview.yml\nAuthor: frack113\nDate Modified: 2023-02-14\nStatus: experimental\nReferences: https://github.com/tevora-threat/SharpView/, https://github.com/PowerShellMafia/PowerSploit/blob/dev/Recon/PowerView.ps1, https://github.com/redcanaryco/atomic-red-team/blob/f339e7da7d05f6057fdfcdd3742bfcf365fee2a9/atomics/T1049/T1049.md#atomic-test-4---system-discovery-using-sharpview\nFalse Positives: Unknown",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where (TargetProcessFilename =~ \"SharpView.exe\" or TargetProcessName endswith \"\\\\SharpView.exe\" or (TargetProcessCommandLine contains \"Add-RemoteConnection\" or TargetProcessCommandLine contains \"Convert-ADName\" or TargetProcessCommandLine contains \"ConvertFrom-SID\" or TargetProcessCommandLine contains \"ConvertFrom-UACValue\" or TargetProcessCommandLine contains \"Convert-SidToName\" or TargetProcessCommandLine contains \"Export-PowerViewCSV\" or TargetProcessCommandLine contains \"Find-DomainObjectPropertyOutlier\" or TargetProcessCommandLine contains \"Find-DomainProcess\" or TargetProcessCommandLine contains \"Find-DomainShare\" or TargetProcessCommandLine contains \"Find-DomainUserEvent\" or TargetProcessCommandLine contains \"Find-DomainUserLocation\" or TargetProcessCommandLine contains \"Find-ForeignGroup\" or TargetProcessCommandLine contains \"Find-ForeignUser\" or TargetProcessCommandLine contains \"Find-GPOComputerAdmin\" or TargetProcessCommandLine contains \"Find-GPOLocation\" or TargetProcessCommandLine contains \"Find-Interesting\" or TargetProcessCommandLine contains \"Find-LocalAdminAccess\" or TargetProcessCommandLine contains \"Find-ManagedSecurityGroups\" or TargetProcessCommandLine contains \"Get-CachedRDPConnection\" or TargetProcessCommandLine contains \"Get-DFSshare\" or TargetProcessCommandLine contains \"Get-DomainComputer\" or TargetProcessCommandLine contains \"Get-DomainController\" or TargetProcessCommandLine contains \"Get-DomainDFSShare\" or TargetProcessCommandLine contains \"Get-DomainDNSRecord\" or TargetProcessCommandLine contains \"Get-DomainFileServer\" or TargetProcessCommandLine contains \"Get-DomainForeign\" or TargetProcessCommandLine contains \"Get-DomainGPO\" or TargetProcessCommandLine contains \"Get-DomainGroup\" or TargetProcessCommandLine contains \"Get-DomainGUIDMap\" or TargetProcessCommandLine contains \"Get-DomainManagedSecurityGroup\" or TargetProcessCommandLine contains \"Get-DomainObject\" or TargetProcessCommandLine contains \"Get-DomainOU\" or TargetProcessCommandLine contains \"Get-DomainPolicy\" or TargetProcessCommandLine contains \"Get-DomainSID\" or TargetProcessCommandLine contains \"Get-DomainSite\" or TargetProcessCommandLine contains \"Get-DomainSPNTicket\" or TargetProcessCommandLine contains \"Get-DomainSubnet\" or TargetProcessCommandLine contains \"Get-DomainTrust\" or TargetProcessCommandLine contains \"Get-DomainUserEvent\" or TargetProcessCommandLine contains \"Get-ForestDomain\" or TargetProcessCommandLine contains \"Get-ForestGlobalCatalog\" or TargetProcessCommandLine contains \"Get-ForestTrust\" or TargetProcessCommandLine contains \"Get-GptTmpl\" or TargetProcessCommandLine contains \"Get-GroupsXML\" or TargetProcessCommandLine contains \"Get-LastLoggedOn\" or TargetProcessCommandLine contains \"Get-LoggedOnLocal\" or TargetProcessCommandLine contains \"Get-NetComputer\" or TargetProcessCommandLine contains \"Get-NetDomain\" or TargetProcessCommandLine contains \"Get-NetFileServer\" or TargetProcessCommandLine contains \"Get-NetForest\" or TargetProcessCommandLine contains \"Get-NetGPO\" or TargetProcessCommandLine contains \"Get-NetGroupMember\" or TargetProcessCommandLine contains \"Get-NetLocalGroup\" or TargetProcessCommandLine contains \"Get-NetLoggedon\" or TargetProcessCommandLine contains \"Get-NetOU\" or TargetProcessCommandLine contains \"Get-NetProcess\" or TargetProcessCommandLine contains \"Get-NetRDPSession\" or TargetProcessCommandLine contains \"Get-NetSession\" or TargetProcessCommandLine contains \"Get-NetShare\" or TargetProcessCommandLine contains \"Get-NetSite\" or TargetProcessCommandLine contains \"Get-NetSubnet\" or TargetProcessCommandLine contains \"Get-NetUser\" or TargetProcessCommandLine contains \"Get-PathAcl\" or TargetProcessCommandLine contains \"Get-PrincipalContext\" or TargetProcessCommandLine contains \"Get-RegistryMountedDrive\" or TargetProcessCommandLine contains \"Get-RegLoggedOn\" or TargetProcessCommandLine contains \"Get-WMIRegCachedRDPConnection\" or TargetProcessCommandLine contains \"Get-WMIRegLastLoggedOn\" or TargetProcessCommandLine contains \"Get-WMIRegMountedDrive\" or TargetProcessCommandLine contains \"Get-WMIRegProxy\" or TargetProcessCommandLine contains \"Invoke-ACLScanner\" or TargetProcessCommandLine contains \"Invoke-CheckLocalAdminAccess\" or TargetProcessCommandLine contains \"Invoke-Kerberoast\" or TargetProcessCommandLine contains \"Invoke-MapDomainTrust\" or TargetProcessCommandLine contains \"Invoke-RevertToSelf\" or TargetProcessCommandLine contains \"Invoke-Sharefinder\" or TargetProcessCommandLine contains \"Invoke-UserImpersonation\" or TargetProcessCommandLine contains \"Remove-DomainObjectAcl\" or TargetProcessCommandLine contains \"Remove-RemoteConnection\" or TargetProcessCommandLine contains \"Request-SPNTicket\" or TargetProcessCommandLine contains \"Set-DomainObject\" or TargetProcessCommandLine contains \"Test-AdminAccess\"))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["Discovery"],
+                "techniques": ["T1033", "T1069", "T1482", "T1049", "T1135"],
+                "alertRuleTemplateName": "b2317cfa-4a47-4ead-b3ff-297438c0bc2d",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

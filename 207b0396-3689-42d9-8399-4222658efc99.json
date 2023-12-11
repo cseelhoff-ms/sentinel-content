@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/207b0396-3689-42d9-8399-4222658efc99')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/207b0396-3689-42d9-8399-4222658efc99')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Potential Privilege Escalation To LOCAL SYSTEM",
+                "description": "Detects unknown program using commandline flags usually used by tools such as PsExec and PAExec to start programs with SYSTEM Privileges\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sysinternals_susp_psexec_paexec_flags_.yml\nAuthor: Florian Roth (Nextron Systems), Nasreddine Bencherchali (Nextron Systems)\nDate Modified: 2023-02-27\nStatus: experimental\nReferences: https://docs.microsoft.com/en-us/sysinternals/downloads/psexec, https://www.poweradmin.com/paexec/, https://www.fireeye.com/blog/threat-research/2020/10/kegtap-and-singlemalt-with-a-ransomware-chaser.html\nFalse Positives: Weird admins that rename their tools, Software companies that bundle PsExec/PAExec with their software and rename it, so that it is less embarrassing",
+                "severity": "high",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \" -s cmd\" or TargetProcessCommandLine contains \" /s cmd\" or TargetProcessCommandLine contains \" -s -i cmd\" or TargetProcessCommandLine contains \" /s /i cmd\" or TargetProcessCommandLine contains \" /s -i cmd\" or TargetProcessCommandLine contains \" -s /i cmd\" or TargetProcessCommandLine contains \" -i -s cmd\" or TargetProcessCommandLine contains \" /i /s cmd\" or TargetProcessCommandLine contains \" -i /s cmd\" or TargetProcessCommandLine contains \" /i -s cmd\" or TargetProcessCommandLine contains \" -s pwsh\" or TargetProcessCommandLine contains \" /s pwsh\" or TargetProcessCommandLine contains \" -s -i pwsh\" or TargetProcessCommandLine contains \" /s /i pwsh\" or TargetProcessCommandLine contains \" /s -i pwsh\" or TargetProcessCommandLine contains \" -s /i pwsh\" or TargetProcessCommandLine contains \" -i -s pwsh\" or TargetProcessCommandLine contains \" /i /s pwsh\" or TargetProcessCommandLine contains \" -i /s pwsh\" or TargetProcessCommandLine contains \" /i -s pwsh\" or TargetProcessCommandLine contains \" -s powershell\" or TargetProcessCommandLine contains \" /s powershell\" or TargetProcessCommandLine contains \" -s -i powershell\" or TargetProcessCommandLine contains \" /s /i powershell\" or TargetProcessCommandLine contains \" /s -i powershell\" or TargetProcessCommandLine contains \" -s /i powershell\" or TargetProcessCommandLine contains \" -i -s powershell\" or TargetProcessCommandLine contains \" /i /s powershell\" or TargetProcessCommandLine contains \" -i /s powershell\" or TargetProcessCommandLine contains \" /i -s powershell\") and (not((TargetProcessCommandLine contains \"paexec\" or TargetProcessCommandLine contains \"PsExec\" or TargetProcessCommandLine contains \"accepteula\"))))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["ResourceDevelopment"],
+                "techniques": ["T1587"],
+                "alertRuleTemplateName": "207b0396-3689-42d9-8399-4222658efc99",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

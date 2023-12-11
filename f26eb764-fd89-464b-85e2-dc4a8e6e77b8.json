@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/f26eb764-fd89-464b-85e2-dc4a8e6e77b8')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/f26eb764-fd89-464b-85e2-dc4a8e6e77b8')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Suspicious Electron Application Child Processes",
+                "description": "Detects suspicious child processes of electron apps (teams, discord, slack, etc.). This could be a potential sign of \".asar\" file tampering (See reference section for more information) or binary execution proxy through specific CLI arguments (see related rule)\n\nSource URL: https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_electron_app_children.yml\nAuthor: Nasreddine Bencherchali (Nextron Systems)\nDate Modified: 2023-09-05\nStatus: experimental\nReferences: https://taggart-tech.com/quasar-electron/, https://github.com/mttaggart/quasar, https://positive.security/blog/ms-officecmd-rce, https://lolbas-project.github.io/lolbas/Binaries/Msedge/, https://lolbas-project.github.io/lolbas/Binaries/Teams/, https://lolbas-project.github.io/lolbas/Binaries/msedgewebview2/, https://medium.com/@MalFuzzer/one-electron-to-rule-them-all-dc2e9b263daf\nFalse Positives: Legitimate child processes can occur in cases of debugging",
+                "severity": "medium",
+                "enabled": true,
+                "query": "_Im_ProcessCreate\n| where ((ActingProcessName endswith \"\\\\chrome.exe\" or ActingProcessName endswith \"\\\\discord.exe\" or ActingProcessName endswith \"\\\\GitHubDesktop.exe\" or ActingProcessName endswith \"\\\\keybase.exe\" or ActingProcessName endswith \"\\\\msedge.exe\" or ActingProcessName endswith \"\\\\msedgewebview2.exe\" or ActingProcessName endswith \"\\\\msteams.exe\" or ActingProcessName endswith \"\\\\slack.exe\" or ActingProcessName endswith \"\\\\Teams.exe\") and ((TargetProcessName endswith \"\\\\cmd.exe\" or TargetProcessName endswith \"\\\\cscript.exe\" or TargetProcessName endswith \"\\\\mshta.exe\" or TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\" or TargetProcessName endswith \"\\\\regsvr32.exe\" or TargetProcessName endswith \"\\\\wscript.exe\") or (TargetProcessName contains \"\\\\AppData\\\\Local\\\\Temp\\\\\" or TargetProcessName contains \"\\\\Users\\\\Public\\\\\" or TargetProcessName contains \"\\\\Windows\\\\Temp\\\\\" or TargetProcessName contains \":\\\\Temp\\\\\")) and (not(((ActingProcessName endswith \"\\\\chrome.exe\" and TargetProcessName endswith \"\\\\chrome.exe\") or (ActingProcessName endswith \"\\\\discord.exe\" and TargetProcessName endswith \"\\\\discord.exe\") or (ActingProcessName endswith \"\\\\GitHubDesktop.exe\" and TargetProcessName endswith \"\\\\GitHubDesktop.exe\") or (ActingProcessName endswith \"\\\\keybase.exe\" and TargetProcessName endswith \"\\\\keybase.exe\") or (ActingProcessName endswith \"\\\\msedge.exe\" and TargetProcessName endswith \"\\\\msedge.exe\") or (ActingProcessName endswith \"\\\\msedgewebview2.exe\" and TargetProcessName endswith \"\\\\msedgewebview2.exe\") or (ActingProcessName endswith \"\\\\msteams.exe\" and TargetProcessName endswith \"\\\\msteams.exe\") or (ActingProcessName endswith \"\\\\slack.exe\" and TargetProcessName endswith \"\\\\slack.exe\") or (ActingProcessName endswith \"\\\\teams.exe\" and TargetProcessName endswith \"\\\\teams.exe\") or (TargetProcessName =~ \"C:\\\\Windows\\\\SysWOW64\\\\WerFault.exe\" or TargetProcessName =~ \"C:\\\\Windows\\\\System32\\\\WerFault.exe\")))) and (not((ActingProcessName endswith \"\\\\Discord.exe\" and TargetProcessCommandLine contains \"\\\\NVSMI\\\\nvidia-smi.exe\"))))",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["Execution"],
+                "techniques": [],
+                "alertRuleTemplateName": "f26eb764-fd89-464b-85e2-dc4a8e6e77b8",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}
