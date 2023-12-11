@@ -26,7 +26,7 @@
                 "suppressionDuration": "PT1H",
                 "suppressionEnabled": false,
                 "startTimeUtc": null,
-                "tactics": ["InitialAccess", "PrivilegeEscalation", "Persistence"],
+                "tactics": ["Persistence", "PrivilegeEscalation", "InitialAccess"],
                 "techniques": [],
                 "alertRuleTemplateName": "0d34ed8b-1c12-4ff2-828c-16fc860b766d",
                 "incidentConfiguration": {

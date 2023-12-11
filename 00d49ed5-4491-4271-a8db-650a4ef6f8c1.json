@@ -27,7 +27,7 @@
                 "suppressionEnabled": false,
                 "startTimeUtc": null,
                 "tactics": ["ResourceDevelopment", "CommandAndControl"],
-                "techniques": ["T1608", "T1105"],
+                "techniques": ["T1105", "T1608"],
                 "alertRuleTemplateName": "00d49ed5-4491-4271-a8db-650a4ef6f8c1",
                 "incidentConfiguration": {
                     "createIncident": true,
