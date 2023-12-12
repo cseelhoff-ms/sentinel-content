@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-4c76-45a9-804d-dc3f355f2035')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-4c76-45a9-804d-dc3f355f2035')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation high 035",
+                "description": "Sigma Windows Process Creation high 035",
+                "severity": "medium",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\Werfault.exe\" or TargetProcessFilename =~ \"WerFault.exe\") and ((ParentUser contains \"AUTHORI\" or ParentUser contains \"AUTORI\") and (TargetUsername contains \"AUTHORI\" or TargetUsername contains \"AUTORI\") and (TargetProcessCommandLine contains \" -u -p \" and TargetProcessCommandLine contains \" -ip \" and TargetProcessCommandLine contains \" -s \"))) and (not(ActingProcessName =~ \"C:\\\\Windows\\\\System32\\\\lsass.exe\")))|extend RuleId=\"9a4ccd1a-3526-4d99-b980-9f9c5d3a6ff3\";\nlet q1=_Im_ProcessCreate\n| where (ActingProcessName endswith \"\\\\wermgr.exe\" and (TargetProcessName endswith \"\\\\cmd.exe\" or TargetProcessName endswith \"\\\\cscript.exe\" or TargetProcessName endswith \"\\\\ipconfig.exe\" or TargetProcessName endswith \"\\\\mshta.exe\" or TargetProcessName endswith \"\\\\net.exe\" or TargetProcessName endswith \"\\\\net1.exe\" or TargetProcessName endswith \"\\\\netstat.exe\" or TargetProcessName endswith \"\\\\nslookup.exe\" or TargetProcessName endswith \"\\\\powershell_ise.exe\" or TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\" or TargetProcessName endswith \"\\\\regsvr32.exe\" or TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessName endswith \"\\\\systeminfo.exe\" or TargetProcessName endswith \"\\\\whoami.exe\" or TargetProcessName endswith \"\\\\wscript.exe\"))|extend RuleId=\"396f6630-f3ac-44e3-bfc8-1b161bc00c4e\";\nlet q2=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\wermgr.exe\" and (not((TargetProcessName startswith \"C:\\\\Windows\\\\System32\\\\\" or TargetProcessName startswith \"C:\\\\Windows\\\\SysWOW64\\\\\" or TargetProcessName startswith \"C:\\\\Windows\\\\WinSxS\\\\\"))))|extend RuleId=\"5394fcc7-aeb2-43b5-9a09-cac9fc5edcd5\";\nlet q3=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\wget.exe\" or TargetProcessFilename =~ \"wget.exe\") and TargetProcessCommandLine matches regex \"://[0-9]{1,3}\\\\.[0-9]{1,3}\\\\.[0-9]{1,3}\\\\.[0-9]{1,3}\" and TargetProcessCommandLine contains \"http\" and (TargetProcessCommandLine matches regex \"\\\\s-O\\\\s\" or TargetProcessCommandLine contains \"--output-document\") and (TargetProcessCommandLine endswith \".ps1\" or TargetProcessCommandLine endswith \".ps1'\" or TargetProcessCommandLine endswith \".ps1\\\"\" or TargetProcessCommandLine endswith \".dat\" or TargetProcessCommandLine endswith \".dat'\" or TargetProcessCommandLine endswith \".dat\\\"\" or TargetProcessCommandLine endswith \".msi\" or TargetProcessCommandLine endswith \".msi'\" or TargetProcessCommandLine endswith \".msi\\\"\" or TargetProcessCommandLine endswith \".bat\" or TargetProcessCommandLine endswith \".bat'\" or TargetProcessCommandLine endswith \".bat\\\"\" or TargetProcessCommandLine endswith \".exe\" or TargetProcessCommandLine endswith \".exe'\" or TargetProcessCommandLine endswith \".exe\\\"\" or TargetProcessCommandLine endswith \".vbs\" or TargetProcessCommandLine endswith \".vbs'\" or TargetProcessCommandLine endswith \".vbs\\\"\" or TargetProcessCommandLine endswith \".vbe\" or TargetProcessCommandLine endswith \".vbe'\" or TargetProcessCommandLine endswith \".vbe\\\"\" or TargetProcessCommandLine endswith \".hta\" or TargetProcessCommandLine endswith \".hta'\" or TargetProcessCommandLine endswith \".hta\\\"\" or TargetProcessCommandLine endswith \".dll\" or TargetProcessCommandLine endswith \".dll'\" or TargetProcessCommandLine endswith \".dll\\\"\" or TargetProcessCommandLine endswith \".psm1\" or TargetProcessCommandLine endswith \".psm1'\" or TargetProcessCommandLine endswith \".psm1\\\"\"))|extend RuleId=\"17f0c0a8-8bd5-4ee0-8c5f-a342c0199f35\";\nlet q4=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\wget.exe\" or TargetProcessFilename =~ \"wget.exe\") and (TargetProcessCommandLine contains \".githubusercontent.com\" or TargetProcessCommandLine contains \"anonfiles.com\" or TargetProcessCommandLine contains \"cdn.discordapp.com\" or TargetProcessCommandLine contains \"cdn.discordapp.com/attachments/\" or TargetProcessCommandLine contains \"ddns.net\" or TargetProcessCommandLine contains \"dl.dropboxusercontent.com\" or TargetProcessCommandLine contains \"ghostbin.co\" or TargetProcessCommandLine contains \"gofile.io\" or TargetProcessCommandLine contains \"hastebin.com\" or TargetProcessCommandLine contains \"mediafire.com\" or TargetProcessCommandLine contains \"mega.nz\" or TargetProcessCommandLine contains \"paste.ee\" or TargetProcessCommandLine contains \"pastebin.com\" or TargetProcessCommandLine contains \"pastebin.pl\" or TargetProcessCommandLine contains \"pastetext.net\" or TargetProcessCommandLine contains \"privatlab.com\" or TargetProcessCommandLine contains \"privatlab.net\" or TargetProcessCommandLine contains \"send.exploit.in\" or TargetProcessCommandLine contains \"sendspace.com\" or TargetProcessCommandLine contains \"storage.googleapis.com\" or TargetProcessCommandLine contains \"storjshare.io\" or TargetProcessCommandLine contains \"temp.sh\" or TargetProcessCommandLine contains \"transfer.sh\" or TargetProcessCommandLine contains \"ufile.io\") and TargetProcessCommandLine contains \"http\" and (TargetProcessCommandLine matches regex \"\\\\s-O\\\\s\" or TargetProcessCommandLine contains \"--output-document\") and (TargetProcessCommandLine endswith \".ps1\" or TargetProcessCommandLine endswith \".ps1'\" or TargetProcessCommandLine endswith \".ps1\\\"\" or TargetProcessCommandLine endswith \".dat\" or TargetProcessCommandLine endswith \".dat'\" or TargetProcessCommandLine endswith \".dat\\\"\" or TargetProcessCommandLine endswith \".msi\" or TargetProcessCommandLine endswith \".msi'\" or TargetProcessCommandLine endswith \".msi\\\"\" or TargetProcessCommandLine endswith \".bat\" or TargetProcessCommandLine endswith \".bat'\" or TargetProcessCommandLine endswith \".bat\\\"\" or TargetProcessCommandLine endswith \".exe\" or TargetProcessCommandLine endswith \".exe'\" or TargetProcessCommandLine endswith \".exe\\\"\" or TargetProcessCommandLine endswith \".vbs\" or TargetProcessCommandLine endswith \".vbs'\" or TargetProcessCommandLine endswith \".vbs\\\"\" or TargetProcessCommandLine endswith \".vbe\" or TargetProcessCommandLine endswith \".vbe'\" or TargetProcessCommandLine endswith \".vbe\\\"\" or TargetProcessCommandLine endswith \".hta\" or TargetProcessCommandLine endswith \".hta'\" or TargetProcessCommandLine endswith \".hta\\\"\" or TargetProcessCommandLine endswith \".dll\" or TargetProcessCommandLine endswith \".dll'\" or TargetProcessCommandLine endswith \".dll\\\"\" or TargetProcessCommandLine endswith \".psm1\" or TargetProcessCommandLine endswith \".psm1'\" or TargetProcessCommandLine endswith \".psm1\\\"\"))|extend RuleId=\"a0d7e4d2-bede-4141-8896-bc6e237e977c\";\nlet q5=_Im_ProcessCreate\n| where ((TargetProcessFilename =~ \"whoami.exe\" or TargetProcessName endswith \"\\\\whoami.exe\") and (TargetUsername contains \"AUTHORI\" or TargetUsername contains \"AUTORI\" or TargetUsername contains \"TrustedInstaller\"))|extend RuleId=\"79ce34ca-af29-4d0e-b832-fc1b377020db\";\nlet q6=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\whoami.exe\" or TargetProcessFilename =~ \"whoami.exe\") and (not(((ActingProcessName endswith \"\\\\cmd.exe\" or ActingProcessName endswith \"\\\\powershell.exe\" or ActingProcessName endswith \"\\\\pwsh.exe\" or ActingProcessName endswith \"\\\\powershell_ise.exe\") or ActingProcessName =~ \"C:\\\\Program Files\\\\Microsoft Monitoring Agent\\\\Agent\\\\MonitoringHost.exe\" or isnull(ActingProcessName) or ActingProcessName =~ \"\"))))|extend RuleId=\"8de1cbe8-d6f5-496d-8237-5f44a721c7a0\";\nlet q7=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\whoami.exe\" or TargetProcessFilename =~ \"whoami.exe\") and (TargetProcessCommandLine contains \" /priv\" or TargetProcessCommandLine contains \" -priv\"))|extend RuleId=\"97a80ec7-0e2f-4d05-9ef4-65760e634f6b\";\nlet q8=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\whoami.exe\" or TargetProcessFilename =~ \"whoami.exe\") and (TargetProcessCommandLine contains \" -all\" or TargetProcessCommandLine contains \" /all\" or TargetProcessCommandLine contains \" /FO CSV\" or TargetProcessCommandLine contains \" -FO CSV\")) or (TargetProcessCommandLine contains \"whoami\" and TargetProcessCommandLine contains \">\"))|extend RuleId=\"c30fb093-1109-4dc8-88a8-b30d11c95a5d\";\nlet q9=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\winget.exe\" or TargetProcessFilename =~ \"winget.exe\") and (TargetProcessCommandLine contains \"source \" and TargetProcessCommandLine contains \"add \" and TargetProcessCommandLine contains \"http://\"))|extend RuleId=\"81a0ecb5-0a41-4ba1-b2ba-c944eb92bfa2\";\nlet q10=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\winget.exe\" or TargetProcessFilename =~ \"winget.exe\") and (TargetProcessCommandLine contains \"source \" and TargetProcessCommandLine contains \"add \") and TargetProcessCommandLine matches regex \"://\\\\d{1,3}\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}\")|extend RuleId=\"c15a46a0-07d4-4c87-b4b6-89207835a83b\";\nlet q11=_Im_ProcessCreate\n| where (ActingProcessName endswith \"\\\\wsmprovhost.exe\" and (TargetProcessName endswith \"\\\\cmd.exe\" or TargetProcessName endswith \"\\\\sh.exe\" or TargetProcessName endswith \"\\\\bash.exe\" or TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\" or TargetProcessName endswith \"\\\\wsl.exe\" or TargetProcessName endswith \"\\\\schtasks.exe\" or TargetProcessName endswith \"\\\\certutil.exe\" or TargetProcessName endswith \"\\\\whoami.exe\" or TargetProcessName endswith \"\\\\bitsadmin.exe\"))|extend RuleId=\"5cc2cda8-f261-4d88-a2de-e9e193c86716\";\nlet q12=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"ActiveScriptEventConsumer\" and TargetProcessCommandLine contains \" CREATE \")|extend RuleId=\"ebef4391-1a81-4761-a40a-1db446c0e625\";\nlet q13=_Im_ProcessCreate\n| where ((TargetProcessFilename =~ \"wmic.exe\" or TargetProcessName endswith \"\\\\WMIC.exe\") and TargetProcessCommandLine contains \"/Namespace:\\\\\\\\root\\\\Microsoft\\\\Windows\\\\Defender\")|extend RuleId=\"51cbac1e-eee3-4a90-b1b7-358efb81fa0a\";\nlet q14=_Im_ProcessCreate\n| where ((ActingProcessName endswith \"\\\\WINWORD.EXE\" or ActingProcessName endswith \"\\\\EXCEL.EXE\" or ActingProcessName endswith \"\\\\POWERPNT.exe\" or ActingProcessName endswith \"\\\\MSPUB.exe\" or ActingProcessName endswith \"\\\\VISIO.exe\" or ActingProcessName endswith \"\\\\MSACCESS.EXE\" or ActingProcessName endswith \"\\\\EQNEDT32.EXE\" or ActingProcessName endswith \"\\\\ONENOTE.EXE\" or ActingProcessName endswith \"\\\\wordpad.exe\" or ActingProcessName endswith \"\\\\wordview.exe\") and (TargetProcessName endswith \"\\\\wbem\\\\WMIC.exe\" or TargetProcessFilename =~ \"wmic.exe\") and ((TargetProcessCommandLine contains \"process\" and TargetProcessCommandLine contains \"create\" and TargetProcessCommandLine contains \"call\") and (TargetProcessCommandLine contains \"regsvr32\" or TargetProcessCommandLine contains \"rundll32\" or TargetProcessCommandLine contains \"msiexec\" or TargetProcessCommandLine contains \"mshta\" or TargetProcessCommandLine contains \"verclsid\" or TargetProcessCommandLine contains \"wscript\" or TargetProcessCommandLine contains \"cscript\")))|extend RuleId=\"e1693bc8-7168-4eab-8718-cdcaa68a1738\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["PrivilegeEscalation", "Discovery", "DefenseEvasion", "InitialAccess", "CredentialAccess", "Persistence", "Execution"],
+                "techniques": ["T1218", "T1204", "T1033", "T1190", "T1003", "T1059", "T1036", "T1546", "T1047", "T1055"],
+                "alertRuleTemplateName": "5163A000-4c76-45a9-804d-dc3f355f2035",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

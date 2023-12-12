@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-4c76-45a9-804d-dc3f355f1012')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-4c76-45a9-804d-dc3f355f1012')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation medium 012",
+                "description": "Sigma Windows Process Creation medium 012",
+                "severity": "medium",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where (TargetProcessFileProduct =~ \"UltraViewer\" or TargetProcessFileCompany =~ \"DucFabulous Co,ltd\" or TargetProcessFilename =~ \"UltraViewer_Desktop.exe\")|extend RuleId=\"88656cec-6c3b-487c-82c0-f73ebb805503\";\nlet q1=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\AnyDesk.exe\" or TargetProcessFileDescription =~ \"AnyDesk\" or TargetProcessFileProduct =~ \"AnyDesk\" or TargetProcessFileCompany =~ \"AnyDesk Software GmbH\")|extend RuleId=\"b52e84a3-029e-4529-b09b-71d19dd27e94\";\nlet q2=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"/c \" and TargetProcessCommandLine contains \"echo \" and TargetProcessCommandLine contains \".exe --set-password\")|extend RuleId=\"b1377339-fda6-477a-b455-ac0923f9ec2c\";\nlet q3=_Im_ProcessCreate\n| where (TargetProcessFileDescription =~ \"GoTo Opener\" or TargetProcessFileProduct =~ \"GoTo Opener\" or TargetProcessFileCompany =~ \"LogMeIn, Inc.\")|extend RuleId=\"b6d98a4f-cef0-4abf-bbf6-24132854a83d\";\nlet q4=_Im_ProcessCreate\n| where (TargetProcessFileDescription =~ \"LMIGuardianSvc\" or TargetProcessFileProduct =~ \"LMIGuardianSvc\" or TargetProcessFileCompany =~ \"LogMeIn, Inc.\")|extend RuleId=\"d85873ef-a0f8-4c48-a53a-6b621f11729d\";\nlet q5=_Im_ProcessCreate\n| where (TargetProcessFileDescription =~ \"NetSupport Client Configurator\" or TargetProcessFileProduct =~ \"NetSupport Remote Control\" or TargetProcessFileCompany =~ \"NetSupport Ltd\" or TargetProcessFilename =~ \"PCICFGUI.EXE\")|extend RuleId=\"758ff488-18d5-4cbe-8ec4-02b6285a434f\";\nlet q6=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\client32.exe\" or TargetProcessFileProduct contains \"NetSupport Remote Control\" or TargetProcessFilename contains \"client32.exe\" or TargetProcessIMPHASH =~ \"a9d50692e95b79723f3e76fcf70d023e\" or Hashes contains \"IMPHASH=a9d50692e95b79723f3e76fcf70d023e\") and (not((TargetProcessName startswith \"C:\\\\Program Files\\\\\" or TargetProcessName startswith \"C:\\\\Program Files (x86)\\\\\"))))|extend RuleId=\"37e8d358-6408-4853-82f4-98333fca7014\";\nlet q7=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\rutserv.exe\" or TargetProcessName endswith \"\\\\rfusclient.exe\") or TargetProcessFileProduct =~ \"Remote Utilities\") and (not((TargetProcessName startswith \"C:\\\\Program Files\\\\Remote Utilities\" or TargetProcessName startswith \"C:\\\\Program Files (x86)\\\\Remote Utilities\"))))|extend RuleId=\"e01fa958-6893-41d4-ae03-182477c5e77d\";\nlet q8=_Im_ProcessCreate\n| where (TargetProcessFileDescription =~ \"ScreenConnect Service\" or TargetProcessFileProduct =~ \"ScreenConnect\" or TargetProcessFileCompany =~ \"ScreenConnect Software\")|extend RuleId=\"57bff678-25d1-4d6c-8211-8ca106d12053\";\nlet q9=_Im_ProcessCreate\n| where (ActingProcessName endswith \"\\\\ScreenConnect.ClientService.exe\" and (TargetProcessName endswith \"\\\\cmd.exe\" or TargetProcessFilename =~ \"Cmd.Exe\") and TargetProcessCommandLine contains \"\\\\TEMP\\\\ScreenConnect\\\\\")|extend RuleId=\"b1f73849-6329-4069-bc8f-78a604bb8b23\";\nlet q10=_Im_ProcessCreate\n| where ((TargetProcessFileProduct contains \"AutoHotkey\" or TargetProcessFileDescription contains \"AutoHotkey\" or (TargetProcessFilename =~ \"AutoHotkey.exe\" or TargetProcessFilename =~ \"AutoHotkey.rc\")) and (not(((TargetProcessName endswith \"\\\\AutoHotkey.exe\" or TargetProcessName endswith \"\\\\AutoHotkey32.exe\" or TargetProcessName endswith \"\\\\AutoHotkey32_UIA.exe\" or TargetProcessName endswith \"\\\\AutoHotkey64.exe\" or TargetProcessName endswith \"\\\\AutoHotkey64_UIA.exe\" or TargetProcessName endswith \"\\\\AutoHotkeyA32.exe\" or TargetProcessName endswith \"\\\\AutoHotkeyA32_UIA.exe\" or TargetProcessName endswith \"\\\\AutoHotkeyU32.exe\" or TargetProcessName endswith \"\\\\AutoHotkeyU32_UIA.exe\" or TargetProcessName endswith \"\\\\AutoHotkeyU64.exe\" or TargetProcessName endswith \"\\\\AutoHotkeyU64_UIA.exe\") or TargetProcessName contains \"\\\\AutoHotkey\"))))|extend RuleId=\"0f16d9cf-0616-45c8-8fad-becc11b5a41c\";\nlet q11=_Im_ProcessCreate\n| where ((TargetProcessFilename =~ \"Cmd.Exe\" or TargetProcessFilename =~ \"CONHOST.EXE\" or TargetProcessFilename =~ \"7z.exe\" or TargetProcessFilename =~ \"WinRAR.exe\" or TargetProcessFilename =~ \"wevtutil.exe\" or TargetProcessFilename =~ \"net.exe\" or TargetProcessFilename =~ \"net1.exe\" or TargetProcessFilename =~ \"netsh.exe\" or TargetProcessFilename =~ \"InstallUtil.exe\") and (not((TargetProcessName endswith \"\\\\cmd.exe\" or TargetProcessName endswith \"\\\\conhost.exe\" or TargetProcessName endswith \"\\\\7z.exe\" or TargetProcessName endswith \"\\\\WinRAR.exe\" or TargetProcessName endswith \"\\\\wevtutil.exe\" or TargetProcessName endswith \"\\\\net.exe\" or TargetProcessName endswith \"\\\\net1.exe\" or TargetProcessName endswith \"\\\\netsh.exe\" or TargetProcessName endswith \"\\\\InstallUtil.exe\"))))|extend RuleId=\"36480ae1-a1cb-4eaa-a0d6-29801d7e9142\";\nlet q12=_Im_ProcessCreate\n| where ((TargetProcessFilename =~ \"curl.exe\" or TargetProcessFileDescription =~ \"The curl executable\") and (not(TargetProcessName contains \"\\\\curl\")))|extend RuleId=\"7530cd3d-7671-43e3-b209-976966f6ea48\";\nlet q13=_Im_ProcessCreate\n| where (TargetProcessFilename =~ \"ftp.exe\" and (not(TargetProcessName endswith \"\\\\ftp.exe\")))|extend RuleId=\"277a4393-446c-449a-b0ed-7fdc7795244c\";\nlet q14=_Im_ProcessCreate\n| where (TargetProcessFilename =~ \"Microsoft.NodejsTools.PressAnyKey.exe\" and (not(TargetProcessName endswith \"\\\\Microsoft.NodejsTools.PressAnyKey.exe\")))|extend RuleId=\"65c3ca2c-525f-4ced-968e-246a713d164f\";\nlet q15=_Im_ProcessCreate\n| where (TargetProcessFileProduct =~ \"Remote Utilities\" and (not((TargetProcessName endswith \"\\\\rutserv.exe\" or TargetProcessName endswith \"\\\\rfusclient.exe\"))))|extend RuleId=\"9ef27c24-4903-4192-881a-3adde7ff92a5\";\nlet q16=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\rpcping.exe\" and (TargetProcessCommandLine contains \"-s\" or TargetProcessCommandLine contains \"/s\") and ((TargetProcessCommandLine contains \"-u\" and TargetProcessCommandLine contains \"NTLM\") or (TargetProcessCommandLine contains \"/u\" and TargetProcessCommandLine contains \"NTLM\") or (TargetProcessCommandLine contains \"-t\" and TargetProcessCommandLine contains \"ncacn_np\") or (TargetProcessCommandLine contains \"/t\" and TargetProcessCommandLine contains \"ncacn_np\")))|extend RuleId=\"93671f99-04eb-4ab4-a161-70d446a84003\";\nlet q17=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\ruby.exe\" or TargetProcessFilename =~ \"ruby.exe\") and TargetProcessCommandLine contains \" -e\")|extend RuleId=\"20a5ffa1-3848-4584-b6f8-c7c7fd9f69c8\";\nlet q18=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessFilename =~ \"RUNDLL32.EXE\") and TargetProcessCommandLine contains \"InstallScreenSaver\")|extend RuleId=\"15bd98ea-55f4-4d37-b09a-e7caa0fa2221\";\nlet q19=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessFilename =~ \"RUNDLL32.EXE\" or TargetProcessCommandLine contains \"rundll32\") and (TargetProcessCommandLine contains \"#+\" or TargetProcessCommandLine contains \"#-\"))|extend RuleId=\"43fa5350-db63-4b8f-9a01-789a427074e1\";\nlet q20=_Im_ProcessCreate\n| where ((ActingProcessName endswith \"\\\\explorer.exe\" and (TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessFilename =~ \"RUNDLL32.EXE\")) and (not((TargetProcessCommandLine contains \" C:\\\\Windows\\\\System32\\\\\" or TargetProcessCommandLine endswith \" -localserver 22d8c27b-47a1-48d1-ad08-7da7abd79617\"))))|extend RuleId=\"1723e720-616d-4ddc-ab02-f7e3685a4713\";\nlet q21=_Im_ProcessCreate\n| where ((TargetProcessName contains \":\\\\RECYCLER\\\\\" or TargetProcessName contains \":\\\\SystemVolumeInformation\\\\\") or (TargetProcessName startswith \"C:\\\\Windows\\\\Tasks\\\\\" or TargetProcessName startswith \"C:\\\\Windows\\\\debug\\\\\" or TargetProcessName startswith \"C:\\\\Windows\\\\fonts\\\\\" or TargetProcessName startswith \"C:\\\\Windows\\\\help\\\\\" or TargetProcessName startswith \"C:\\\\Windows\\\\drivers\\\\\" or TargetProcessName startswith \"C:\\\\Windows\\\\addins\\\\\" or TargetProcessName startswith \"C:\\\\Windows\\\\cursors\\\\\" or TargetProcessName startswith \"C:\\\\Windows\\\\system32\\\\tasks\\\\\"))|extend RuleId=\"15b75071-74cc-47e0-b4c6-b43744a62a2b\";\nlet q22=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"rundll32\" and (TargetProcessCommandLine contains \"mshtml,RunHTMLApplication\" or TargetProcessCommandLine contains \"mshtml,#135\") and (TargetProcessCommandLine contains \"javascript:\" or TargetProcessCommandLine contains \"vbscript:\"))|extend RuleId=\"73fcad2e-ff14-4c38-b11d-4172c8ac86c7\";\nlet q23=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\runonce.exe\" and ActingProcessName endswith \"\\\\rundll32.exe\" and (ActingProcessCommandLine contains \"setupapi.dll\" and ActingProcessCommandLine contains \"InstallHinfSection\"))|extend RuleId=\"285b85b1-a555-4095-8652-a8a4106af63f\";\nlet q24=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessFilename =~ \"RUNDLL32.EXE\") and TargetProcessCommandLine contains \"RunDll_ShellExecuteW\")|extend RuleId=\"82343930-652f-43f5-ab70-2ee9fdd6d5e9\";\nlet q25=_Im_ProcessCreate\n| where (((TargetProcessCommandLine contains \"javascript:\" and TargetProcessCommandLine contains \".RegisterXLL\") or (TargetProcessCommandLine contains \"url.dll\" and TargetProcessCommandLine contains \"OpenURL\") or (TargetProcessCommandLine contains \"url.dll\" and TargetProcessCommandLine contains \"OpenURLA\") or (TargetProcessCommandLine contains \"url.dll\" and TargetProcessCommandLine contains \"FileProtocolHandler\") or (TargetProcessCommandLine contains \"zipfldr.dll\" and TargetProcessCommandLine contains \"RouteTheCall\") or (TargetProcessCommandLine contains \"shell32.dll\" and TargetProcessCommandLine contains \"Control_RunDLL\") or (TargetProcessCommandLine contains \"shell32.dll\" and TargetProcessCommandLine contains \"ShellExec_RunDLL\") or (TargetProcessCommandLine contains \"mshtml.dll\" and TargetProcessCommandLine contains \"PrintHTML\") or (TargetProcessCommandLine contains \"advpack.dll\" and TargetProcessCommandLine contains \"LaunchINFSection\") or (TargetProcessCommandLine contains \"advpack.dll\" and TargetProcessCommandLine contains \"RegisterOCX\") or (TargetProcessCommandLine contains \"ieadvpack.dll\" and TargetProcessCommandLine contains \"LaunchINFSection\") or (TargetProcessCommandLine contains \"ieadvpack.dll\" and TargetProcessCommandLine contains \"RegisterOCX\") or (TargetProcessCommandLine contains \"ieframe.dll\" and TargetProcessCommandLine contains \"OpenURL\") or (TargetProcessCommandLine contains \"shdocvw.dll\" and TargetProcessCommandLine contains \"OpenURL\") or (TargetProcessCommandLine contains \"syssetup.dll\" and TargetProcessCommandLine contains \"SetupInfObjectInstallAction\") or (TargetProcessCommandLine contains \"setupapi.dll\" and TargetProcessCommandLine contains \"InstallHinfSection\") or (TargetProcessCommandLine contains \"pcwutl.dll\" and TargetProcessCommandLine contains \"LaunchApplication\") or (TargetProcessCommandLine contains \"dfshim.dll\" and TargetProcessCommandLine contains \"ShOpenVerbApplication\") or (TargetProcessCommandLine contains \"dfshim.dll\" and TargetProcessCommandLine contains \"ShOpenVerbShortcut\") or (TargetProcessCommandLine contains \"scrobj.dll\" and TargetProcessCommandLine contains \"GenerateTypeLib\" and TargetProcessCommandLine contains \"http\") or (TargetProcessCommandLine contains \"shimgvw.dll\" and TargetProcessCommandLine contains \"ImageView_Fullscreen\" and TargetProcessCommandLine contains \"http\") or (TargetProcessCommandLine contains \"comsvcs.dll\" and TargetProcessCommandLine contains \"MiniDump\")) and (not((TargetProcessCommandLine contains \"shell32.dll,Control_RunDLL desk.cpl,screensaver,@screensaver\" or (ActingProcessName =~ \"C:\\\\Windows\\\\System32\\\\control.exe\" and ActingProcessCommandLine contains \".cpl\" and (TargetProcessCommandLine contains \"Shell32.dll\" and TargetProcessCommandLine contains \"Control_RunDLL\" and TargetProcessCommandLine contains \".cpl\")) or (ActingProcessName =~ \"C:\\\\Windows\\\\System32\\\\control.exe\" and TargetProcessCommandLine startswith \"\\\"C:\\\\Windows\\\\system32\\\\rundll32.exe\\\" Shell32.dll,Control_RunDLL \\\"C:\\\\Windows\\\\System32\\\\\" and TargetProcessCommandLine endswith \".cpl\\\",\")))))|extend RuleId=\"e593cf51-88db-4ee1-b920-37e89012a3c9\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18, q19, q20, q21, q22, q23, q24, q25;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["Collection", "Discovery", "CredentialAccess", "DefenseEvasion", "Execution", "CommandAndControl"],
+                "techniques": ["T1218", "T1059", "T1219", "T1036", "T1003", "T1202"],
+                "alertRuleTemplateName": "5163A000-4c76-45a9-804d-dc3f355f1012",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

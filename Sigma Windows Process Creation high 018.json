@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-4c76-45a9-804d-dc3f355f2018')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-4c76-45a9-804d-dc3f355f2018')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation high 018",
+                "description": "Sigma Windows Process Creation high 018",
+                "severity": "medium",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where ((ActingProcessName contains \"tomcat\" or (ActingProcessName endswith \"\\\\amigo.exe\" or ActingProcessName endswith \"\\\\browser.exe\" or ActingProcessName endswith \"\\\\chrome.exe\" or ActingProcessName endswith \"\\\\firefox.exe\" or ActingProcessName endswith \"\\\\httpd.exe\" or ActingProcessName endswith \"\\\\iexplore.exe\" or ActingProcessName endswith \"\\\\jbosssvc.exe\" or ActingProcessName endswith \"\\\\microsoftedge.exe\" or ActingProcessName endswith \"\\\\microsoftedgecp.exe\" or ActingProcessName endswith \"\\\\MicrosoftEdgeSH.exe\" or ActingProcessName endswith \"\\\\mshta.exe\" or ActingProcessName endswith \"\\\\nginx.exe\" or ActingProcessName endswith \"\\\\outlook.exe\" or ActingProcessName endswith \"\\\\php-cgi.exe\" or ActingProcessName endswith \"\\\\regsvr32.exe\" or ActingProcessName endswith \"\\\\rundll32.exe\" or ActingProcessName endswith \"\\\\safari.exe\" or ActingProcessName endswith \"\\\\services.exe\" or ActingProcessName endswith \"\\\\sqlagent.exe\" or ActingProcessName endswith \"\\\\sqlserver.exe\" or ActingProcessName endswith \"\\\\sqlservr.exe\" or ActingProcessName endswith \"\\\\vivaldi.exe\" or ActingProcessName endswith \"\\\\w3wp.exe\")) and ((TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\") or (TargetProcessCommandLine contains \"/c powershell\" or TargetProcessCommandLine contains \"/c pwsh\") or TargetProcessFileDescription =~ \"Windows PowerShell\" or TargetProcessFileProduct =~ \"PowerShell Core 6\" or (TargetProcessFilename =~ \"PowerShell.EXE\" or TargetProcessFilename =~ \"pwsh.dll\")))|extend RuleId=\"754ed792-634f-40ae-b3bc-e0448d33f695\";\nlet q1=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"powershell\" and TargetProcessCommandLine contains \".DownloadFile\" and TargetProcessCommandLine contains \"System.Net.WebClient\")|extend RuleId=\"8f70ac5f-1f6f-4f8e-b454-db19561216c5\";\nlet q2=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"Remove-MpPreference\" and (TargetProcessCommandLine contains \"-ControlledFolderAccessProtectedFolders \" or TargetProcessCommandLine contains \"-AttackSurfaceReductionRules_Ids \" or TargetProcessCommandLine contains \"-AttackSurfaceReductionRules_Actions \" or TargetProcessCommandLine contains \"-CheckForSignaturesBeforeRunningScan \"))|extend RuleId=\"07e3cb2c-0608-410d-be4b-1511cb1a0448\";\nlet q3=_Im_ProcessCreate\n| where (TargetProcessCommandLine matches regex \"\\\\w+`(\\\\w+|-|.)`[\\\\w+|\\\\s]\" or TargetProcessCommandLine matches regex \"\"(\\\\{\\\\d\\\\})+\"\\\\s*-f\" or TargetProcessCommandLine matches regex \"\\\\$\\\\{((e|n|v)*`(e|n|v)*)+:path\\\\}|\\\\$\\\\{((e|n|v)*`(e|n|v)*)+:((p|a|t|h)*`(p|a|t|h)*)+\\\\}|\\\\$\\\\{env:((p|a|t|h)*`(p|a|t|h)*)+\\\\}\")|extend RuleId=\"deb9b646-a508-44ee-b7c9-d8965921c6b6\";\nlet q4=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\") or (TargetProcessFilename =~ \"PowerShell.EXE\" or TargetProcessFilename =~ \"pwsh.dll\")) and (TargetProcessCommandLine contains \"TgBlAFQALgB3AEUAQg\" or TargetProcessCommandLine contains \"4AZQBUAC4AdwBFAEIA\" or TargetProcessCommandLine contains \"OAGUAVAAuAHcARQBCA\" or TargetProcessCommandLine contains \"bgBFAHQALgB3AGUAYg\" or TargetProcessCommandLine contains \"4ARQB0AC4AdwBlAGIA\" or TargetProcessCommandLine contains \"uAEUAdAAuAHcAZQBiA\" or TargetProcessCommandLine contains \"TgBFAHQALgB3AGUAYg\" or TargetProcessCommandLine contains \"OAEUAdAAuAHcAZQBiA\" or TargetProcessCommandLine contains \"bgBlAFQALgB3AGUAYg\" or TargetProcessCommandLine contains \"4AZQBUAC4AdwBlAGIA\" or TargetProcessCommandLine contains \"uAGUAVAAuAHcAZQBiA\" or TargetProcessCommandLine contains \"TgBlAFQALgB3AGUAYg\" or TargetProcessCommandLine contains \"OAGUAVAAuAHcAZQBiA\" or TargetProcessCommandLine contains \"bgBFAFQALgB3AGUAYg\" or TargetProcessCommandLine contains \"4ARQBUAC4AdwBlAGIA\" or TargetProcessCommandLine contains \"uAEUAVAAuAHcAZQBiA\" or TargetProcessCommandLine contains \"bgBlAHQALgBXAGUAYg\" or TargetProcessCommandLine contains \"4AZQB0AC4AVwBlAGIA\" or TargetProcessCommandLine contains \"uAGUAdAAuAFcAZQBiA\" or TargetProcessCommandLine contains \"bgBFAHQALgBXAGUAYg\" or TargetProcessCommandLine contains \"4ARQB0AC4AVwBlAGIA\" or TargetProcessCommandLine contains \"uAEUAdAAuAFcAZQBiA\" or TargetProcessCommandLine contains \"TgBFAHQALgBXAGUAYg\" or TargetProcessCommandLine contains \"OAEUAdAAuAFcAZQBiA\" or TargetProcessCommandLine contains \"bgBlAFQALgBXAGUAYg\" or TargetProcessCommandLine contains \"4AZQBUAC4AVwBlAGIA\" or TargetProcessCommandLine contains \"uAGUAVAAuAFcAZQBiA\" or TargetProcessCommandLine contains \"TgBlAFQALgBXAGUAYg\" or TargetProcessCommandLine contains \"OAGUAVAAuAFcAZQBiA\" or TargetProcessCommandLine contains \"bgBFAFQALgBXAGUAYg\" or TargetProcessCommandLine contains \"4ARQBUAC4AVwBlAGIA\" or TargetProcessCommandLine contains \"uAEUAVAAuAFcAZQBiA\" or TargetProcessCommandLine contains \"bgBlAHQALgB3AEUAYg\" or TargetProcessCommandLine contains \"4AZQB0AC4AdwBFAGIA\" or TargetProcessCommandLine contains \"uAGUAdAAuAHcARQBiA\" or TargetProcessCommandLine contains \"TgBlAHQALgB3AEUAYg\" or TargetProcessCommandLine contains \"OAGUAdAAuAHcARQBiA\" or TargetProcessCommandLine contains \"bgBFAHQALgB3AEUAYg\" or TargetProcessCommandLine contains \"4ARQB0AC4AdwBFAGIA\" or TargetProcessCommandLine contains \"uAEUAdAAuAHcARQBiA\" or TargetProcessCommandLine contains \"TgBFAHQALgB3AEUAYg\" or TargetProcessCommandLine contains \"OAEUAdAAuAHcARQBiA\" or TargetProcessCommandLine contains \"bgBlAFQALgB3AEUAYg\" or TargetProcessCommandLine contains \"4AZQBUAC4AdwBFAGIA\" or TargetProcessCommandLine contains \"uAGUAVAAuAHcARQBiA\" or TargetProcessCommandLine contains \"TgBlAFQALgB3AEUAYg\" or TargetProcessCommandLine contains \"OAGUAVAAuAHcARQBiA\" or TargetProcessCommandLine contains \"bgBFAFQALgB3AEUAYg\" or TargetProcessCommandLine contains \"4ARQBUAC4AdwBFAGIA\" or TargetProcessCommandLine contains \"uAEUAVAAuAHcARQBiA\" or TargetProcessCommandLine contains \"TgBFAFQALgB3AEUAYg\" or TargetProcessCommandLine contains \"OAEUAVAAuAHcARQBiA\" or TargetProcessCommandLine contains \"bgBlAHQALgBXAEUAYg\" or TargetProcessCommandLine contains \"4AZQB0AC4AVwBFAGIA\" or TargetProcessCommandLine contains \"uAGUAdAAuAFcARQBiA\" or TargetProcessCommandLine contains \"TgBlAHQALgBXAEUAYg\" or TargetProcessCommandLine contains \"OAGUAdAAuAFcARQBiA\" or TargetProcessCommandLine contains \"bgBFAHQALgBXAEUAYg\" or TargetProcessCommandLine contains \"4ARQB0AC4AVwBFAGIA\" or TargetProcessCommandLine contains \"uAEUAdAAuAFcARQBiA\" or TargetProcessCommandLine contains \"TgBFAHQALgBXAEUAYg\" or TargetProcessCommandLine contains \"OAEUAdAAuAFcARQBiA\" or TargetProcessCommandLine contains \"bgBlAFQALgBXAEUAYg\" or TargetProcessCommandLine contains \"4AZQBUAC4AVwBFAGIA\" or TargetProcessCommandLine contains \"uAGUAVAAuAFcARQBiA\" or TargetProcessCommandLine contains \"TgBlAFQALgBXAEUAYg\" or TargetProcessCommandLine contains \"OAGUAVAAuAFcARQBiA\" or TargetProcessCommandLine contains \"bgBFAFQALgBXAEUAYg\" or TargetProcessCommandLine contains \"4ARQBUAC4AVwBFAGIA\" or TargetProcessCommandLine contains \"uAEUAVAAuAFcARQBiA\" or TargetProcessCommandLine contains \"TgBFAFQALgBXAEUAYg\" or TargetProcessCommandLine contains \"OAEUAVAAuAFcARQBiA\" or TargetProcessCommandLine contains \"bgBlAHQALgB3AGUAQg\" or TargetProcessCommandLine contains \"4AZQB0AC4AdwBlAEIA\" or TargetProcessCommandLine contains \"uAGUAdAAuAHcAZQBCA\" or TargetProcessCommandLine contains \"TgBlAHQALgB3AGUAQg\" or TargetProcessCommandLine contains \"OAGUAdAAuAHcAZQBCA\" or TargetProcessCommandLine contains \"bgBFAHQALgB3AGUAQg\" or TargetProcessCommandLine contains \"4ARQB0AC4AdwBlAEIA\" or TargetProcessCommandLine contains \"uAEUAdAAuAHcAZQBCA\" or TargetProcessCommandLine contains \"TgBFAHQALgB3AGUAQg\" or TargetProcessCommandLine contains \"OAEUAdAAuAHcAZQBCA\" or TargetProcessCommandLine contains \"bgBlAFQALgB3AGUAQg\" or TargetProcessCommandLine contains \"4AZQBUAC4AdwBlAEIA\" or TargetProcessCommandLine contains \"uAGUAVAAuAHcAZQBCA\" or TargetProcessCommandLine contains \"TgBlAFQALgB3AGUAQg\" or TargetProcessCommandLine contains \"OAGUAVAAuAHcAZQBCA\" or TargetProcessCommandLine contains \"bgBFAFQALgB3AGUAQg\" or TargetProcessCommandLine contains \"4ARQBUAC4AdwBlAEIA\" or TargetProcessCommandLine contains \"uAEUAVAAuAHcAZQBCA\" or TargetProcessCommandLine contains \"TgBFAFQALgB3AGUAQg\" or TargetProcessCommandLine contains \"OAEUAVAAuAHcAZQBCA\" or TargetProcessCommandLine contains \"bgBlAHQALgBXAGUAQg\" or TargetProcessCommandLine contains \"4AZQB0AC4AVwBlAEIA\" or TargetProcessCommandLine contains \"uAGUAdAAuAFcAZQBCA\" or TargetProcessCommandLine contains \"TgBlAHQALgBXAGUAQg\" or TargetProcessCommandLine contains \"OAGUAdAAuAFcAZQBCA\" or TargetProcessCommandLine contains \"bgBFAHQALgBXAGUAQg\" or TargetProcessCommandLine contains \"4ARQB0AC4AVwBlAEIA\" or TargetProcessCommandLine contains \"uAEUAdAAuAFcAZQBCA\" or TargetProcessCommandLine contains \"TgBFAHQALgBXAGUAQg\" or TargetProcessCommandLine contains \"OAEUAdAAuAFcAZQBCA\" or TargetProcessCommandLine contains \"bgBlAFQALgBXAGUAQg\" or TargetProcessCommandLine contains \"4AZQBUAC4AVwBlAEIA\" or TargetProcessCommandLine contains \"uAGUAVAAuAFcAZQBCA\" or TargetProcessCommandLine contains \"TgBlAFQALgBXAGUAQg\" or TargetProcessCommandLine contains \"OAGUAVAAuAFcAZQBCA\" or TargetProcessCommandLine contains \"bgBFAFQALgBXAGUAQg\" or TargetProcessCommandLine contains \"4ARQBUAC4AVwBlAEIA\" or TargetProcessCommandLine contains \"uAEUAVAAuAFcAZQBCA\" or TargetProcessCommandLine contains \"TgBFAFQALgBXAGUAQg\" or TargetProcessCommandLine contains \"OAEUAVAAuAFcAZQBCA\" or TargetProcessCommandLine contains \"bgBlAHQALgB3AEUAQg\" or TargetProcessCommandLine contains \"4AZQB0AC4AdwBFAEIA\" or TargetProcessCommandLine contains \"uAGUAdAAuAHcARQBCA\" or TargetProcessCommandLine contains \"TgBlAHQALgB3AEUAQg\" or TargetProcessCommandLine contains \"OAGUAdAAuAHcARQBCA\" or TargetProcessCommandLine contains \"bgBFAHQALgB3AEUAQg\" or TargetProcessCommandLine contains \"4ARQB0AC4AdwBFAEIA\" or TargetProcessCommandLine contains \"uAEUAdAAuAHcARQBCA\" or TargetProcessCommandLine contains \"TgBFAHQALgB3AEUAQg\" or TargetProcessCommandLine contains \"OAEUAdAAuAHcARQBCA\" or TargetProcessCommandLine contains \"bgBlAFQALgB3AEUAQg\" or TargetProcessCommandLine contains \"uAGUAVAAuAHcARQBCA\" or TargetProcessCommandLine contains \"bgBFAFQALgB3AEUAQg\" or TargetProcessCommandLine contains \"4ARQBUAC4AdwBFAEIA\" or TargetProcessCommandLine contains \"uAEUAVAAuAHcARQBCA\" or TargetProcessCommandLine contains \"TgBFAFQALgB3AEUAQg\" or TargetProcessCommandLine contains \"OAEUAVAAuAHcARQBCA\" or TargetProcessCommandLine contains \"TgBlAHQALgBXAEUAQg\" or TargetProcessCommandLine contains \"4AZQB0AC4AVwBFAEIA\" or TargetProcessCommandLine contains \"OAGUAdAAuAFcARQBCA\" or TargetProcessCommandLine contains \"bgBFAHQALgBXAEUAQg\" or TargetProcessCommandLine contains \"4ARQB0AC4AVwBFAEIA\" or TargetProcessCommandLine contains \"uAEUAdAAuAFcARQBCA\" or TargetProcessCommandLine contains \"TgBFAHQALgBXAEUAQg\" or TargetProcessCommandLine contains \"OAEUAdAAuAFcARQBCA\" or TargetProcessCommandLine contains \"bgBlAFQALgBXAEUAQg\" or TargetProcessCommandLine contains \"4AZQBUAC4AVwBFAEIA\" or TargetProcessCommandLine contains \"uAGUAVAAuAFcARQBCA\" or TargetProcessCommandLine contains \"TgBlAFQALgBXAEUAQg\" or TargetProcessCommandLine contains \"OAGUAVAAuAFcARQBCA\" or TargetProcessCommandLine contains \"bgBFAFQALgBXAEUAQg\" or TargetProcessCommandLine contains \"4ARQBUAC4AVwBFAEIA\" or TargetProcessCommandLine contains \"uAEUAVAAuAFcARQBCA\"))|extend RuleId=\"c86133ad-4725-4bd0-8170-210788e0a7ba\";\nunion q0, q1, q2, q3, q4;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["Execution", "CommandAndControl", "DefenseEvasion"],
+                "techniques": ["T1059", "T1562", "T1027", "T1104", "T1105"],
+                "alertRuleTemplateName": "5163A000-4c76-45a9-804d-dc3f355f2018",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}
