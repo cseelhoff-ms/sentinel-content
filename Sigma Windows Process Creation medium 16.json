@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A5163A116')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A5163A116')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation medium 16",
+                "description": "Sigma Windows Process Creation low 16",
+                "severity": "medium",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\calc\\.exe\" or TargetProcessName endswith \"\\\\certutil\\.exe\" or TargetProcessName endswith \"\\\\cmstp\\.exe\" or TargetProcessName endswith \"\\\\cscript\\.exe\" or TargetProcessName endswith \"\\\\installutil\\.exe\" or TargetProcessName endswith \"\\\\mshta\\.exe\" or TargetProcessName endswith \"\\\\regsvr32\\.exe\" or TargetProcessName endswith \"\\\\rundll32\\.exe\" or TargetProcessName endswith \"\\\\wscript\\.exe\") or (TargetProcessFilename =~ \"CALC\\.EXE\" or TargetProcessFilename =~ \"CertUtil\\.exe\" or TargetProcessFilename =~ \"CMSTP\\.EXE\" or TargetProcessFilename =~ \"cscript\\.exe\" or TargetProcessFilename =~ \"installutil\\.exe\" or TargetProcessFilename =~ \"MSHTA\\.EXE\" or TargetProcessFilename =~ \"REGSVR32\\.EXE\" or TargetProcessFilename =~ \"RUNDLL32\\.EXE\" or TargetProcessFilename =~ \"wscript\\.exe\")) and (not((TargetProcessCurrentDirectory contains \"C:\\\\\" or TargetProcessCurrentDirectory =~ \"\" or isnull(TargetProcessCurrentDirectory)))))|extend RuleId=\"5163A000-5160-5160-5160-5163A5163A115\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_lolbin_exec_from_non_c_drive.yml\";\nlet q1=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \"for \" or TargetProcessCommandLine contains \"foreach \") and (TargetProcessCommandLine contains \"nslookup\" or TargetProcessCommandLine contains \"ping\"))|extend RuleId=\"f8ad2e2c-40b6-4117-84d7-20b89896ab23\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_network_scan_loop.yml\";\nlet q2=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \"~1\\\\\" or TargetProcessCommandLine contains \"~2\\\\\") and (not(((ActingProcessName =~ \"C:\\\\Windows\\\\System32\\\\Dism\\.exe\" or ActingProcessName =~ \"C:\\\\Windows\\\\System32\\\\cleanmgr\\.exe\" or ActingProcessName =~ \"C:\\\\Program Files\\\\GPSoftware\\\\Directory Opus\\\\dopus\\.exe\") or (ActingProcessName endswith \"\\\\WebEx\\\\WebexHost\\.exe\" or ActingProcessName endswith \"\\\\thor\\\\thor64\\.exe\" or ActingProcessName endswith \"\\\\veam\\.backup\\.shell\\.exe\" or ActingProcessName endswith \"\\\\winget\\.exe\" or ActingProcessName endswith \"\\\\Everything\\\\Everything\\.exe\") or ActingProcessName contains \"\\\\AppData\\\\Local\\\\Temp\\\\WinGet\\\\\" or (TargetProcessCommandLine contains \"\\\\appdata\\\\local\\\\webex\\\\webex64\\\\meetings\\\\wbxreport\\.exe\" or TargetProcessCommandLine contains \"C:\\\\Program Files\\\\Git\\\\post-install\\.bat\" or TargetProcessCommandLine contains \"C:\\\\Program Files\\\\Git\\\\cmd\\\\scalar\\.exe\")))))|extend RuleId=\"349d891d-fef0-4fe4-bc53-eee623a15969\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_ntfs_short_name_path_use_cli.yml\";\nlet q3=_Im_ProcessCreate\n| where ((TargetProcessName contains \"~1\\\\\" or TargetProcessName contains \"~2\\\\\") and (not((((ActingProcessName =~ \"C:\\\\Windows\\\\System32\\\\Dism\\.exe\" or ActingProcessName =~ \"C:\\\\Windows\\\\System32\\\\cleanmgr\\.exe\") or (ActingProcessName endswith \"\\\\WebEx\\\\WebexHost\\.exe\" or ActingProcessName endswith \"\\\\thor\\\\thor64\\.exe\") or TargetProcessFileProduct =~ \"InstallShield (R)\" or TargetProcessFileDescription =~ \"InstallShield (R) Setup Engine\" or TargetProcessFileCompany =~ \"InstallShield Software Corporation\") or ((TargetProcessName contains \"\\\\AppData\\\\\" and TargetProcessName contains \"\\\\Temp\\\\\") or (TargetProcessName endswith \"~1\\\\unzip\\.exe\" or TargetProcessName endswith \"~1\\\\7zG\\.exe\"))))))|extend RuleId=\"a96970af-f126-420d-90e1-d37bf25e50e1\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_ntfs_short_name_path_use_image.yml\";\nlet q4=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \"~1\\.exe\" or TargetProcessCommandLine contains \"~1\\.bat\" or TargetProcessCommandLine contains \"~1\\.msi\" or TargetProcessCommandLine contains \"~1\\.vbe\" or TargetProcessCommandLine contains \"~1\\.vbs\" or TargetProcessCommandLine contains \"~1\\.dll\" or TargetProcessCommandLine contains \"~1\\.ps1\" or TargetProcessCommandLine contains \"~1\\.js\" or TargetProcessCommandLine contains \"~1\\.hta\" or TargetProcessCommandLine contains \"~2\\.exe\" or TargetProcessCommandLine contains \"~2\\.bat\" or TargetProcessCommandLine contains \"~2\\.msi\" or TargetProcessCommandLine contains \"~2\\.vbe\" or TargetProcessCommandLine contains \"~2\\.vbs\" or TargetProcessCommandLine contains \"~2\\.dll\" or TargetProcessCommandLine contains \"~2\\.ps1\" or TargetProcessCommandLine contains \"~2\\.js\" or TargetProcessCommandLine contains \"~2\\.hta\") and (not(((ActingProcessName endswith \"\\\\WebEx\\\\WebexHost\\.exe\" or ActingProcessName endswith \"\\\\thor\\\\thor64\\.exe\") or TargetProcessCommandLine contains \"C:\\\\xampp\\\\vcredist\\\\VCREDI~1\\.EXE\"))))|extend RuleId=\"dd6b39d9-d9be-4a3b-8fe0-fe3c6a5c1795\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_ntfs_short_name_use_cli.yml\";\nlet q5=_Im_ProcessCreate\n| where ((TargetProcessName contains \"~1\\.bat\" or TargetProcessName contains \"~1\\.dll\" or TargetProcessName contains \"~1\\.exe\" or TargetProcessName contains \"~1\\.hta\" or TargetProcessName contains \"~1\\.js\" or TargetProcessName contains \"~1\\.msi\" or TargetProcessName contains \"~1\\.ps1\" or TargetProcessName contains \"~1\\.tmp\" or TargetProcessName contains \"~1\\.vbe\" or TargetProcessName contains \"~1\\.vbs\" or TargetProcessName contains \"~2\\.bat\" or TargetProcessName contains \"~2\\.dll\" or TargetProcessName contains \"~2\\.exe\" or TargetProcessName contains \"~2\\.hta\" or TargetProcessName contains \"~2\\.js\" or TargetProcessName contains \"~2\\.msi\" or TargetProcessName contains \"~2\\.ps1\" or TargetProcessName contains \"~2\\.tmp\" or TargetProcessName contains \"~2\\.vbe\" or TargetProcessName contains \"~2\\.vbs\") and (not(ActingProcessName =~ \"C:\\\\Windows\\\\explorer\\.exe\")) and (not((ActingProcessName endswith \"\\\\WebEx\\\\WebexHost\\.exe\" or ActingProcessName endswith \"\\\\thor\\\\thor64\\.exe\" or TargetProcessName =~ \"C:\\\\PROGRA~1\\\\WinZip\\\\WZPREL~1\\.EXE\" or TargetProcessName endswith \"\\\\VCREDI~1\\.EXE\"))))|extend RuleId=\"3ef5605c-9eb9-47b0-9a71-b727e6aa5c3b\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_ntfs_short_name_use_image.yml\";\nlet q6=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \"Invoke-WebRequest\" or TargetProcessCommandLine contains \"iwr \" or TargetProcessCommandLine contains \"wget \" or TargetProcessCommandLine contains \"curl \" or TargetProcessCommandLine contains \"DownloadFile\" or TargetProcessCommandLine contains \"DownloadString\") and ((TargetProcessCommandLine contains \"//0x\" or TargetProcessCommandLine contains \"\\.0x\" or TargetProcessCommandLine contains \"\\.00x\") or (TargetProcessCommandLine contains \"http://%\" and TargetProcessCommandLine contains \"%2e\")))|extend RuleId=\"cb5a2333-56cf-4562-8fcb-22ba1bca728d\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_obfuscated_ip_download.yml\";\nlet q7=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\ping\\.exe\" or TargetProcessName endswith \"\\\\arp\\.exe\") and (TargetProcessCommandLine contains \" 0x\" or TargetProcessCommandLine matches regex \" [0-9]{7,13}\"))|extend RuleId=\"56d19cb4-6414-4769-9644-1ed35ffbb148\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_obfuscated_ip_via_cli.yml\";\nlet q8=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"eyJ0eXAiOi\" or TargetProcessCommandLine contains \" eyJ0eX\" or TargetProcessCommandLine contains \" \\\"eyJ0eX\\\"\" or TargetProcessCommandLine contains \" 'eyJ0eX'\")|extend RuleId=\"6d3a3952-6530-44a3-8554-cf17c116c615\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_office_token_search.yml\";\nlet q9=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \"\\.key\" or TargetProcessCommandLine contains \"\\.pgp\" or TargetProcessCommandLine contains \"\\.gpg\" or TargetProcessCommandLine contains \"\\.ppk\" or TargetProcessCommandLine contains \"\\.p12\" or TargetProcessCommandLine contains \"\\.pem\" or TargetProcessCommandLine contains \"\\.pfx\" or TargetProcessCommandLine contains \"\\.cer\" or TargetProcessCommandLine contains \"\\.p7b\" or TargetProcessCommandLine contains \"\\.asc\") and (((TargetProcessName endswith \"\\\\cmd\\.exe\" or TargetProcessFilename =~ \"Cmd\\.Exe\") and TargetProcessCommandLine contains \"dir \") or (((TargetProcessName endswith \"\\\\powershell\\.exe\" or TargetProcessName endswith \"\\\\pwsh\\.exe\") or (TargetProcessFilename =~ \"PowerShell\\.EXE\" or TargetProcessFilename =~ \"pwsh\\.dll\")) and TargetProcessCommandLine contains \"Get-ChildItem \") or (TargetProcessName endswith \"\\\\findstr\\.exe\" or TargetProcessFilename =~ \"FINDSTR\\.EXE\")))|extend RuleId=\"213d6a77-3d55-4ce8-ba74-fcfef741974e\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_private_keys_recon.yml\";\nlet q10=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \" -u system \" or TargetProcessCommandLine contains \" --user system \" or TargetProcessCommandLine contains \" -u NT\" or TargetProcessCommandLine contains \" -u \\\"NT\" or TargetProcessCommandLine contains \" -u 'NT\" or TargetProcessCommandLine contains \" --system \" or TargetProcessCommandLine contains \" -u administrator \") and (TargetProcessCommandLine contains \" -c cmd\" or TargetProcessCommandLine contains \" -c \\\"cmd\" or TargetProcessCommandLine contains \" -c powershell\" or TargetProcessCommandLine contains \" -c \\\"powershell\" or TargetProcessCommandLine contains \" --command cmd\" or TargetProcessCommandLine contains \" --command powershell\" or TargetProcessCommandLine contains \" -c whoami\" or TargetProcessCommandLine contains \" -c wscript\" or TargetProcessCommandLine contains \" -c cscript\"))|extend RuleId=\"50d66fb0-03f8-4da0-8add-84e77d12a020\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_privilege_escalation_cli_patterns.yml\";\nlet q11=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\tree\\.com\" or TargetProcessName endswith \"\\\\WMIC\\.exe\" or TargetProcessName endswith \"\\\\doskey\\.exe\" or TargetProcessName endswith \"\\\\sc\\.exe\") or (TargetProcessFilename =~ \"wmic\\.exe\" or TargetProcessFilename =~ \"DOSKEY\\.EXE\" or TargetProcessFilename =~ \"sc\\.exe\")) and (ActingProcessCommandLine contains \" > %TEMP%\\\\\" or ActingProcessCommandLine contains \" > %TMP%\\\\\"))|extend RuleId=\"aa2efee7-34dd-446e-8a37-40790a66efd7\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_recon.yml\";\nlet q12=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \":3389\" and (TargetProcessCommandLine contains \" -L \" or TargetProcessCommandLine contains \" -P \" or TargetProcessCommandLine contains \" -R \" or TargetProcessCommandLine contains \" -pw \" or TargetProcessCommandLine contains \" -ssh \"))|extend RuleId=\"8a3038e8-9c9d-46f8-b184-66234a160f6f\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_remote_desktop_tunneling.yml\";\nlet q13=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\powershell\\.exe\" or TargetProcessName endswith \"\\\\pwsh\\.exe\" or TargetProcessName endswith \"\\\\wmic\\.exe\" or TargetProcessName endswith \"\\\\vssadmin\\.exe\") or (TargetProcessFilename =~ \"PowerShell\\.EXE\" or TargetProcessFilename =~ \"pwsh\\.dll\" or TargetProcessFilename =~ \"wmic\\.exe\" or TargetProcessFilename =~ \"VSSADMIN\\.EXE\")) and (TargetProcessCommandLine contains \"shadow\" and TargetProcessCommandLine contains \"create\"))|extend RuleId=\"b17ea6f7-6e90-447e-a799-e6c0a493d6ce\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_shadow_copies_creation.yml\";\nlet q14=_Im_ProcessCreate\n| where TargetProcessCommandLine startswith \"C:\\\\Windows\\\\Sysnative\\\\\"|extend RuleId=\"3c1b5fb0-c72f-45ba-abd1-4d4c353144ab\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_sysnative.yml\";\nlet q15=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"\\\\SYSVOL\\\\\" and TargetProcessCommandLine contains \"\\\\policies\\\\\")|extend RuleId=\"05f3c945-dcc8-4393-9f3d-af65077a8f86\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_sysvol_access.yml\";\nlet q16=_Im_ProcessCreate\n| where (ActingProcessName endswith \"\\\\userinit\\.exe\" and (not((TargetProcessCommandLine contains \"\\\\netlogon\\\\\" or (TargetProcessName endswith \"\\\\explorer\\.exe\" or TargetProcessFilename =~ \"explorer\\.exe\")))))|extend RuleId=\"b655a06a-31c0-477a-95c2-3726b83d649d\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_userinit_child.yml\";\nlet q17=_Im_ProcessCreate\n| where (ActingProcessName endswith \"\\\\vsjitdebugger\\.exe\" and (not((TargetProcessName matches regex \".*\\\\vsimmersiveactivatehelper.*\\.exe\" or TargetProcessName endswith \"\\\\devenv\\.exe\"))))|extend RuleId=\"15c7904e-6ad1-4a45-9b46-5fb25df37fd2\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_use_of_vsjitdebugger_bin.yml\";\nlet q18=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"Asd123\\.aaaa\" or TargetProcessCommandLine contains \"password123\" or TargetProcessCommandLine contains \"123456789\" or TargetProcessCommandLine contains \"P@ssw0rd!\")|extend RuleId=\"91edcfb1-2529-4ac2-9ecc-7617f895c7e4\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_weak_or_abused_passwords.yml\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["Discovery", "CredentialAccess", "Collection", "Execution", "PrivilegeEscalation", "DefenseEvasion", "LateralMovement"],
+                "techniques": ["T1528", "T1021", "T1119", "T1564", "T1018", "T1003", "T1055", "T1218", "T1059", "T1552"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A5163A116",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

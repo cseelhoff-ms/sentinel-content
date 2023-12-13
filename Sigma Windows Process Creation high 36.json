@@ -1,0 +1,130 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A5163A236')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A5163A236')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation high 36",
+                "description": "Sigma Windows Process Creation medium 36",
+                "severity": "high",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where (ActingProcessName endswith \"\\\\wbem\\\\WmiPrvSE\\.exe\" and ((TargetProcessName endswith \"\\\\certutil\\.exe\" or TargetProcessName endswith \"\\\\cscript\\.exe\" or TargetProcessName endswith \"\\\\mshta\\.exe\" or TargetProcessName endswith \"\\\\msiexec\\.exe\" or TargetProcessName endswith \"\\\\regsvr32\\.exe\" or TargetProcessName endswith \"\\\\rundll32\\.exe\" or TargetProcessName endswith \"\\\\verclsid\\.exe\" or TargetProcessName endswith \"\\\\wscript\\.exe\") or (TargetProcessName endswith \"\\\\cmd\\.exe\" and (TargetProcessCommandLine contains \"cscript\" or TargetProcessCommandLine contains \"mshta\" or TargetProcessCommandLine contains \"powershell\" or TargetProcessCommandLine contains \"pwsh\" or TargetProcessCommandLine contains \"regsvr32\" or TargetProcessCommandLine contains \"rundll32\" or TargetProcessCommandLine contains \"wscript\"))) and (not((TargetProcessName endswith \"\\\\WerFault\\.exe\" or TargetProcessName endswith \"\\\\WmiPrvSE\\.exe\"))))|extend RuleId=\"5163A000-5160-5160-5160-5163A5163A235\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wmiprvse_susp_child_processes.yml\";\nlet q1=_Im_ProcessCreate\n| where TargetProcessName =~ \"C:\\\\Windows\\\\System32\\\\wpbbin\\.exe\"|extend RuleId=\"4abc0ec4-db5a-412f-9632-26659cddf145\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wpbbin_potential_persistence.yml\";\nlet q2=_Im_ProcessCreate\n| where (((TargetProcessFilename =~ \"wscript\\.exe\" or TargetProcessFilename =~ \"cscript\\.exe\") or (TargetProcessName endswith \"\\\\wscript\\.exe\" or TargetProcessName endswith \"\\\\cscript\\.exe\")) and (TargetProcessCommandLine contains \"\\.csv\" or TargetProcessCommandLine contains \"\\.dat\" or TargetProcessCommandLine contains \"\\.doc\" or TargetProcessCommandLine contains \"\\.gif\" or TargetProcessCommandLine contains \"\\.jpeg\" or TargetProcessCommandLine contains \"\\.jpg\" or TargetProcessCommandLine contains \"\\.png\" or TargetProcessCommandLine contains \"\\.ppt\" or TargetProcessCommandLine contains \"\\.txt\" or TargetProcessCommandLine contains \"\\.xls\" or TargetProcessCommandLine contains \"\\.xml\"))|extend RuleId=\"99b7460d-c9f1-40d7-a316-1f36f61d52ee\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wscript_cscript_uncommon_extension_exec.yml\";\nlet q3=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\wuauclt\\.exe\" or TargetProcessFilename =~ \"wuauclt\\.exe\") and (TargetProcessCommandLine contains \"/UpdateDeploymentProvider\" and TargetProcessCommandLine contains \"/RunHandlerComServer\" and TargetProcessCommandLine contains \"\\.dll\")) and (not((TargetProcessCommandLine contains \" /ClassId \" or TargetProcessCommandLine contains \" wuaueng\\.dll \"))))|extend RuleId=\"d7825193-b70a-48a4-b992-8b5b3015cc11\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wuauclt_execution.yml\";\nlet q4=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\Wuauclt\\.exe\" or TargetProcessFilename =~ \"Wuauclt\\.exe\") and TargetProcessCommandLine endswith \"\\\\Wuauclt\\.exe\")|extend RuleId=\"52d097e2-063e-4c9c-8fbb-855c8948d135\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wuauclt_no_cli_flags_execution.yml\";\nlet q5=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\wusa\\.exe\" and TargetProcessCommandLine contains \"/extract:\") and (TargetProcessCommandLine contains \"C:\\\\Users\\\\Public\\\\\" or TargetProcessCommandLine contains \"\\\\Desktop\\\\\" or TargetProcessCommandLine contains \"\\\\Downloads\\\\\" or TargetProcessCommandLine contains \"\\\\Appdata\\\\Local\\\\Temp\\\\\" or TargetProcessCommandLine contains \"\\\\Windows\\\\Temp\\\\\" or TargetProcessCommandLine contains \"\\\\PerfLogs\\\\\"))|extend RuleId=\"c74c0390-3e20-41fd-a69a-128f0275a5ea\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wusa_cab_files_extraction_from_susp_paths.yml\";\nunion q0, q1, q2, q3, q4, q5;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion", "CommandAndControl", "Persistence", "Execution"],
+                "techniques": ["T1105", "T1036", "T1218", "T1047", "T1542", "T1204", "T1059"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A5163A236",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}
