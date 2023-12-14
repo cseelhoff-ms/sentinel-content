@@ -26,8 +26,8 @@
                 "suppressionDuration": "PT1H",
                 "suppressionEnabled": false,
                 "startTimeUtc": null,
-                "tactics": ["LateralMovement", "CredentialAccess", "DefenseEvasion", "Impact"],
-                "techniques": ["T1218", "T1003", "T1112", "T1486", "T1021", "T1562"],
+                "tactics": ["CredentialAccess", "DefenseEvasion", "LateralMovement", "Impact"],
+                "techniques": ["T1486", "T1562", "T1021", "T1003", "T1112", "T1218"],
                 "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000221",
                 "incidentConfiguration": {
                     "createIncident": true,
