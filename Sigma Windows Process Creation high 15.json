@@ -26,8 +26,8 @@
                 "suppressionDuration": "PT1H",
                 "suppressionEnabled": false,
                 "startTimeUtc": null,
-                "tactics": ["Execution", "DefenseEvasion", "CommandAndControl", "LateralMovement", "InitialAccess"],
-                "techniques": ["T1059", "T1027", "T1204", "T1566", "T1218", "T1021", "T1047", "T1140", "T1202", "T1572"],
+                "tactics": ["DefenseEvasion", "InitialAccess", "Execution", "CommandAndControl", "LateralMovement"],
+                "techniques": ["T1027", "T1218", "T1021", "T1202", "T1204", "T1566", "T1572", "T1047", "T1059", "T1140"],
                 "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000215",
                 "incidentConfiguration": {
                     "createIncident": true,

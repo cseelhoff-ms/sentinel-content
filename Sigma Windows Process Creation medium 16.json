@@ -26,8 +26,8 @@
                 "suppressionDuration": "PT1H",
                 "suppressionEnabled": false,
                 "startTimeUtc": null,
-                "tactics": ["DefenseEvasion", "CommandAndControl", "Persistence", "CredentialAccess", "Discovery", "PrivilegeEscalation"],
-                "techniques": ["T1546", "T1574", "T1112", "T1219", "T1552", "T1484", "T1518", "T1562", "T1007", "T1003", "T1012"],
+                "tactics": ["Persistence", "PrivilegeEscalation", "DefenseEvasion", "CredentialAccess", "Discovery", "CommandAndControl"],
+                "techniques": ["T1574", "T1219", "T1003", "T1518", "T1012", "T1007", "T1562", "T1546", "T1484", "T1112", "T1552"],
                 "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000116",
                 "incidentConfiguration": {
                     "createIncident": true,

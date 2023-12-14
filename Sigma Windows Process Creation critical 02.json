@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000302')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000302')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation high 02",
+                "description": "Sigma Windows Process Creation high 02",
+                "severity": "high",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where (((TargetProcessName contains \"PetitPotam\" or TargetProcessName contains \"RottenPotato\" or TargetProcessName contains \"HotPotato\" or TargetProcessName contains \"JuicyPotato\" or TargetProcessName contains \"\\\\just_dce_\" or TargetProcessName contains \"Juicy Potato\" or TargetProcessName contains \"\\\\temp\\\\rot.exe\" or TargetProcessName contains \"\\\\Potato.exe\" or TargetProcessName contains \"\\\\SpoolSample.exe\" or TargetProcessName contains \"\\\\Responder.exe\" or TargetProcessName contains \"\\\\smbrelayx\" or TargetProcessName contains \"\\\\ntlmrelayx\" or TargetProcessName contains \"\\\\LocalPotato\") or (TargetProcessCommandLine contains \"Invoke-Tater\" or TargetProcessCommandLine contains \" smbrelay\" or TargetProcessCommandLine contains \" ntlmrelay\" or TargetProcessCommandLine contains \"cme smb \" or TargetProcessCommandLine contains \" /ntlm:NTLMhash \" or TargetProcessCommandLine contains \"Invoke-PetitPotam\" or TargetProcessCommandLine contains \"*.exe -t * -p *\") or (TargetProcessCommandLine contains \".exe -c \\\"{\" and TargetProcessCommandLine endswith \"}\\\" -z\")) and (not((TargetProcessName contains \"HotPotatoes6\" or TargetProcessName contains \"HotPotatoes7\" or TargetProcessName contains \"HotPotatoes \"))))|extend RuleId=\"5589ab4f-a767-433c-961d-c91f3f704db1\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_hktl_relay_attacks_tools.yml\"|extend RuleTitle=\"Potential SMB Relay Attack Tool Execution\"|extend RuleDescription=\"Detects different hacktools used for relay attacks on Windows for privilege escalation\";\nlet q1=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\Rubeus.exe\" or TargetProcessFilename =~ \"Rubeus.exe\" or TargetProcessFileDescription =~ \"Rubeus\" or (TargetProcessCommandLine contains \"asreproast \" or TargetProcessCommandLine contains \"dump /service:krbtgt \" or TargetProcessCommandLine contains \"dump /luid:0x\" or TargetProcessCommandLine contains \"kerberoast \" or TargetProcessCommandLine contains \"createnetonly /program:\" or TargetProcessCommandLine contains \"ptt /ticket:\" or TargetProcessCommandLine contains \"/impersonateuser:\" or TargetProcessCommandLine contains \"renew /ticket:\" or TargetProcessCommandLine contains \"asktgt /user:\" or TargetProcessCommandLine contains \"harvest /interval:\" or TargetProcessCommandLine contains \"s4u /user:\" or TargetProcessCommandLine contains \"s4u /ticket:\" or TargetProcessCommandLine contains \"hash /password:\" or TargetProcessCommandLine contains \"golden /aes256:\" or TargetProcessCommandLine contains \"silver /user:\"))|extend RuleId=\"7ec2c172-dceb-4c10-92c9-87c1881b7e18\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_hktl_rubeus.yml\"|extend RuleTitle=\"HackTool - Rubeus Execution\"|extend RuleDescription=\"Detects the execution of the hacktool Rubeus via PE information of command line parameters\";\nlet q2=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\SafetyKatz.exe\" or TargetProcessFilename =~ \"SafetyKatz.exe\" or TargetProcessFileDescription =~ \"SafetyKatz\")|extend RuleId=\"b1876533-4ed5-4a83-90f3-b8645840a413\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_hktl_safetykatz.yml\"|extend RuleTitle=\"HackTool - SafetyKatz Execution\"|extend RuleDescription=\"Detects the execution of the hacktool SafetyKatz via PE information and default Image name\";\nlet q3=_Im_ProcessCreate\n| where (TargetProcessFileCompany =~ \"SecurityXploded\" or TargetProcessName endswith \"PasswordDump.exe\" or TargetProcessFilename endswith \"PasswordDump.exe\")|extend RuleId=\"7679d464-4f74-45e2-9e01-ac66c5eb041a\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_hktl_secutyxploded.yml\"|extend RuleTitle=\"HackTool - SecurityXploded Execution\"|extend RuleDescription=\"Detects the execution of SecurityXploded Tools\";\nlet q4=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\SharpUp.exe\" or TargetProcessFileDescription =~ \"SharpUp\" or (TargetProcessCommandLine contains \"HijackablePaths\" or TargetProcessCommandLine contains \"UnquotedServicePath\" or TargetProcessCommandLine contains \"ProcessDLLHijack\" or TargetProcessCommandLine contains \"ModifiableServiceBinaries\" or TargetProcessCommandLine contains \"ModifiableScheduledTask\" or TargetProcessCommandLine contains \"DomainGPPPassword\" or TargetProcessCommandLine contains \"CachedGPPPassword\"))|extend RuleId=\"c484e533-ee16-4a93-b6ac-f0ea4868b2f1\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_hktl_sharpup.yml\"|extend RuleTitle=\"HackTool - SharpUp PrivEsc Tool Execution\"|extend RuleDescription=\"Detects the use of SharpUp, a tool for local privilege escalation\";\nlet q5=_Im_ProcessCreate\n| where TargetProcessCommandLine contains \"-NoExit -Command [Console]::OutputEncoding=[Text.UTF8Encoding]::UTF8\"|extend RuleId=\"42333b2c-b425-441c-b70e-99404a17170f\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_hktl_sliver_c2_execution_pattern.yml\"|extend RuleTitle=\"HackTool - Sliver C2 Implant Activity Pattern\"|extend RuleDescription=\"Detects process activity patterns as seen being used by Sliver C2 framework implants\";\nlet q6=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\SysmonEOP.exe\" or ((TargetProcessIMPHASH=~\"22F4089EB8ABA31E1BB162C6D9BF72E5\" or TargetProcessIMPHASH=~\"5123FA4C4384D431CD0D893EEB49BBEC\") or (TargetProcessIMPHASH =~ \"22f4089eb8aba31e1bb162c6d9bf72e5\" or TargetProcessIMPHASH =~ \"5123fa4c4384d431cd0d893eeb49bbec\")))|extend RuleId=\"8a7e90c5-fe6e-45dc-889e-057fe4378bd9\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_hktl_sysmoneop.yml\"|extend RuleTitle=\"HackTool - SysmonEOP Execution\"|extend RuleDescription=\"Detects the execution of the PoC that can be used to exploit Sysmon CVE-2022-41120\";\nlet q7=_Im_ProcessCreate\n| where ((((TargetProcessIMPHASH =~ \"a53a02b997935fd8eedcb5f7abab9b9f\" or TargetProcessIMPHASH =~ \"e96a73c7bf33a464c510ede582318bf2\") or (TargetProcessIMPHASH=~\"a53a02b997935fd8eedcb5f7abab9b9f\" or TargetProcessIMPHASH=~\"e96a73c7bf33a464c510ede582318bf2\")) or (TargetProcessCommandLine endswith \".exe -S\" and ActingProcessName endswith \"\\\\services.exe\")) and (not(TargetProcessName endswith \"\\\\clussvc.exe\")))|extend RuleId=\"7aa7009a-28b9-4344-8c1f-159489a390df\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_hktl_wce.yml\"|extend RuleTitle=\"HackTool - Windows Credential Editor (WCE) Execution\"|extend RuleDescription=\"Detects the use of Windows Credential Editor (WCE)\";\nlet q8=_Im_ProcessCreate\n| where (ActingProcessName endswith \"\\\\Windows\\\\System32\\\\lsass.exe\" and TargetProcessName endswith \"\\\\Windows\\\\System32\\\\lsass.exe\")|extend RuleId=\"c8da0dfd-4ed0-4b68-962d-13c9c884384e\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lsass_process_clone.yml\"|extend RuleTitle=\"Potential Credential Dumping Via LSASS Process Clone\"|extend RuleDescription=\"Detects a suspicious LSASS process process clone that could be a sign of credential dumping activity\";\nlet q9=_Im_ProcessCreate\n| where ((ActingProcessName endswith \"\\\\sqlservr.exe\" and ActingProcessCommandLine contains \"VEEAMSQL\") and (((TargetProcessName endswith \"\\\\cmd.exe\" or TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\" or TargetProcessName endswith \"\\\\wsl.exe\" or TargetProcessName endswith \"\\\\wt.exe\") and (TargetProcessCommandLine contains \"-ex \" or TargetProcessCommandLine contains \"bypass\" or TargetProcessCommandLine contains \"cscript\" or TargetProcessCommandLine contains \"DownloadString\" or TargetProcessCommandLine contains \"http://\" or TargetProcessCommandLine contains \"https://\" or TargetProcessCommandLine contains \"mshta\" or TargetProcessCommandLine contains \"regsvr32\" or TargetProcessCommandLine contains \"rundll32\" or TargetProcessCommandLine contains \"wscript\" or TargetProcessCommandLine contains \"copy \")) or (TargetProcessName endswith \"\\\\net.exe\" or TargetProcessName endswith \"\\\\net1.exe\" or TargetProcessName endswith \"\\\\netstat.exe\" or TargetProcessName endswith \"\\\\nltest.exe\" or TargetProcessName endswith \"\\\\ping.exe\" or TargetProcessName endswith \"\\\\tasklist.exe\" or TargetProcessName endswith \"\\\\whoami.exe\")))|extend RuleId=\"d55b793d-f847-4eea-b59a-5ab09908ac90\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_mssql_veaam_susp_child_processes.yml\"|extend RuleTitle=\"Suspicious Child Process Of Veeam Dabatase\"|extend RuleDescription=\"Detects suspicious child processes of the Veeam service process. This could indicate potential RCE or SQL Injection.\";\nlet q10=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"New-MailboxExportRequest\" and TargetProcessCommandLine contains \" -Mailbox \" and TargetProcessCommandLine contains \" -FilePath \\\\\\\\\")|extend RuleId=\"889719ef-dd62-43df-86c3-768fb08dc7c0\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_mailboxexport_share.yml\"|extend RuleTitle=\"Suspicious PowerShell Mailbox Export to Share\"|extend RuleDescription=\"Detects usage of the powerShell New-MailboxExportRequest Cmdlet to exports a mailbox to a remote or local share, as used in ProxyShell exploitations\";\nlet q11=_Im_ProcessCreate\n| where (TargetProcessFilename =~ \"whoami.exe\" and (not(TargetProcessName endswith \"\\\\whoami.exe\")))|extend RuleId=\"f1086bf7-a0c4-4a37-9102-01e573caf4a0\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_renamed_whoami.yml\"|extend RuleTitle=\"Renamed Whoami Execution\"|extend RuleDescription=\"Detects the execution of whoami that has been renamed to a different name to avoid detection\";\nlet q12=_Im_ProcessCreate\n| where ((TargetProcessName endswith \".doc.exe\" or TargetProcessName endswith \".docx.exe\" or TargetProcessName endswith \".xls.exe\" or TargetProcessName endswith \".xlsx.exe\" or TargetProcessName endswith \".ppt.exe\" or TargetProcessName endswith \".pptx.exe\" or TargetProcessName endswith \".rtf.exe\" or TargetProcessName endswith \".pdf.exe\" or TargetProcessName endswith \".txt.exe\" or TargetProcessName endswith \"      .exe\" or TargetProcessName endswith \"______.exe\" or TargetProcessName endswith \".doc.js\" or TargetProcessName endswith \".docx.js\" or TargetProcessName endswith \".xls.js\" or TargetProcessName endswith \".xlsx.js\" or TargetProcessName endswith \".ppt.js\" or TargetProcessName endswith \".pptx.js\" or TargetProcessName endswith \".rtf.js\" or TargetProcessName endswith \".pdf.js\" or TargetProcessName endswith \".txt.js\") and (TargetProcessCommandLine contains \".doc.exe\" or TargetProcessCommandLine contains \".docx.exe\" or TargetProcessCommandLine contains \".xls.exe\" or TargetProcessCommandLine contains \".xlsx.exe\" or TargetProcessCommandLine contains \".ppt.exe\" or TargetProcessCommandLine contains \".pptx.exe\" or TargetProcessCommandLine contains \".rtf.exe\" or TargetProcessCommandLine contains \".pdf.exe\" or TargetProcessCommandLine contains \".txt.exe\" or TargetProcessCommandLine contains \"      .exe\" or TargetProcessCommandLine contains \"______.exe\" or TargetProcessCommandLine contains \".doc.js\" or TargetProcessCommandLine contains \".docx.js\" or TargetProcessCommandLine contains \".xls.js\" or TargetProcessCommandLine contains \".xlsx.js\" or TargetProcessCommandLine contains \".ppt.js\" or TargetProcessCommandLine contains \".pptx.js\" or TargetProcessCommandLine contains \".rtf.js\" or TargetProcessCommandLine contains \".pdf.js\" or TargetProcessCommandLine contains \".txt.js\"))|extend RuleId=\"1cdd9a09-06c9-4769-99ff-626e2b3991b8\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_double_extension.yml\"|extend RuleTitle=\"Suspicious Double Extension File Execution\"|extend RuleDescription=\"Detects suspicious use of an .exe extension after a non-executable file extension like .pdf.exe, a set of spaces or underlines to cloak the executable file in spear phishing campaigns\";\nlet q13=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\DumpStack.log\" or TargetProcessCommandLine contains \" -o DumpStack.log\")|extend RuleId=\"4f647cfa-b598-4e12-ad69-c68dd16caef8\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_dumpstack_log_evasion.yml\"|extend RuleTitle=\"DumpStack.log Defender Evasion\"|extend RuleDescription=\"Detects the use of the filename DumpStack.log to evade Microsoft Defender\";\nlet q14=_Im_ProcessCreate\n| where TargetProcessName contains \"C:\\\\Windows \\\\System32\\\\\"|extend RuleId=\"4ac47ed3-44c2-4b1f-9d51-bf46e8914126\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_uac_bypass_trustedpath.yml\"|extend RuleTitle=\"TrustedPath UAC Bypass Pattern\"|extend RuleDescription=\"Detects indicators of a UAC bypass method by mocking directories\";\nlet q15=_Im_ProcessCreate\n| where (ActingProcessName endswith \"\\\\EdgeTransport.exe\" and (not((TargetProcessName =~ \"C:\\\\Windows\\\\System32\\\\conhost.exe\" or (TargetProcessName startswith \"C:\\\\Program Files\\\\Microsoft\\\\Exchange Server\\\\\" and TargetProcessName endswith \"\\\\Bin\\\\OleConverter.exe\")))))|extend RuleId=\"797011dc-44f4-4e6f-9f10-a8ceefbe566b\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wmi_backdoor_exchange_transport_agent.yml\"|extend RuleTitle=\"WMI Backdoor Exchange Transport Agent\"|extend RuleDescription=\"Detects a WMI backdoor in Exchange Transport Agents via WMI event filters\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["Collection", "PrivilegeEscalation", "Discovery", "InitialAccess", "Execution", "Exfiltration", "LateralMovement", "Persistence", "DefenseEvasion", "CredentialAccess"],
+                "techniques": ["T1068", "T1548", "T1574", "T1615", "T1003", "T1555", "T1033", "T1558", "T1557", "T1566", "T1546", "T1059", "T1569", "T1550"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000302",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

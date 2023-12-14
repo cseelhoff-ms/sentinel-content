@@ -27,7 +27,7 @@
                 "suppressionEnabled": false,
                 "startTimeUtc": null,
                 "tactics": ["DefenseEvasion", "Impact"],
-                "techniques": ["T1070", "T1489", "T1490"],
+                "techniques": ["T1489", "T1070", "T1490"],
                 "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000238",
                 "incidentConfiguration": {
                     "createIncident": true,
