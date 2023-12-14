@@ -26,8 +26,8 @@
                 "suppressionDuration": "PT1H",
                 "suppressionEnabled": false,
                 "startTimeUtc": null,
-                "tactics": ["PrivilegeEscalation", "Persistence", "Execution", "Impact", "DefenseEvasion", "CredentialAccess"],
-                "techniques": ["T1218", "T1564", "T1036", "T1197", "T1059", "T1003", "T1202", "T1562", "T1127", "T1053", "T1490"],
+                "tactics": ["PrivilegeEscalation", "Impact", "Persistence", "CredentialAccess", "DefenseEvasion", "Execution"],
+                "techniques": ["T1218", "T1197", "T1564", "T1059", "T1202", "T1036", "T1003", "T1490", "T1053", "T1127", "T1562"],
                 "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000200",
                 "incidentConfiguration": {
                     "createIncident": true,
@@ -43,8 +43,21 @@
                 },
                 "eventGroupingSettings": {
                     "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
                 },
-                "alertDetailsOverride": null,
                 "customDetails": null,
                 "entityMappings": [
                     {
