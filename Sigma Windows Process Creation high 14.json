@@ -26,8 +26,8 @@
                 "suppressionDuration": "PT1H",
                 "suppressionEnabled": false,
                 "startTimeUtc": null,
-                "tactics": ["CredentialAccess", "DefenseEvasion", "Exfiltration", "Execution"],
-                "techniques": ["T1552", "T1140", "T1562", "T1059", "T1027", "T1218"],
+                "tactics": ["Exfiltration", "DefenseEvasion", "Execution", "CredentialAccess"],
+                "techniques": ["T1218", "T1562", "T1140", "T1027", "T1552", "T1059"],
                 "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000214",
                 "incidentConfiguration": {
                     "createIncident": true,
