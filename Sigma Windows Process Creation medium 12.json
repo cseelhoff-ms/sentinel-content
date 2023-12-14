@@ -14,7 +14,7 @@
             "kind": "Scheduled",
             "apiVersion": "2022-11-01-preview",
             "properties": {
-                "displayName": "Sigma Windows Process Creation medium 12",
+                "displayName": "Sigma Windows Process Creation low 12",
                 "description": "Sigma Windows Process Creation low 12",
                 "severity": "low",
                 "enabled": false,
@@ -26,8 +26,8 @@
                 "suppressionDuration": "PT1H",
                 "suppressionEnabled": false,
                 "startTimeUtc": null,
-                "tactics": ["Execution", "DefenseEvasion", "Collection", "Persistence", "CredentialAccess", "Discovery", "CommandAndControl"],
-                "techniques": ["T1574", "T1059", "T1003", "T1518", "T1036", "T1202", "T1219", "T1562", "T1218"],
+                "tactics": ["Persistence", "Collection", "Discovery", "DefenseEvasion", "CredentialAccess", "Execution", "CommandAndControl"],
+                "techniques": ["T1218", "T1518", "T1574", "T1036", "T1202", "T1219", "T1059", "T1562", "T1003"],
                 "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000112",
                 "incidentConfiguration": {
                     "createIncident": true,
