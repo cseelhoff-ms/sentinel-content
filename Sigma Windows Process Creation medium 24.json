@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000124')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000124')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation low 24",
+                "description": "Sigma Windows Process Creation low 24",
+                "severity": "low",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\accesschk.exe\" or TargetProcessName endswith \"\\\\accesschk64.exe\" or TargetProcessName endswith \"\\\\AccessEnum.exe\" or TargetProcessName endswith \"\\\\ADExplorer.exe\" or TargetProcessName endswith \"\\\\ADExplorer64.exe\" or TargetProcessName endswith \"\\\\ADInsight.exe\" or TargetProcessName endswith \"\\\\ADInsight64.exe\" or TargetProcessName endswith \"\\\\adrestore.exe\" or TargetProcessName endswith \"\\\\adrestore64.exe\" or TargetProcessName endswith \"\\\\Autologon.exe\" or TargetProcessName endswith \"\\\\Autologon64.exe\" or TargetProcessName endswith \"\\\\Autoruns.exe\" or TargetProcessName endswith \"\\\\Autoruns64.exe\" or TargetProcessName endswith \"\\\\autorunsc.exe\" or TargetProcessName endswith \"\\\\autorunsc64.exe\" or TargetProcessName endswith \"\\\\Bginfo.exe\" or TargetProcessName endswith \"\\\\Bginfo64.exe\" or TargetProcessName endswith \"\\\\Cacheset.exe\" or TargetProcessName endswith \"\\\\Cacheset64.exe\" or TargetProcessName endswith \"\\\\Clockres.exe\" or TargetProcessName endswith \"\\\\Clockres64.exe\" or TargetProcessName endswith \"\\\\Contig.exe\" or TargetProcessName endswith \"\\\\Contig64.exe\" or TargetProcessName endswith \"\\\\Coreinfo.exe\" or TargetProcessName endswith \"\\\\Coreinfo64.exe\" or TargetProcessName endswith \"\\\\CPUSTRES.EXE\" or TargetProcessName endswith \"\\\\CPUSTRES64.EXE\" or TargetProcessName endswith \"\\\\ctrl2cap.exe\" or TargetProcessName endswith \"\\\\Dbgview.exe\" or TargetProcessName endswith \"\\\\dbgview64.exe\" or TargetProcessName endswith \"\\\\Desktops.exe\" or TargetProcessName endswith \"\\\\Desktops64.exe\" or TargetProcessName endswith \"\\\\disk2vhd.exe\" or TargetProcessName endswith \"\\\\disk2vhd64.exe\" or TargetProcessName endswith \"\\\\diskext.exe\" or TargetProcessName endswith \"\\\\diskext64.exe\" or TargetProcessName endswith \"\\\\Diskmon.exe\" or TargetProcessName endswith \"\\\\Diskmon64.exe\" or TargetProcessName endswith \"\\\\DiskView.exe\" or TargetProcessName endswith \"\\\\DiskView64.exe\" or TargetProcessName endswith \"\\\\du.exe\" or TargetProcessName endswith \"\\\\du64.exe\" or TargetProcessName endswith \"\\\\efsdump.exe\" or TargetProcessName endswith \"\\\\FindLinks.exe\" or TargetProcessName endswith \"\\\\FindLinks64.exe\" or TargetProcessName endswith \"\\\\handle.exe\" or TargetProcessName endswith \"\\\\handle64.exe\" or TargetProcessName endswith \"\\\\hex2dec.exe\" or TargetProcessName endswith \"\\\\hex2dec64.exe\" or TargetProcessName endswith \"\\\\junction.exe\" or TargetProcessName endswith \"\\\\junction64.exe\" or TargetProcessName endswith \"\\\\ldmdump.exe\" or TargetProcessName endswith \"\\\\listdlls.exe\" or TargetProcessName endswith \"\\\\listdlls64.exe\" or TargetProcessName endswith \"\\\\livekd.exe\" or TargetProcessName endswith \"\\\\livekd64.exe\" or TargetProcessName endswith \"\\\\loadOrd.exe\" or TargetProcessName endswith \"\\\\loadOrd64.exe\" or TargetProcessName endswith \"\\\\loadOrdC.exe\" or TargetProcessName endswith \"\\\\loadOrdC64.exe\" or TargetProcessName endswith \"\\\\logonsessions.exe\" or TargetProcessName endswith \"\\\\logonsessions64.exe\" or TargetProcessName endswith \"\\\\movefile.exe\" or TargetProcessName endswith \"\\\\movefile64.exe\" or TargetProcessName endswith \"\\\\notmyfault.exe\" or TargetProcessName endswith \"\\\\notmyfault64.exe\" or TargetProcessName endswith \"\\\\notmyfaultc.exe\" or TargetProcessName endswith \"\\\\notmyfaultc64.exe\" or TargetProcessName endswith \"\\\\ntfsinfo.exe\" or TargetProcessName endswith \"\\\\ntfsinfo64.exe\" or TargetProcessName endswith \"\\\\pendmoves.exe\" or TargetProcessName endswith \"\\\\pendmoves64.exe\" or TargetProcessName endswith \"\\\\pipelist.exe\" or TargetProcessName endswith \"\\\\pipelist64.exe\" or TargetProcessName endswith \"\\\\portmon.exe\" or TargetProcessName endswith \"\\\\procdump.exe\" or TargetProcessName endswith \"\\\\procdump64.exe\" or TargetProcessName endswith \"\\\\procexp.exe\" or TargetProcessName endswith \"\\\\procexp64.exe\" or TargetProcessName endswith \"\\\\Procmon.exe\" or TargetProcessName endswith \"\\\\Procmon64.exe\" or TargetProcessName endswith \"\\\\psExec.exe\" or TargetProcessName endswith \"\\\\psExec64.exe\" or TargetProcessName endswith \"\\\\psfile.exe\" or TargetProcessName endswith \"\\\\psfile64.exe\" or TargetProcessName endswith \"\\\\psGetsid.exe\" or TargetProcessName endswith \"\\\\psGetsid64.exe\" or TargetProcessName endswith \"\\\\psInfo.exe\" or TargetProcessName endswith \"\\\\psInfo64.exe\" or TargetProcessName endswith \"\\\\pskill.exe\" or TargetProcessName endswith \"\\\\pskill64.exe\" or TargetProcessName endswith \"\\\\pslist.exe\" or TargetProcessName endswith \"\\\\pslist64.exe\" or TargetProcessName endswith \"\\\\psLoggedon.exe\" or TargetProcessName endswith \"\\\\psLoggedon64.exe\" or TargetProcessName endswith \"\\\\psloglist.exe\" or TargetProcessName endswith \"\\\\psloglist64.exe\" or TargetProcessName endswith \"\\\\pspasswd.exe\" or TargetProcessName endswith \"\\\\pspasswd64.exe\" or TargetProcessName endswith \"\\\\psping.exe\" or TargetProcessName endswith \"\\\\psping64.exe\" or TargetProcessName endswith \"\\\\psService.exe\" or TargetProcessName endswith \"\\\\psService64.exe\" or TargetProcessName endswith \"\\\\psshutdown.exe\" or TargetProcessName endswith \"\\\\psshutdown64.exe\" or TargetProcessName endswith \"\\\\pssuspend.exe\" or TargetProcessName endswith \"\\\\pssuspend64.exe\" or TargetProcessName endswith \"\\\\RAMMap.exe\" or TargetProcessName endswith \"\\\\RDCMan.exe\" or TargetProcessName endswith \"\\\\RegDelNull.exe\" or TargetProcessName endswith \"\\\\RegDelNull64.exe\" or TargetProcessName endswith \"\\\\regjump.exe\" or TargetProcessName endswith \"\\\\ru.exe\" or TargetProcessName endswith \"\\\\ru64.exe\" or TargetProcessName endswith \"\\\\sdelete.exe\" or TargetProcessName endswith \"\\\\sdelete64.exe\" or TargetProcessName endswith \"\\\\ShareEnum.exe\" or TargetProcessName endswith \"\\\\ShareEnum64.exe\" or TargetProcessName endswith \"\\\\shellRunas.exe\" or TargetProcessName endswith \"\\\\sigcheck.exe\" or TargetProcessName endswith \"\\\\sigcheck64.exe\" or TargetProcessName endswith \"\\\\streams.exe\" or TargetProcessName endswith \"\\\\streams64.exe\" or TargetProcessName endswith \"\\\\strings.exe\" or TargetProcessName endswith \"\\\\strings64.exe\" or TargetProcessName endswith \"\\\\sync.exe\" or TargetProcessName endswith \"\\\\sync64.exe\" or TargetProcessName endswith \"\\\\Sysmon.exe\" or TargetProcessName endswith \"\\\\Sysmon64.exe\" or TargetProcessName endswith \"\\\\tcpvcon.exe\" or TargetProcessName endswith \"\\\\tcpvcon64.exe\" or TargetProcessName endswith \"\\\\tcpview.exe\" or TargetProcessName endswith \"\\\\tcpview64.exe\" or TargetProcessName endswith \"\\\\Testlimit.exe\" or TargetProcessName endswith \"\\\\Testlimit64.exe\" or TargetProcessName endswith \"\\\\vmmap.exe\" or TargetProcessName endswith \"\\\\vmmap64.exe\" or TargetProcessName endswith \"\\\\Volumeid.exe\" or TargetProcessName endswith \"\\\\Volumeid64.exe\" or TargetProcessName endswith \"\\\\whois.exe\" or TargetProcessName endswith \"\\\\whois64.exe\" or TargetProcessName endswith \"\\\\Winobj.exe\" or TargetProcessName endswith \"\\\\Winobj64.exe\" or TargetProcessName endswith \"\\\\ZoomIt.exe\" or TargetProcessName endswith \"\\\\ZoomIt64.exe\") and (not(((TargetProcessFileCompany =~ \"Sysinternals - www.sysinternals.com\" or TargetProcessFileCompany =~ \"Sysinternals\") or isnull(TargetProcessFileCompany)))))|extend RuleId=\"7cce6fc8-a07f-4d84-a53e-96e1879843c9\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sysinternals_tools_masquerading.yml\"|extend RuleTitle=\"Potential Binary Impersonating Sysinternals Tools\"|extend RuleDescription=\"Detects binaries that use the same name as legitimate sysinternals tools to evade detection\";\nlet q1=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\sysprep.exe\" and TargetProcessCommandLine contains \"\\\\AppData\\\\\")|extend RuleId=\"d5b9ae7a-e6fc-405e-80ff-2ff9dcc64e7e\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sysprep_appdata.yml\"|extend RuleTitle=\"Sysprep on AppData Folder\"|extend RuleDescription=\"Detects suspicious sysprep process start with AppData folder as target (as used by Trojan Syndicasec in Thrip report by Symantec)\";\nlet q2=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\takeown.exe\" and (TargetProcessCommandLine contains \"/f \" and TargetProcessCommandLine contains \"/r\"))|extend RuleId=\"554601fb-9b71-4bcc-abf4-21a611be4fde\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_takeown_recursive_own.yml\"|extend RuleTitle=\"Suspicious Recursive Takeown\"|extend RuleDescription=\"Adversaries can interact with the DACLs using built-in Windows commands takeown which can grant adversaries higher permissions on specific files and folders\";\nlet q3=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\tapinstall.exe\" and (not(((TargetProcessName =~ \"C:\\\\Program Files\\\\Avast Software\\\\SecureLine VPN\\\\tapinstall.exe\" or TargetProcessName =~ \"C:\\\\Program Files (x86)\\\\Avast Software\\\\SecureLine VPN\\\\tapinstall.exe\") or TargetProcessName startswith \"C:\\\\Program Files\\\\OpenVPN Connect\\\\drivers\\\\tap\\\\\" or TargetProcessName startswith \"C:\\\\Program Files (x86)\\\\Proton Technologies\\\\ProtonVPNTap\\\\installer\\\\\"))))|extend RuleId=\"99793437-3e16-439b-be0f-078782cf953d\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_tapinstall_execution.yml\"|extend RuleTitle=\"Tap Installer Execution\"|extend RuleDescription=\"Well-known TAP software installation. Possible preparation for data exfiltration using tunneling techniques\";\nlet q4=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\tpmvscmgr.exe\" and TargetProcessFilename =~ \"TpmVscMgr.exe\") and TargetProcessCommandLine contains \"create\")|extend RuleId=\"c633622e-cab9-4eaa-bb13-66a1d68b3e47\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_tpmvscmgr_add_virtual_smartcard.yml\"|extend RuleTitle=\"New Virtual Smart Card Created Via TpmVscMgr.EXE\"|extend RuleDescription=\"Detects execution of \"Tpmvscmgr.exe\" to create a new virtual smart card.\";\nlet q5=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\tscon.exe\" or TargetProcessFilename =~ \"tscon.exe\") and TargetProcessIntegrityLevel =~ \"SYSTEM\")|extend RuleId=\"224f140f-3553-4cd1-af78-13d81bf9f7cc\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_tscon_rdp_session_hijacking.yml\"|extend RuleTitle=\"Potential RDP Session Hijacking Activity\"|extend RuleDescription=\"Detects potential RDP Session Hijacking activity on Windows systems\";\nlet q6=_Im_ProcessCreate\n| where ((ActingProcessName endswith \"\\\\mmc.exe\" and ActingProcessCommandLine contains \"WF.msc\") and (not(TargetProcessName endswith \"\\\\WerFault.exe\")))|extend RuleId=\"e52cb31c-10ed-4aea-bcb7-593c9f4a315b\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_uac_bypass_hijacking_firwall_snap_in.yml\"|extend RuleTitle=\"UAC Bypass via Windows Firewall Snap-In Hijack\"|extend RuleDescription=\"Detects attempts to bypass User Account Control (UAC) by hijacking the Microsoft Management Console (MMC) Windows Firewall snap-in\";\nlet q7=_Im_ProcessCreate\n| where (TargetProcessName endswith \"sdclt.exe\" and TargetProcessIntegrityLevel =~ \"High\")|extend RuleId=\"40f9af16-589d-4984-b78d-8c2aec023197\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_uac_bypass_sdclt.yml\"|extend RuleTitle=\"Potential UAC Bypass Via Sdclt.EXE\"|extend RuleDescription=\"A General detection for sdclt being spawned as an elevated process. This could be an indicator of sdclt being used for bypass UAC techniques.\";\nlet q8=_Im_ProcessCreate\n| where (TargetProcessFileDescription =~ \"VNCViewer\" or TargetProcessFileProduct =~ \"UltraVNC VNCViewer\" or TargetProcessFileCompany =~ \"UltraVNC\" or TargetProcessFilename =~ \"VNCViewer.exe\")|extend RuleId=\"145322e4-0fd3-486b-81ca-9addc75736d8\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_ultravnc.yml\"|extend RuleTitle=\"Use of UltraVNC Remote Access Software\"|extend RuleDescription=\"An adversary may use legitimate desktop support and remote access software,to establish an interactive command and control channel to target systems within networks\";\nlet q9=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\VaultCmd.exe\" or TargetProcessFilename =~ \"VAULTCMD.EXE\") and TargetProcessCommandLine contains \"/listcreds:\")|extend RuleId=\"58f50261-c53b-4c88-bd12-1d71f12eda4c\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_vaultcmd_list_creds.yml\"|extend RuleTitle=\"Windows Credential Manager Access via VaultCmd\"|extend RuleDescription=\"List credentials currently stored in Windows Credential Manager via the native Windows utility vaultcmd.exe\";\nlet q10=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\verclsid.exe\" or TargetProcessFilename =~ \"verclsid.exe\") and (TargetProcessCommandLine contains \"/S\" and TargetProcessCommandLine contains \"/C\"))|extend RuleId=\"d06be4b9-8045-428b-a567-740a26d9db25\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_verclsid_runs_com.yml\"|extend RuleTitle=\"Verclsid.exe Runs COM Object\"|extend RuleDescription=\"Detects when verclsid.exe is used to run COM object via GUID\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion", "CommandAndControl", "CredentialAccess", "Execution", "Exfiltration", "PrivilegeEscalation"],
+                "techniques": ["T1219", "T1202", "T1222", "T1548", "T1218", "T1555", "T1048", "T1059"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000124",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

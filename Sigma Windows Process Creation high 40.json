@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000240')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000240')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation medium 40",
+                "description": "Sigma Windows Process Creation medium 40",
+                "severity": "medium",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\livekd.exe\" or TargetProcessName endswith \"\\\\livekd64.exe\") or TargetProcessFilename =~ \"livekd.exe\") and (TargetProcessCommandLine contains \" /m\" and TargetProcessCommandLine contains \" -m\"))|extend RuleId=\"c7746f1c-47d3-43d6-8c45-cd1e54b6b0a2\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sysinternals_livekd_kernel_memory_dump.yml\"|extend RuleTitle=\"Kernel Memory Dump Via LiveKD\"|extend RuleDescription=\"Detects execution of LiveKD with the \"-m\" flag to potentially dump the kernel memory\";\nlet q1=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \"copy procdump\" or TargetProcessCommandLine contains \"move procdump\") or ((TargetProcessCommandLine contains \"copy \" and TargetProcessCommandLine contains \".dmp \") and (TargetProcessCommandLine contains \"2.dmp\" or TargetProcessCommandLine contains \"lsass\" or TargetProcessCommandLine contains \"out.dmp\")) or (TargetProcessCommandLine contains \"copy lsass.exe_\" or TargetProcessCommandLine contains \"move lsass.exe_\"))|extend RuleId=\"79b06761-465f-4f88-9ef2-150e24d3d737\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sysinternals_procdump_evasion.yml\"|extend RuleTitle=\"Potential SysInternals ProcDump Evasion\"|extend RuleDescription=\"Detects uses of the SysInternals ProcDump utility in which ProcDump or its output get renamed, or a dump file is moved or copied to a different name\";\nlet q2=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \" -ma \" or TargetProcessCommandLine contains \" /ma \") and TargetProcessCommandLine contains \" ls\")|extend RuleId=\"5afee48e-67dd-4e03-a783-f74259dcf998\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sysinternals_procdump_lsass.yml\"|extend RuleTitle=\"Potential LSASS Process Dump Via Procdump\"|extend RuleDescription=\"Detects suspicious uses of the SysInternals Procdump utility by using a special command line parameter in combination with the lsass.exe process.\nThis way we are also able to catch cases in which the attacker has renamed the procdump executable.\n\";\nlet q3=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \" -s cmd\" or TargetProcessCommandLine contains \" /s cmd\" or TargetProcessCommandLine contains \" -s -i cmd\" or TargetProcessCommandLine contains \" /s /i cmd\" or TargetProcessCommandLine contains \" /s -i cmd\" or TargetProcessCommandLine contains \" -s /i cmd\" or TargetProcessCommandLine contains \" -i -s cmd\" or TargetProcessCommandLine contains \" /i /s cmd\" or TargetProcessCommandLine contains \" -i /s cmd\" or TargetProcessCommandLine contains \" /i -s cmd\" or TargetProcessCommandLine contains \" -s pwsh\" or TargetProcessCommandLine contains \" /s pwsh\" or TargetProcessCommandLine contains \" -s -i pwsh\" or TargetProcessCommandLine contains \" /s /i pwsh\" or TargetProcessCommandLine contains \" /s -i pwsh\" or TargetProcessCommandLine contains \" -s /i pwsh\" or TargetProcessCommandLine contains \" -i -s pwsh\" or TargetProcessCommandLine contains \" /i /s pwsh\" or TargetProcessCommandLine contains \" -i /s pwsh\" or TargetProcessCommandLine contains \" /i -s pwsh\" or TargetProcessCommandLine contains \" -s powershell\" or TargetProcessCommandLine contains \" /s powershell\" or TargetProcessCommandLine contains \" -s -i powershell\" or TargetProcessCommandLine contains \" /s /i powershell\" or TargetProcessCommandLine contains \" /s -i powershell\" or TargetProcessCommandLine contains \" -s /i powershell\" or TargetProcessCommandLine contains \" -i -s powershell\" or TargetProcessCommandLine contains \" /i /s powershell\" or TargetProcessCommandLine contains \" -i /s powershell\" or TargetProcessCommandLine contains \" /i -s powershell\") and (TargetProcessCommandLine contains \"psexec\" or TargetProcessCommandLine contains \"paexec\" or TargetProcessCommandLine contains \"accepteula\"))|extend RuleId=\"8834e2f7-6b4b-4f09-8906-d2276470ee23\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sysinternals_psexec_paexec_escalate_system.yml\"|extend RuleTitle=\"PsExec/PAExec Escalation to LOCAL SYSTEM\"|extend RuleDescription=\"Detects suspicious commandline flags used by PsExec and PAExec to escalate a command line to LOCAL_SYSTEM rights\";\nlet q4=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"accepteula\" and TargetProcessCommandLine contains \" -u \" and TargetProcessCommandLine contains \" -p \" and TargetProcessCommandLine contains \" \\\\\\\\\")|extend RuleId=\"ea011323-7045-460b-b2d7-0f7442ea6b38\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sysinternals_psexec_remote_execution.yml\"|extend RuleTitle=\"Potential PsExec Remote Execution\"|extend RuleDescription=\"Detects potential psexec command that initiate execution on a remote systems via common commandline flags used by the utility\";\nlet q5=_Im_ProcessCreate\n| where (ActingProcessName =~ \"C:\\\\Windows\\\\PSEXESVC.exe\" and (TargetUsername contains \"AUTHORI\" or TargetUsername contains \"AUTORI\"))|extend RuleId=\"7c0dcd3d-acf8-4f71-9570-f448b0034f94\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sysinternals_psexesvc_as_system.yml\"|extend RuleTitle=\"PsExec Service Child Process Execution as LOCAL SYSTEM\"|extend RuleDescription=\"Detects suspicious launch of the PSEXESVC service on this system and a sub process run as LOCAL_SYSTEM (-s), which means that someone remotely started a command on this system running it with highest privileges and not only the privileges of the login user account (e.g. the administrator account)\";\nlet q6=_Im_ProcessCreate\n| where ((TargetProcessFilename =~ \"pssuspend.exe\" or (TargetProcessName endswith \"\\\\pssuspend.exe\" or TargetProcessName endswith \"\\\\pssuspend64.exe\")) and TargetProcessCommandLine contains \"msmpeng.exe\")|extend RuleId=\"4beb6ae0-f85b-41e2-8f18-8668abc8af78\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sysinternals_pssuspend_susp_execution.yml\"|extend RuleTitle=\"Sysinternals PsSuspend Suspicious Execution\"|extend RuleDescription=\"Detects suspicious execution of Sysinternals PsSuspend, where the utility is used to suspend critical processes such as AV or EDR to bypass defenses\";\nlet q7=_Im_ProcessCreate\n| where (TargetProcessFilename =~ \"sdelete.exe\" and (not((TargetProcessCommandLine contains \" -h\" or TargetProcessCommandLine contains \" -c\" or TargetProcessCommandLine contains \" -z\" or TargetProcessCommandLine contains \" /?\"))))|extend RuleId=\"a4824fca-976f-4964-b334-0621379e84c4\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sysinternals_sdelete.yml\"|extend RuleTitle=\"Potential File Overwrite Via Sysinternals SDelete\"|extend RuleDescription=\"Detects the use of SDelete to erase a file not the free space\";\nlet q8=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \" -s cmd\" or TargetProcessCommandLine contains \" /s cmd\" or TargetProcessCommandLine contains \" -s -i cmd\" or TargetProcessCommandLine contains \" /s /i cmd\" or TargetProcessCommandLine contains \" /s -i cmd\" or TargetProcessCommandLine contains \" -s /i cmd\" or TargetProcessCommandLine contains \" -i -s cmd\" or TargetProcessCommandLine contains \" /i /s cmd\" or TargetProcessCommandLine contains \" -i /s cmd\" or TargetProcessCommandLine contains \" /i -s cmd\" or TargetProcessCommandLine contains \" -s pwsh\" or TargetProcessCommandLine contains \" /s pwsh\" or TargetProcessCommandLine contains \" -s -i pwsh\" or TargetProcessCommandLine contains \" /s /i pwsh\" or TargetProcessCommandLine contains \" /s -i pwsh\" or TargetProcessCommandLine contains \" -s /i pwsh\" or TargetProcessCommandLine contains \" -i -s pwsh\" or TargetProcessCommandLine contains \" /i /s pwsh\" or TargetProcessCommandLine contains \" -i /s pwsh\" or TargetProcessCommandLine contains \" /i -s pwsh\" or TargetProcessCommandLine contains \" -s powershell\" or TargetProcessCommandLine contains \" /s powershell\" or TargetProcessCommandLine contains \" -s -i powershell\" or TargetProcessCommandLine contains \" /s /i powershell\" or TargetProcessCommandLine contains \" /s -i powershell\" or TargetProcessCommandLine contains \" -s /i powershell\" or TargetProcessCommandLine contains \" -i -s powershell\" or TargetProcessCommandLine contains \" /i /s powershell\" or TargetProcessCommandLine contains \" -i /s powershell\" or TargetProcessCommandLine contains \" /i -s powershell\") and (not((TargetProcessCommandLine contains \"paexec\" or TargetProcessCommandLine contains \"PsExec\" or TargetProcessCommandLine contains \"accepteula\"))))|extend RuleId=\"207b0396-3689-42d9-8399-4222658efc99\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sysinternals_susp_psexec_paexec_flags.yml\"|extend RuleTitle=\"Potential Privilege Escalation To LOCAL SYSTEM\"|extend RuleDescription=\"Detects unknown program using commandline flags usually used by tools such as PsExec and PAExec to start programs with SYSTEM Privileges\";\nlet q9=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \" -s cmd\" or TargetProcessCommandLine contains \" /s cmd\" or TargetProcessCommandLine contains \" -s -i cmd\" or TargetProcessCommandLine contains \" /s /i cmd\" or TargetProcessCommandLine contains \" /s -i cmd\" or TargetProcessCommandLine contains \" -s /i cmd\" or TargetProcessCommandLine contains \" -i -s cmd\" or TargetProcessCommandLine contains \" /i /s cmd\" or TargetProcessCommandLine contains \" -i /s cmd\" or TargetProcessCommandLine contains \" /i -s cmd\" or TargetProcessCommandLine contains \" -s pwsh\" or TargetProcessCommandLine contains \" /s pwsh\" or TargetProcessCommandLine contains \" -s -i pwsh\" or TargetProcessCommandLine contains \" /s /i pwsh\" or TargetProcessCommandLine contains \" /s -i pwsh\" or TargetProcessCommandLine contains \" -s /i pwsh\" or TargetProcessCommandLine contains \" -i -s pwsh\" or TargetProcessCommandLine contains \" /i /s pwsh\" or TargetProcessCommandLine contains \" -i /s pwsh\" or TargetProcessCommandLine contains \" /i -s pwsh\" or TargetProcessCommandLine contains \" -s powershell\" or TargetProcessCommandLine contains \" /s powershell\" or TargetProcessCommandLine contains \" -s -i powershell\" or TargetProcessCommandLine contains \" /s /i powershell\" or TargetProcessCommandLine contains \" /s -i powershell\" or TargetProcessCommandLine contains \" -s /i powershell\" or TargetProcessCommandLine contains \" -i -s powershell\" or TargetProcessCommandLine contains \" /i /s powershell\" or TargetProcessCommandLine contains \" -i /s powershell\" or TargetProcessCommandLine contains \" /i -s powershell\") and (not((TargetProcessCommandLine contains \"paexec\" or TargetProcessCommandLine contains \"PsExec\" or TargetProcessCommandLine contains \"accepteula\"))))|extend RuleId=\"207b0396-3689-42d9-8399-4222658efc99\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sysinternals_susp_psexec_paexec_flags_.yml\"|extend RuleTitle=\"Potential Privilege Escalation To LOCAL SYSTEM\"|extend RuleDescription=\"Detects unknown program using commandline flags usually used by tools such as PsExec and PAExec to start programs with SYSTEM Privileges\";\nlet q10=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\Sysmon64.exe\" or TargetProcessName endswith \"\\\\Sysmon.exe\") or TargetProcessFileDescription =~ \"System activity monitor\") and (TargetProcessCommandLine contains \"-u\" or TargetProcessCommandLine contains \"/u\"))|extend RuleId=\"6a5f68d1-c4b5-46b9-94ee-5324892ea939\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sysinternals_sysmon_uninstall.yml\"|extend RuleTitle=\"Uninstall Sysinternals Sysmon\"|extend RuleDescription=\"Detects the removal of Sysmon, which could be a potential attempt at defense evasion\";\nlet q11=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\SystemSettingsAdminFlows.exe\" or TargetProcessFilename =~ \"SystemSettingsAdminFlows.EXE\") and TargetProcessCommandLine contains \"TurnOnDeveloperFeatures\" and (TargetProcessCommandLine contains \"DeveloperUnlock\" or TargetProcessCommandLine contains \"EnableSideloading\"))|extend RuleId=\"a383dec4-deec-4e6e-913b-ed9249670848\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_systemsettingsadminflows_turn_on_dev_features.yml\"|extend RuleTitle=\"Potential Signing Bypass Via Windows Developer Features\"|extend RuleDescription=\"Detects when a user enable developer features such as \"Developer Mode\" or \"Application Sideloading\". Which allows the user to install untrusted packages.\";\nlet q12=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"taskkill\" and TargetProcessCommandLine contains \" /F \" and TargetProcessCommandLine contains \" /IM \" and TargetProcessCommandLine contains \"ccSvcHst.exe\")|extend RuleId=\"4a6713f6-3331-11ed-a261-0242ac120002\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_taskkill_sep.yml\"|extend RuleTitle=\"Taskkill Symantec Endpoint Protection\"|extend RuleDescription=\"Detects one of the possible scenarios for disabling Symantec Endpoint Protection.\nSymantec Endpoint Protection antivirus software services incorrectly implement the protected service mechanism.\nAs a result, the NT AUTHORITY/SYSTEM user can execute the taskkill /im command several times ccSvcHst.exe /f, thereby killing the process belonging to the service, and thus shutting down the service.\n\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion", "Impact", "CredentialAccess", "Execution", "ResourceDevelopment"],
+                "techniques": ["T1587", "T1485", "T1036", "T1003", "T1562"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000240",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}
