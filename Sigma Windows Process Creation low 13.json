@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000113')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000113')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation low 13",
+                "description": "Sigma Windows Process Creation low 13",
+                "severity": "low",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\") or (TargetProcessFilename =~ \"PowerShell.EXE\" or TargetProcessFilename =~ \"pwsh.dll\")) and ((TargetProcessCommandLine contains \"Get-ADComputer \" and TargetProcessCommandLine contains \" -Filter \\\\*\") and (TargetProcessCommandLine contains \" > \" or TargetProcessCommandLine contains \" | Select \" or TargetProcessCommandLine contains \"Out-File\" or TargetProcessCommandLine contains \"Set-Content\" or TargetProcessCommandLine contains \"Add-Content\")))|extend RuleId=\"435e10e4-992a-4281-96f3-38b11106adde\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_computer_discovery_get_adcomputer.yml\"|extend RuleTitle=\"Computer Discovery And Export Via Get-ADComputer Cmdlet\"|extend RuleDescription=\"Detects usage of the Get-ADComputer cmdlet to collect computer information and output it to a file\";\nlet q1=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"GZipStream\" and TargetProcessCommandLine contains \"::Decompress\")|extend RuleId=\"98767d61-b2e8-4d71-b661-e36783ee24c1\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_decode_gzip.yml\"|extend RuleTitle=\"Gzip Archive Decode Via PowerShell\"|extend RuleDescription=\"Detects attempts of decoding encoded Gzip archives via PowerShell.\";\nlet q2=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \"Add-MpPreference \" or TargetProcessCommandLine contains \"Set-MpPreference \") and (TargetProcessCommandLine contains \" -ExclusionPath \" or TargetProcessCommandLine contains \" -ExclusionExtension \" or TargetProcessCommandLine contains \" -ExclusionProcess \" or TargetProcessCommandLine contains \" -ExclusionIpAddress \"))|extend RuleId=\"17769c90-230e-488b-a463-e05c08e9d48f\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_defender_exclusion.yml\"|extend RuleTitle=\"Powershell Defender Exclusion\"|extend RuleDescription=\"Detects requests to exclude files, folders or processes from Antivirus scanning using PowerShell cmdlets\";\nlet q3=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\" or TargetProcessName endswith \"\\\\powershell_ise.exe\") or (TargetProcessFilename =~ \"PowerShell.EXE\" or TargetProcessFilename =~ \"pwsh.dll\")) and (TargetProcessCommandLine contains \"Set-NetFirewallProfile \" and TargetProcessCommandLine contains \" -Enabled \" and TargetProcessCommandLine contains \" False\") and (TargetProcessCommandLine contains \" -All \" or TargetProcessCommandLine contains \"Public\" or TargetProcessCommandLine contains \"Domain\" or TargetProcessCommandLine contains \"Private\"))|extend RuleId=\"12f6b752-042d-483e-bf9c-915a6d06ad75\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_disable_firewall.yml\"|extend RuleTitle=\"Windows Firewall Disabled via PowerShell\"|extend RuleDescription=\"Detects attempts to disable the Windows Firewall using PowerShell\";\nlet q4=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\powershell.exe\" and (TargetProcessCommandLine contains \" -version 2 \" or TargetProcessCommandLine contains \" -versio 2 \" or TargetProcessCommandLine contains \" -versi 2 \" or TargetProcessCommandLine contains \" -vers 2 \" or TargetProcessCommandLine contains \" -ver 2 \" or TargetProcessCommandLine contains \" -ve 2 \" or TargetProcessCommandLine contains \" -v 2 \"))|extend RuleId=\"b3512211-c67e-4707-bedc-66efc7848863\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_downgrade_attack.yml\"|extend RuleTitle=\"Potential PowerShell Downgrade Attack\"|extend RuleDescription=\"Detects PowerShell downgrade attack by comparing the host versions with the actually used engine version 2.0\";\nlet q5=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"[Type]::GetTypeFromCLSID(\" and (TargetProcessCommandLine contains \"0002DF01-0000-0000-C000-000000000046\" or TargetProcessCommandLine contains \"F6D90F16-9C73-11D3-B32E-00C04F990BB4\" or TargetProcessCommandLine contains \"F5078F35-C551-11D3-89B9-0000F81FE221\" or TargetProcessCommandLine contains \"88d96a0a-f192-11d4-a65f-0040963251e5\" or TargetProcessCommandLine contains \"AFBA6B42-5692-48EA-8141-DC517DCF0EF1\" or TargetProcessCommandLine contains \"AFB40FFD-B609-40A3-9828-F88BBE11E4E3\" or TargetProcessCommandLine contains \"88d96a0b-f192-11d4-a65f-0040963251e5\" or TargetProcessCommandLine contains \"2087c2f4-2cef-4953-a8ab-66779b670495\" or TargetProcessCommandLine contains \"000209FF-0000-0000-C000-000000000046\" or TargetProcessCommandLine contains \"00024500-0000-0000-C000-000000000046\"))|extend RuleId=\"02b64f1b-3f33-4e67-aede-ef3b0a5a8fcf\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_download_com_cradles.yml\"|extend RuleTitle=\"Potential COM Objects Download Cradles Usage - Process Creation\"|extend RuleDescription=\"Detects usage of COM objects that can be abused to download files in PowerShell by CLSID\";\nlet q6=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \".DownloadString(\" or TargetProcessCommandLine contains \".DownloadFile(\" or TargetProcessCommandLine contains \"Invoke-WebRequest \" or TargetProcessCommandLine contains \"iwr \")|extend RuleId=\"6e897651-f157-4d8f-aaeb-df8151488385\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_download_cradles.yml\"|extend RuleTitle=\"PowerShell Web Download\"|extend RuleDescription=\"Detects suspicious ways to download files or content using PowerShell\";\nlet q7=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \"Invoke-WebRequest \" or TargetProcessCommandLine contains \"IWR \") and (TargetProcessCommandLine contains \"http\" and TargetProcessCommandLine contains \"OutFile\" and TargetProcessCommandLine contains \".dll\"))|extend RuleId=\"0f0450f3-8b47-441e-a31b-15a91dc243e2\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_download_dll.yml\"|extend RuleTitle=\"Potential DLL File Download Via PowerShell Invoke-WebRequest\"|extend RuleDescription=\"Detects potential DLL files being downloaded using the PowerShell Invoke-WebRequest cmdlet\";\nlet q8=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\") or (TargetProcessFilename =~ \"PowerShell.EXE\" or TargetProcessFilename =~ \"pwsh.dll\")) and ((TargetProcessCommandLine contains \"new-object\" and TargetProcessCommandLine contains \"net.webclient).\" and TargetProcessCommandLine contains \"download\") and (TargetProcessCommandLine contains \"string(\" or TargetProcessCommandLine contains \"file(\")))|extend RuleId=\"3b6ab547-8ec2-4991-b9d2-2b06702a48d7\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_download_patterns.yml\"|extend RuleTitle=\"PowerShell Download Pattern\"|extend RuleDescription=\"Detects a Powershell process that contains download commands in its command line string\";\nlet q9=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \"Enable-WindowsOptionalFeature\" and TargetProcessCommandLine contains \"-Online\" and TargetProcessCommandLine contains \"-FeatureName\") and (TargetProcessCommandLine contains \"TelnetServer\" or TargetProcessCommandLine contains \"Internet-Explorer-Optional-amd64\" or TargetProcessCommandLine contains \"TFTP\" or TargetProcessCommandLine contains \"SMB1Protocol\" or TargetProcessCommandLine contains \"Client-ProjFS\" or TargetProcessCommandLine contains \"Microsoft-Windows-Subsystem-Linux\"))|extend RuleId=\"c740d4cf-a1e9-41de-bb16-8a46a4f57918\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_enable_susp_windows_optional_feature.yml\"|extend RuleTitle=\"Potential Suspicious Windows Feature Enabled - ProcCreation\"|extend RuleDescription=\"Detects usage of the built-in PowerShell cmdlet \\\"Enable-WindowsOptionalFeature\\\" used as a Deployment Image Servicing and Management tool.\\nSimilar to DISM.exe, this cmdlet is used to enumerate, install, uninstall, configure, and update features and packages in Windows images\\n\";\nlet q10=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\") and (TargetProcessCommandLine contains \" -e \" or TargetProcessCommandLine contains \" -en \" or TargetProcessCommandLine contains \" -enc \" or TargetProcessCommandLine contains \" -enco\" or TargetProcessCommandLine contains \" -ec \")) and (not((TargetProcessCommandLine contains \" -Encoding \" or (ActingProcessName contains \"C:\\\\Packages\\\\Plugins\\\\Microsoft.GuestConfiguration.ConfigurationforWindows\\\\\" or ActingProcessName contains \"\\\\gc_worker.exe\")))))|extend RuleId=\"fb843269-508c-4b76-8b8d-88679db22ce7\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_encode.yml\"|extend RuleTitle=\"Suspicious Execution of Powershell with Base64\"|extend RuleDescription=\"Commandline to launch powershell with a base64 payload\";\nlet q11=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \"iex \" or TargetProcessCommandLine contains \"Invoke-Expression \" or TargetProcessCommandLine contains \"Invoke-Command \" or TargetProcessCommandLine contains \"icm \") and (TargetProcessCommandLine contains \"cat \" or TargetProcessCommandLine contains \"get-content \" or TargetProcessCommandLine contains \"type \") and TargetProcessCommandLine contains \" -raw\")|extend RuleId=\"ee218c12-627a-4d27-9e30-d6fb2fe22ed2\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_exec_data_file.yml\"|extend RuleTitle=\"Powershell Inline Execution From A File\"|extend RuleDescription=\"Detects inline execution of PowerShell code from a file\";\nlet q12=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"Export-PfxCertificate \" or TargetProcessCommandLine contains \"Export-Certificate \")|extend RuleId=\"9e716b33-63b2-46da-86a4-bd3c3b9b5dfb\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_export_certificate.yml\"|extend RuleTitle=\"Certificate Exported Via PowerShell\"|extend RuleDescription=\"Detects calls to cmdlets that are used to export certificates from the local certificate store. Threat actors were seen abusing this to steal private keys from compromised machines.\";\nlet q13=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"FromBase64String\" and TargetProcessCommandLine contains \"MemoryStream\" and TargetProcessCommandLine contains \"H4sI\")|extend RuleId=\"d75d6b6b-adb9-48f7-824b-ac2e786efe1f\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_frombase64string_archive.yml\"|extend RuleTitle=\"Suspicious FromBase64String Usage On Gzip Archive - Process Creation\"|extend RuleDescription=\"Detects attempts of decoding a base64 Gzip archive via PowerShell. This technique is often used as a method to load malicious content into memory afterward.\";\nlet q14=_Im_ProcessCreate\n| where TargetProcessCommandLine contains \"Get-Clipboard\"|extend RuleId=\"b9aeac14-2ffd-4ad3-b967-1354a4e628c3\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_get_clipboard.yml\"|extend RuleTitle=\"PowerShell Get-Clipboard Cmdlet Via CLI\"|extend RuleDescription=\"Detects usage of the 'Get-Clipboard' cmdlet via CLI\";\nlet q15=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"Get-LocalGroupMember \" and (TargetProcessCommandLine contains \"domain admins\" or TargetProcessCommandLine contains \" administrator\" or TargetProcessCommandLine contains \" administrateur\" or TargetProcessCommandLine contains \"enterprise admins\" or TargetProcessCommandLine contains \"Exchange Trusted Subsystem\" or TargetProcessCommandLine contains \"Remote Desktop Users\" or TargetProcessCommandLine contains \"Utilisateurs du Bureau \u00e0 distance\" or TargetProcessCommandLine contains \"Usuarios de escritorio remoto\"))|extend RuleId=\"c8a180d6-47a3-4345-a609-53f9c3d834fc\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_get_localgroup_member_recon.yml\"|extend RuleTitle=\"Suspicious Reconnaissance Activity Using Get-LocalGroupMember Cmdlet\"|extend RuleDescription=\"Detects suspicious reconnaissance command line activity on Windows systems using the PowerShell Get-LocalGroupMember Cmdlet\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion", "CommandAndControl", "CredentialAccess", "Collection", "Discovery", "Execution"],
+                "techniques": ["T1115", "T1105", "T1552", "T1562", "T1087", "T1059", "T1132", "T1033"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000113",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

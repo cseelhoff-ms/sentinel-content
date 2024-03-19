@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000231')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000231')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation medium 31",
+                "description": "Sigma Windows Process Creation medium 31",
+                "severity": "medium",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessFilename =~ \"RUNDLL32.EXE\") and ((TargetProcessCommandLine contains \"shell32.dll\" and TargetProcessCommandLine contains \"Control_RunDLL\") and (TargetProcessCommandLine contains \"%AppData%\" or TargetProcessCommandLine contains \"%LocalAppData%\" or TargetProcessCommandLine contains \"%Temp%\" or TargetProcessCommandLine contains \"%tmp%\" or TargetProcessCommandLine contains \"\\\\AppData\\\\\" or TargetProcessCommandLine contains \"\\\\Temp\\\\\" or TargetProcessCommandLine contains \"\\\\Users\\\\Public\\\\\")))|extend RuleId=\"32b96012-7892-429e-b26c-ac2bf46066ff\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_shell32_susp_execution.yml\"|extend RuleTitle=\"Shell32 DLL Execution in Suspicious Directory\"|extend RuleDescription=\"Detects shell32.dll executing a DLL in a suspicious directory\";\nlet q1=_Im_ProcessCreate\n| where ((ActingProcessName endswith \"\\\\rundll32.exe\" and TargetProcessName endswith \"\\\\explorer.exe\") and (not(ActingProcessCommandLine contains \"\\\\shell32.dll,Control_RunDLL\")))|extend RuleId=\"caa06de8-fdef-4c91-826a-7f9e163eef4b\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_spawn_explorer.yml\"|extend RuleTitle=\"RunDLL32 Spawning Explorer\"|extend RuleDescription=\"Detects RunDLL32.exe spawning explorer.exe as child, which is very uncommon, often observes Gamarue spawning the explorer.exe process in an unusual way\";\nlet q2=_Im_ProcessCreate\n| where ((ActingProcessName endswith \"\\\\System32\\\\control.exe\" and (TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessFilename =~ \"RUNDLL32.EXE\")) and (not(TargetProcessCommandLine contains \"Shell32.dll\")))|extend RuleId=\"d7eb979b-c2b5-4a6f-a3a7-c87ce6763819\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_susp_control_dll_load.yml\"|extend RuleTitle=\"Suspicious Control Panel DLL Load\"|extend RuleDescription=\"Detects suspicious Rundll32 execution from control.exe as used by Equation Group and Exploit Kits\";\nlet q3=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessFilename =~ \"RUNDLL32.exe\") and (TargetProcessCommandLine contains \".bmp\" or TargetProcessCommandLine contains \".cr2\" or TargetProcessCommandLine contains \".eps\" or TargetProcessCommandLine contains \".gif\" or TargetProcessCommandLine contains \".ico\" or TargetProcessCommandLine contains \".jpeg\" or TargetProcessCommandLine contains \".jpg\" or TargetProcessCommandLine contains \".nef\" or TargetProcessCommandLine contains \".orf\" or TargetProcessCommandLine contains \".png\" or TargetProcessCommandLine contains \".raw\" or TargetProcessCommandLine contains \".sr2\" or TargetProcessCommandLine contains \".tif\" or TargetProcessCommandLine contains \".tiff\"))|extend RuleId=\"4aa6040b-3f28-44e3-a769-9208e5feb5ec\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_susp_execution_with_image_extension.yml\"|extend RuleTitle=\"Suspicious Rundll32 Execution With Image Extension\"|extend RuleDescription=\"Detects the execution of Rundll32.exe with DLL files masquerading as image files\";\nlet q4=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"ShellExec_RunDLL\" and (TargetProcessCommandLine contains \"regsvr32\" or TargetProcessCommandLine contains \"msiexec\" or TargetProcessCommandLine contains \"\\\\Users\\\\Public\\\\\" or TargetProcessCommandLine contains \"odbcconf\" or TargetProcessCommandLine contains \"\\\\Desktop\\\\\" or TargetProcessCommandLine contains \"\\\\Temp\\\\\" or TargetProcessCommandLine contains \"Invoke-\" or TargetProcessCommandLine contains \"iex\" or TargetProcessCommandLine contains \"comspec\"))|extend RuleId=\"d87bd452-6da1-456e-8155-7dc988157b7d\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_susp_shellexec_execution.yml\"|extend RuleTitle=\"Suspicious Usage Of ShellExec_RunDLL\"|extend RuleDescription=\"Detects suspicious usage of the ShellExec_RunDLL function to launch other commands as seen in the the raspberry-robin attack\";\nlet q5=_Im_ProcessCreate\n| where (((TargetProcessCommandLine contains \"rundll32\" and TargetProcessCommandLine contains \"apphelp.dll\") and (TargetProcessCommandLine contains \"ShimFlushCache\" or TargetProcessCommandLine contains \"#250\")) or ((TargetProcessCommandLine contains \"rundll32\" and TargetProcessCommandLine contains \"kernel32.dll\") and (TargetProcessCommandLine contains \"BaseFlushAppcompatCache\" or TargetProcessCommandLine contains \"#46\")))|extend RuleId=\"b0524451-19af-4efa-a46f-562a977f792e\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_susp_shimcache_flush.yml\"|extend RuleTitle=\"ShimCache Flush\"|extend RuleDescription=\"Detects actions that clear the local ShimCache and remove forensic evidence\";\nlet q6=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"rundll32.exe\" and (TargetProcessCommandLine contains \".sys,\" or TargetProcessCommandLine contains \".sys \"))|extend RuleId=\"731231b9-0b5d-4219-94dd-abb6959aa7ea\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_sys.yml\"|extend RuleTitle=\"Suspicious Rundll32 Activity Invoking Sys File\"|extend RuleDescription=\"Detects suspicious process related to rundll32 based on command line that includes a *.sys file as seen being used by UNC2452\";\nlet q7=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessFilename =~ \"RUNDLL32.EXE\" or TargetProcessCommandLine contains \"rundll32\") and TargetProcessCommandLine contains \" \\\\\\\\\")|extend RuleId=\"5cdb711b-5740-4fb2-ba88-f7945027afac\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_unc_path.yml\"|extend RuleTitle=\"Rundll32 UNC Path Execution\"|extend RuleDescription=\"Detects rundll32 execution where the DLL is located on a remote location (share)\";\nlet q8=_Im_ProcessCreate\n| where ((ActingProcessName endswith \"\\\\svchost.exe\" and ActingProcessCommandLine contains \"-s WebClient\" and TargetProcessName endswith \"\\\\rundll32.exe\" and TargetProcessCommandLine contains \"C:\\\\windows\\\\system32\\\\davclnt.dll,DavSetCookie\" and TargetProcessCommandLine matches regex \"://\\\\d{1,3}\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}\") and (not((TargetProcessCommandLine contains \"://10.\" or TargetProcessCommandLine contains \"://192.168.\" or TargetProcessCommandLine contains \"://172.16.\" or TargetProcessCommandLine contains \"://172.17.\" or TargetProcessCommandLine contains \"://172.18.\" or TargetProcessCommandLine contains \"://172.19.\" or TargetProcessCommandLine contains \"://172.20.\" or TargetProcessCommandLine contains \"://172.21.\" or TargetProcessCommandLine contains \"://172.22.\" or TargetProcessCommandLine contains \"://172.23.\" or TargetProcessCommandLine contains \"://172.24.\" or TargetProcessCommandLine contains \"://172.25.\" or TargetProcessCommandLine contains \"://172.26.\" or TargetProcessCommandLine contains \"://172.27.\" or TargetProcessCommandLine contains \"://172.28.\" or TargetProcessCommandLine contains \"://172.29.\" or TargetProcessCommandLine contains \"://172.30.\" or TargetProcessCommandLine contains \"://172.31.\" or TargetProcessCommandLine contains \"://127.\" or TargetProcessCommandLine contains \"://169.254.\"))))|extend RuleId=\"982e9f2d-1a85-4d5b-aea4-31f5e97c6555\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_webdav_client_susp_execution.yml\"|extend RuleTitle=\"Suspicious WebDav Client Execution Via Rundll32.EXE\"|extend RuleDescription=\"Detects \\\"svchost.exe\\\" spawning \\\"rundll32.exe\\\" with command arguments like C:\\\\windows\\\\system32\\\\davclnt.dll,DavSetCookie. This could be an indicator of exfiltration or use of WebDav to launch code (hosted on WebDav Server) or potentially a sign of exploitation of CVE-2023-23397\\n\";\nlet q9=_Im_ProcessCreate\n| where (TargetProcessCommandLine =~ \"rundll32.exe\" or TargetProcessCommandLine =~ \"rundll32\")|extend RuleId=\"5bb68627-3198-40ca-b458-49f973db8752\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_without_parameters.yml\"|extend RuleTitle=\"Rundll32 Execution Without Parameters\"|extend RuleDescription=\"Detects rundll32 execution without parameters as observed when running Metasploit windows/smb/psexec exploit module\";\nlet q10=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\schtasks.exe\" and (TargetProcessCommandLine contains \"/Create\" and TargetProcessCommandLine contains \"/RU\" and TargetProcessCommandLine contains \"/TR\" and TargetProcessCommandLine contains \"C:\\\\Users\\\\\" and TargetProcessCommandLine contains \"\\\\AppData\\\\Local\\\\\") and (TargetProcessCommandLine contains \"NT AUT\" or TargetProcessCommandLine contains \" SYSTEM \")) and (not(((ActingProcessName contains \"\\\\AppData\\\\Local\\\\Temp\\\\\" and ActingProcessName contains \"TeamViewer_.exe\") and TargetProcessName endswith \"\\\\schtasks.exe\" and TargetProcessCommandLine contains \"/TN TVInstallRestore\"))))|extend RuleId=\"c5c00f49-b3f9-45a6-997e-cfdecc6e1967\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_schtasks_appdata_local_system.yml\"|extend RuleTitle=\"Suspicious Schtasks Execution AppData Folder\"|extend RuleDescription=\"Detects the creation of a schtask that executes a file from C:\\\\Users\\\\<USER>\\\\AppData\\\\Local\";\nlet q11=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\schtasks.exe\" and (TargetProcessCommandLine contains \" /Change \" and TargetProcessCommandLine contains \" /TN \")) and (TargetProcessCommandLine contains \"\\\\AppData\\\\Local\\\\Temp\" or TargetProcessCommandLine contains \"\\\\AppData\\\\Roaming\\\\\" or TargetProcessCommandLine contains \"\\\\Users\\\\Public\\\\\" or TargetProcessCommandLine contains \"\\\\WINDOWS\\\\Temp\\\\\" or TargetProcessCommandLine contains \"\\\\Desktop\\\\\" or TargetProcessCommandLine contains \"\\\\Downloads\\\\\" or TargetProcessCommandLine contains \"\\\\Temporary Internet\" or TargetProcessCommandLine contains \"C:\\\\ProgramData\\\\\" or TargetProcessCommandLine contains \"C:\\\\Perflogs\\\\\" or TargetProcessCommandLine contains \"%ProgramData%\" or TargetProcessCommandLine contains \"%appdata%\" or TargetProcessCommandLine contains \"%comspec%\" or TargetProcessCommandLine contains \"%localappdata%\") and (TargetProcessCommandLine contains \"regsvr32\" or TargetProcessCommandLine contains \"rundll32\" or TargetProcessCommandLine contains \"cmd /c \" or TargetProcessCommandLine contains \"cmd /k \" or TargetProcessCommandLine contains \"cmd /r \" or TargetProcessCommandLine contains \"cmd.exe /c \" or TargetProcessCommandLine contains \"cmd.exe /k \" or TargetProcessCommandLine contains \"cmd.exe /r \" or TargetProcessCommandLine contains \"powershell\" or TargetProcessCommandLine contains \"mshta\" or TargetProcessCommandLine contains \"wscript\" or TargetProcessCommandLine contains \"cscript\" or TargetProcessCommandLine contains \"certutil\" or TargetProcessCommandLine contains \"bitsadmin\" or TargetProcessCommandLine contains \"bash.exe\" or TargetProcessCommandLine contains \"bash \" or TargetProcessCommandLine contains \"scrcons\" or TargetProcessCommandLine contains \"wmic \" or TargetProcessCommandLine contains \"wmic.exe\" or TargetProcessCommandLine contains \"forfiles\" or TargetProcessCommandLine contains \"scriptrunner\" or TargetProcessCommandLine contains \"hh.exe\" or TargetProcessCommandLine contains \"hh \"))|extend RuleId=\"1c0e41cd-21bb-4433-9acc-4a2cd6367b9b\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_schtasks_change.yml\"|extend RuleTitle=\"Suspicious Modification Of Scheduled Tasks\"|extend RuleDescription=\"Detects when an attacker tries to modify an already existing scheduled tasks to run from a suspicious location\\nAttackers can create a simple looking task in order to avoid detection on creation as it's often the most focused on\\nInstead they modify the task after creation to include their malicious payload\\n\";\nlet q12=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\schtasks.exe\" and (TargetProcessCommandLine contains \" /create \" and TargetProcessCommandLine contains \" /sc once \" and TargetProcessCommandLine contains \"\\\\Temp\\\\\"))|extend RuleId=\"39019a4e-317f-4ce3-ae63-309a8c6b53c5\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_schtasks_creation_temp_folder.yml\"|extend RuleTitle=\"Suspicious Scheduled Task Creation Involving Temp Folder\"|extend RuleDescription=\"Detects the creation of scheduled tasks that involves a temporary folder and runs only once\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["Exfiltration", "PrivilegeEscalation", "DefenseEvasion", "Persistence", "Execution", "LateralMovement"],
+                "techniques": ["T1112", "T1053", "T1048", "T1569", "T1021", "T1059", "T1570", "T1218"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000231",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

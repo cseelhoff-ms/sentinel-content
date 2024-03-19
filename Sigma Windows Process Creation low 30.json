@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000130')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000130')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation low 30",
+                "description": "Sigma Windows Process Creation low 30",
+                "severity": "low",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where (((ActingProcessName endswith \"\\\\WindowsTerminal.exe\" or ActingProcessName endswith \"\\\\wt.exe\") and ((TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessName endswith \"\\\\regsvr32.exe\" or TargetProcessName endswith \"\\\\certutil.exe\" or TargetProcessName endswith \"\\\\cscript.exe\" or TargetProcessName endswith \"\\\\wscript.exe\" or TargetProcessName endswith \"\\\\csc.exe\") or (TargetProcessName contains \"C:\\\\Users\\\\Public\\\\\" or TargetProcessName contains \"\\\\Downloads\\\\\" or TargetProcessName contains \"\\\\Desktop\\\\\" or TargetProcessName contains \"\\\\AppData\\\\Local\\\\Temp\\\\\" or TargetProcessName contains \"\\\\Windows\\\\TEMP\\\\\") or (TargetProcessCommandLine contains \" iex \" or TargetProcessCommandLine contains \" icm\" or TargetProcessCommandLine contains \"Invoke-\" or TargetProcessCommandLine contains \"Import-Module \" or TargetProcessCommandLine contains \"ipmo \" or TargetProcessCommandLine contains \"DownloadString(\" or TargetProcessCommandLine contains \" /c \" or TargetProcessCommandLine contains \" /k \" or TargetProcessCommandLine contains \" /r \"))) and (not(((TargetProcessCommandLine contains \"Import-Module\" and TargetProcessCommandLine contains \"Microsoft.VisualStudio.DevShell.dll\" and TargetProcessCommandLine contains \"Enter-VsDevShell\") or (TargetProcessCommandLine contains \"\\\\AppData\\\\Local\\\\Packages\\\\Microsoft.WindowsTerminal_\" and TargetProcessCommandLine contains \"\\\\LocalState\\\\settings.json\") or (TargetProcessCommandLine contains \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\\" and TargetProcessCommandLine contains \"\\\\Common7\\\\Tools\\\\VsDevCmd.bat\")))))|extend RuleId=\"8de89e52-f6e1-4b5b-afd1-41ecfa300d48\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_windows_terminal_susp_children.yml\"|extend RuleTitle=\"Suspicious WindowsTerminal Child Processes\"|extend RuleDescription=\"Detects suspicious children spawned via the Windows Terminal application which could be a sign of persistence via WindowsTerminal (see references section)\";\nlet q1=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\winget.exe\" or TargetProcessFilename =~ \"winget.exe\") and (TargetProcessCommandLine contains \"source \" and TargetProcessCommandLine contains \"add \"))|extend RuleId=\"05ebafc8-7aa2-4bcd-a269-2aec93f9e842\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_winget_add_custom_source.yml\"|extend RuleTitle=\"Add New Download Source To Winget\"|extend RuleDescription=\"Detects usage of winget to add new additional download sources\";\nlet q2=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\winget.exe\" or TargetProcessFilename =~ \"winget.exe\") and (TargetProcessCommandLine contains \"source \" and TargetProcessCommandLine contains \"add \") and TargetProcessCommandLine matches regex \"://\\\\d{1,3}\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}\")|extend RuleId=\"c15a46a0-07d4-4c87-b4b6-89207835a83b\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_winget_add_susp_custom_source.yml\"|extend RuleTitle=\"Add Potential Suspicious New Download Source To Winget\"|extend RuleDescription=\"Detects usage of winget to add new potentially suspicious download sources\";\nlet q3=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\winget.exe\" or TargetProcessFilename =~ \"winget.exe\") and (TargetProcessCommandLine contains \"install\" or TargetProcessCommandLine contains \" add \") and (TargetProcessCommandLine contains \"-m \" or TargetProcessCommandLine contains \"--manifest\"))|extend RuleId=\"313d6012-51a0-4d93-8dfc-de8553239e25\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_winget_local_install_via_manifest.yml\"|extend RuleTitle=\"Install New Package Via Winget Local Manifest\"|extend RuleDescription=\"Detects usage of winget to install applications via manifest file. Adversaries can abuse winget to download payloads remotely and execute them.\\nThe manifest option enables you to install an application by passing in a YAML file directly to the client.\\nWinget can be used to download and install exe, msi or msix files later.\\n\";\nlet q4=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\rar.exe\" or TargetProcessName endswith \"\\\\winrar.exe\") or TargetProcessFileDescription =~ \"Command line RAR\") and (TargetProcessCommandLine contains \".dmp\" or TargetProcessCommandLine contains \".dump\" or TargetProcessCommandLine contains \".hdmp\"))|extend RuleId=\"1ac14d38-3dfc-4635-92c7-e3fd1c5f5bfc\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_winrar_exfil_dmp_files.yml\"|extend RuleTitle=\"Winrar Compressing Dump Files\"|extend RuleDescription=\"Detects execution of WinRAR in order to compress a file with a \\\".dmp\\\"/\\\".dump\\\" extension, which could be a step in a process of dump file exfiltration.\";\nlet q5=_Im_ProcessCreate\n| where (ActingProcessName endswith \"\\\\WinRAR.exe\" and ((TargetProcessName endswith \"\\\\cmd.exe\" or TargetProcessName endswith \"\\\\cscript.exe\" or TargetProcessName endswith \"\\\\mshta.exe\" or TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\" or TargetProcessName endswith \"\\\\regsvr32.exe\" or TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessName endswith \"\\\\wscript.exe\") or (TargetProcessFilename =~ \"Cmd.Exe\" or TargetProcessFilename =~ \"cscript.exe\" or TargetProcessFilename =~ \"mshta.exe\" or TargetProcessFilename =~ \"PowerShell.EXE\" or TargetProcessFilename =~ \"pwsh.dll\" or TargetProcessFilename =~ \"regsvr32.exe\" or TargetProcessFilename =~ \"RUNDLL32.EXE\" or TargetProcessFilename =~ \"wscript.exe\")))|extend RuleId=\"146aace8-9bd6-42ba-be7a-0070d8027b76\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_winrar_susp_child_process.yml\"|extend RuleTitle=\"Potentially Suspicious Child Process Of WinRAR.EXE\"|extend RuleDescription=\"Detects potentially suspicious child processes of WinRAR.exe.\";\nlet q6=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\rar.exe\" or TargetProcessName endswith \"\\\\winrar.exe\") or TargetProcessFileDescription =~ \"Command line RAR\") and (not((TargetProcessName endswith \"\\\\UnRAR.exe\" or (TargetProcessName contains \":\\\\Program Files (x86)\\\\WinRAR\\\\\" or TargetProcessName contains \":\\\\Program Files\\\\WinRAR\\\\\")))) and (not(TargetProcessName contains \":\\\\Windows\\\\Temp\\\\\")))|extend RuleId=\"4ede543c-e098-43d9-a28f-dd784a13132f\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_winrar_uncommon_folder_execution.yml\"|extend RuleTitle=\"Winrar Execution in Non-Standard Folder\"|extend RuleDescription=\"Detects a suspicious winrar execution in a folder which is not the default installation folder\";\nlet q7=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"winrm\" and ((TargetProcessCommandLine contains \"format:pretty\" or TargetProcessCommandLine contains \"format:\\\"pretty\\\"\" or TargetProcessCommandLine contains \"format:\\\"text\\\"\" or TargetProcessCommandLine contains \"format:text\") and (not((TargetProcessName startswith \"C:\\\\Windows\\\\System32\\\\\" or TargetProcessName startswith \"C:\\\\Windows\\\\SysWOW64\\\\\")))))|extend RuleId=\"074e0ded-6ced-4ebd-8b4d-53f55908119d\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_winrm_awl_bypass.yml\"|extend RuleTitle=\"AWL Bypass with Winrm.vbs and Malicious WsmPty.xsl/WsmTxt.xsl\"|extend RuleDescription=\"Detects execution of attacker-controlled WsmPty.xsl or WsmTxt.xsl via winrm.vbs and copied cscript.exe (can be renamed)\";\nlet q8=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\cscript.exe\" or TargetProcessFilename =~ \"cscript.exe\") and (TargetProcessCommandLine contains \"winrm\" and TargetProcessCommandLine contains \"invoke Create wmicimv2/Win32_\" and TargetProcessCommandLine contains \"-r:http\"))|extend RuleId=\"9df0dd3a-1a5c-47e3-a2bc-30ed177646a0\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_winrm_execution_via_scripting_api_winrm_vbs.yml\"|extend RuleTitle=\"Remote Code Execute via Winrm.vbs\"|extend RuleDescription=\"Detects an attempt to execute code or create service on remote host via winrm.vbs.\";\nlet q9=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\wsmprovhost.exe\" or ActingProcessName endswith \"\\\\wsmprovhost.exe\")|extend RuleId=\"734f8d9b-42b8-41b2-bcf5-abaf49d5a3c8\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_winrm_remote_powershell_session_process.yml\"|extend RuleTitle=\"Remote PowerShell Session Host Process (WinRM)\"|extend RuleDescription=\"Detects remote PowerShell sections by monitoring for wsmprovhost (WinRM host process) as a parent or child process (sign of an active PowerShell remote session).\";\nlet q10=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \"winzip.exe\" or TargetProcessCommandLine contains \"winzip64.exe\") and TargetProcessCommandLine contains \"-s\\\"\" and (TargetProcessCommandLine contains \" -min \" or TargetProcessCommandLine contains \" -a \"))|extend RuleId=\"e2e80da2-8c66-4e00-ae3c-2eebd29f6b6d\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_winzip_password_compression.yml\"|extend RuleTitle=\"Compress Data and Lock With Password for Exfiltration With WINZIP\"|extend RuleDescription=\"An adversary may compress or encrypt data that is collected prior to exfiltration using 3rd party utilities\";\nlet q11=_Im_ProcessCreate\n| where TargetProcessCommandLine contains \"-s \"\n| where TargetProcessCommandLine contains \"/s \"\n| where TargetProcessCommandLine contains \"-f \"\n| where TargetProcessCommandLine contains \"/f \"\n| where TargetProcessCommandLine contains \"-t \"\n| where TargetProcessCommandLine contains \"/t \"\n| where TargetProcessCommandLine contains \"-m \"\n| where TargetProcessCommandLine contains \"/m \"\n| where TargetProcessCommandLine contains \"-a \"\n| where TargetProcessCommandLine contains \"/a \"\n| where TargetProcessCommandLine contains \"-u \"\n| where TargetProcessCommandLine contains \"/u \"\n| where (ActingProcessName endswith \"\\\\wlrmdr.exe\" or (((TargetProcessName endswith \"\\\\wlrmdr.exe\" or TargetProcessFilename =~ \"WLRMNDR.EXE\") and (() and () and () and () and () and ())) and (not((ActingProcessName =~ \"C:\\\\Windows\\\\System32\\\\winlogon.exe\" or (ActingProcessName =~ \"\" or ActingProcessName =~ \"-\") or isempty(ActingProcessName))))))|extend RuleId=\"9cfc00b6-bfb7-49ce-9781-ef78503154bb\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wlrmdr_uncommon_child_process.yml\"|extend RuleTitle=\"Wlrmdr.EXE Uncommon Argument Or Child Process\"|extend RuleDescription=\"Detects the execution of \\\"Wlrmdr.exe\\\" with the \\\"-u\\\" command line flag which allows anything passed to it to be an argument of the ShellExecute API, which would allow an attacker to execute arbitrary binaries.\\nThis detection also focuses on any uncommon child processes spawned from \\\"Wlrmdr.exe\\\" as a supplement for those that posses \\\"ParentImage\\\" telemetry.\\n\";\nlet q12=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\wmic.exe\" or TargetProcessFilename =~ \"wmic.exe\") and (TargetProcessCommandLine contains \"process\" and TargetProcessCommandLine contains \"call\" and TargetProcessCommandLine contains \"create\"))|extend RuleId=\"526be59f-a573-4eea-b5f7-f0973207634d\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wmic_process_creation.yml\"|extend RuleTitle=\"New Process Created Via Wmic.EXE\"|extend RuleDescription=\"Detects new process creation using WMIC via the \\\"process call create\\\" flag\";\nlet q13=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\wmic.exe\" or TargetProcessFilename =~ \"wmic.exe\") and TargetProcessCommandLine contains \"computersystem\")|extend RuleId=\"9d7ca793-f6bd-471c-8d0f-11e68b2f0d2f\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wmic_recon_computersystem.yml\"|extend RuleTitle=\"Computer System Reconnaissance Via Wmic.EXE\"|extend RuleDescription=\"Detects execution of wmic utility with the \\\"computersystem\\\" flag in order to obtain information about the machine such as the domain, username, model, etc.\";\nlet q14=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\wmic.exe\" or TargetProcessFilename =~ \"wmic.exe\") and TargetProcessCommandLine contains \"csproduct\")|extend RuleId=\"3e3ceccd-6c06-48b8-b5ff-ab1d25db8c1d\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wmic_recon_csproduct.yml\"|extend RuleTitle=\"Hardware Model Reconnaissance Via Wmic.EXE\"|extend RuleDescription=\"Detects the execution of WMIC with the \\\"csproduct\\\" which is used to obtain information such as hardware models and vendor information\";\nlet q15=_Im_ProcessCreate\n| where ((TargetProcessFilename =~ \"wmic.exe\" or TargetProcessName endswith \"\\\\WMIC.exe\") and TargetProcessCommandLine contains \" qfe\")|extend RuleId=\"dfd2fcb7-8bd5-4daa-b132-5adb61d6ad45\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wmic_recon_hotfix.yml\"|extend RuleTitle=\"Windows Hotfix Updates Reconnaissance Via Wmic.EXE\"|extend RuleDescription=\"Detects the execution of wmic with the \\\"qfe\\\" flag in order to obtain information about installed hotfix updates on the system. This is often used by pentester and attacker enumeration scripts\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["LateralMovement", "DefenseEvasion", "Collection", "Persistence", "Discovery", "Execution"],
+                "techniques": ["T1216", "T1021", "T1059", "T1218", "T1560", "T1047", "T1203"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000130",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

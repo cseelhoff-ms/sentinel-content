@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000236')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000236')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation medium 36",
+                "description": "Sigma Windows Process Creation medium 36",
+                "severity": "medium",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where (((TargetProcessCommandLine contains \"reg \" and TargetProcessCommandLine contains \"add\") or (TargetProcessCommandLine contains \"powershell\" or TargetProcessCommandLine contains \"set-itemproperty\" or TargetProcessCommandLine contains \" sp \" or TargetProcessCommandLine contains \"new-itemproperty\")) and (TargetProcessIntegrityLevel =~ \"Medium\" and (TargetProcessCommandLine contains \"ControlSet\" and TargetProcessCommandLine contains \"Services\") and (TargetProcessCommandLine contains \"ImagePath\" or TargetProcessCommandLine contains \"FailureCommand\" or TargetProcessCommandLine contains \"ServiceDLL\")))|extend RuleId=\"8f02c935-effe-45b3-8fc9-ef8696a9e41d\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_non_priv_reg_or_ps.yml\"|extend RuleTitle=\"Non-privileged Usage of Reg or Powershell\"|extend RuleDescription=\"Search for usage of reg or Powershell by non-privileged users to modify service configuration in registry\";\nlet q1=_Im_ProcessCreate\n| where ((((TargetProcessName endswith \"\\\\NTDSDump.exe\" or TargetProcessName endswith \"\\\\NTDSDumpEx.exe\") or (TargetProcessCommandLine contains \"ntds.dit\" and TargetProcessCommandLine contains \"system.hiv\") or TargetProcessCommandLine contains \"NTDSgrab.ps1\") or (TargetProcessCommandLine contains \"ac i ntds\" and TargetProcessCommandLine contains \"create full\") or (TargetProcessCommandLine contains \"/c copy \" and TargetProcessCommandLine contains \"\\\\windows\\\\ntds\\\\ntds.dit\") or (TargetProcessCommandLine contains \"activate instance ntds\" and TargetProcessCommandLine contains \"create full\") or (TargetProcessCommandLine contains \"powershell\" and TargetProcessCommandLine contains \"ntds.dit\")) or (TargetProcessCommandLine contains \"ntds.dit\" and ((ActingProcessName contains \"\\\\apache\" or ActingProcessName contains \"\\\\tomcat\" or ActingProcessName contains \"\\\\AppData\\\\\" or ActingProcessName contains \"\\\\Temp\\\\\" or ActingProcessName contains \"\\\\Public\\\\\" or ActingProcessName contains \"\\\\PerfLogs\\\\\") or (TargetProcessName contains \"\\\\apache\" or TargetProcessName contains \"\\\\tomcat\" or TargetProcessName contains \"\\\\AppData\\\\\" or TargetProcessName contains \"\\\\Temp\\\\\" or TargetProcessName contains \"\\\\Public\\\\\" or TargetProcessName contains \"\\\\PerfLogs\\\\\"))))|extend RuleId=\"8bc64091-6875-4881-aaf9-7bd25b5dda08\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_ntds.yml\"|extend RuleTitle=\"Suspicious Process Patterns NTDS.DIT Exfil\"|extend RuleDescription=\"Detects suspicious process patterns used in NTDS.DIT exfiltration\";\nlet q2=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"Win32_NTEventlogFile\" and (TargetProcessCommandLine contains \".BackupEventlog(\" or TargetProcessCommandLine contains \".ChangeSecurityPermissions(\" or TargetProcessCommandLine contains \".ChangeSecurityPermissionsEx(\" or TargetProcessCommandLine contains \".ClearEventLog(\" or TargetProcessCommandLine contains \".Delete(\" or TargetProcessCommandLine contains \".DeleteEx(\" or TargetProcessCommandLine contains \".Rename(\" or TargetProcessCommandLine contains \".TakeOwnerShip(\" or TargetProcessCommandLine contains \".TakeOwnerShipEx(\"))|extend RuleId=\"caf201a9-c2ce-4a26-9c3a-2b9525413711\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_nteventlogfile_usage.yml\"|extend RuleTitle=\"Potentially Suspicious Call To Win32_NTEventlogFile Class\"|extend RuleDescription=\"Detects usage of the WMI class \\\"Win32_NTEventlogFile\\\" in a potentially suspicious way (delete, backup, change permissions, etc.) from a PowerShell script\";\nlet q3=_Im_ProcessCreate\n| where ((ActingProcessName endswith \"\\\\minesweeper.exe\" or ActingProcessName endswith \"\\\\winver.exe\" or ActingProcessName endswith \"\\\\bitsadmin.exe\") or ((ActingProcessName endswith \"\\\\csrss.exe\" or ActingProcessName endswith \"\\\\certutil.exe\" or ActingProcessName endswith \"\\\\eventvwr.exe\" or ActingProcessName endswith \"\\\\calc.exe\" or ActingProcessName endswith \"\\\\notepad.exe\") and (not(((TargetProcessName endswith \"\\\\WerFault.exe\" or TargetProcessName endswith \"\\\\wermgr.exe\" or TargetProcessName endswith \"\\\\conhost.exe\" or TargetProcessName endswith \"\\\\mmc.exe\" or TargetProcessName endswith \"\\\\win32calc.exe\" or TargetProcessName endswith \"\\\\notepad.exe\") or isempty(TargetProcessName))))))|extend RuleId=\"cbec226f-63d9-4eca-9f52-dfb6652f24df\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_parents.yml\"|extend RuleTitle=\"Suspicious Process Parents\"|extend RuleDescription=\"Detects suspicious parent processes that should not have any children or should only have a single possible child program\";\nlet q4=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\InstallUtil.exe\" or TargetProcessName endswith \"\\\\RegAsm.exe\" or TargetProcessName endswith \"\\\\RegSvcs.exe\" or TargetProcessName endswith \"\\\\regsvr32.exe\" or TargetProcessName endswith \"\\\\rundll32.exe\") or (TargetProcessFilename =~ \"InstallUtil.exe\" or TargetProcessFilename =~ \"RegAsm.exe\" or TargetProcessFilename =~ \"RegSvcs.exe\" or TargetProcessFilename =~ \"REGSVR32.EXE\" or TargetProcessFilename =~ \"RUNDLL32.EXE\")) and (TargetProcessCommandLine contains \"Default.GetString\" or TargetProcessCommandLine contains \"DownloadString\" or TargetProcessCommandLine contains \"FromBase64String\" or TargetProcessCommandLine contains \"ICM \" or TargetProcessCommandLine contains \"IEX \" or TargetProcessCommandLine contains \"Invoke-Command\" or TargetProcessCommandLine contains \"Invoke-Expression\"))|extend RuleId=\"6812a10b-60ea-420c-832f-dfcc33b646ba\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_powershell_execution_via_dll.yml\"|extend RuleTitle=\"Potential PowerShell Execution Via DLL\"|extend RuleDescription=\"Detects potential PowerShell execution from a DLL instead of the usual PowerShell process as seen used in PowerShdll.\\nThis detection assumes that PowerShell commands are passed via the CommandLine.\\n\";\nlet q5=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\cmd.exe\" or TargetProcessName endswith \"\\\\powershell.exe\") or (TargetProcessFilename =~ \"Cmd.Exe\" or TargetProcessFilename =~ \"PowerShell.EXE\")) and (TargetProcessCommandLine contains \"echo\" and TargetProcessCommandLine contains \">\" and TargetProcessCommandLine contains \"\\\\\\\\.\\\\pipe\\\\\"))|extend RuleId=\"9bd04a79-dabe-4f1f-a5ff-92430265c96b\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_priv_escalation_via_named_pipe.yml\"|extend RuleTitle=\"Privilege Escalation via Named Pipe Impersonation\"|extend RuleDescription=\"Detects a remote file copy attempt to a hidden network share. This may indicate lateral movement or data staging activity.\";\nlet q6=_Im_ProcessCreate\n| where (((TargetProcessName contains \"\\\\CVE-202\" or TargetProcessName contains \"\\\\CVE202\") or (TargetProcessName endswith \"\\\\poc.exe\" or TargetProcessName endswith \"\\\\artifact.exe\" or TargetProcessName endswith \"\\\\artifact64.exe\" or TargetProcessName endswith \"\\\\artifact_protected.exe\" or TargetProcessName endswith \"\\\\artifact32.exe\" or TargetProcessName endswith \"\\\\artifact32big.exe\" or TargetProcessName endswith \"obfuscated.exe\" or TargetProcessName endswith \"obfusc.exe\" or TargetProcessName endswith \"\\\\meterpreter\")) or (TargetProcessCommandLine contains \"inject.ps1\" or TargetProcessCommandLine contains \"Invoke-CVE\" or TargetProcessCommandLine contains \"pupy.ps1\" or TargetProcessCommandLine contains \"payload.ps1\" or TargetProcessCommandLine contains \"beacon.ps1\" or TargetProcessCommandLine contains \"PowerView.ps1\" or TargetProcessCommandLine contains \"bypass.ps1\" or TargetProcessCommandLine contains \"obfuscated.ps1\" or TargetProcessCommandLine contains \"obfusc.ps1\" or TargetProcessCommandLine contains \"obfus.ps1\" or TargetProcessCommandLine contains \"obfs.ps1\" or TargetProcessCommandLine contains \"evil.ps1\" or TargetProcessCommandLine contains \"MiniDogz.ps1\" or TargetProcessCommandLine contains \"_enc.ps1\" or TargetProcessCommandLine contains \"\\\\shell.ps1\" or TargetProcessCommandLine contains \"\\\\rshell.ps1\" or TargetProcessCommandLine contains \"revshell.ps1\" or TargetProcessCommandLine contains \"\\\\av.ps1\" or TargetProcessCommandLine contains \"\\\\av_test.ps1\" or TargetProcessCommandLine contains \"adrecon.ps1\" or TargetProcessCommandLine contains \"mimikatz.ps1\" or TargetProcessCommandLine contains \"\\\\PowerUp_\" or TargetProcessCommandLine contains \"powerup.ps1\" or TargetProcessCommandLine contains \"\\\\Temp\\\\a.ps1\" or TargetProcessCommandLine contains \"\\\\Temp\\\\p.ps1\" or TargetProcessCommandLine contains \"\\\\Temp\\\\1.ps1\" or TargetProcessCommandLine contains \"Hound.ps1\" or TargetProcessCommandLine contains \"encode.ps1\" or TargetProcessCommandLine contains \"powercat.ps1\"))|extend RuleId=\"efdd8dd5-cee8-4e59-9390-7d4d5e4dd6f6\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_progname.yml\"|extend RuleTitle=\"Suspicious Program Names\"|extend RuleDescription=\"Detects suspicious patterns in program names or folders that are often found in malicious samples or hacktools\";\nlet q7=_Im_ProcessCreate\n| where (TargetProcessName contains \"RECYCLERS.BIN\\\\\" or TargetProcessName contains \"RECYCLER.BIN\\\\\")|extend RuleId=\"5ce0f04e-3efc-42af-839d-5b3a543b76c0\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_recycle_bin_fake_execution.yml\"|extend RuleTitle=\"Suspicious Process Execution From Fake Recycle.Bin Folder\"|extend RuleDescription=\"Detects process execution from a fake recycle bin folder, often used to avoid security solution.\";\nlet q8=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \">\" and (TargetProcessCommandLine contains \"\\\\\\\\127.0.0.1\\\\admin$\\\\\" or TargetProcessCommandLine contains \"\\\\\\\\localhost\\\\admin$\\\\\"))|extend RuleId=\"ab9e3b40-0c85-4ba1-aede-455d226fd124\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_redirect_local_admin_share.yml\"|extend RuleTitle=\"Suspicious Redirection to Local Admin Share\"|extend RuleDescription=\"Detects a suspicious output redirection to the local admins share, this technique is often found in malicious scripts or hacktool stagers\";\nlet q9=_Im_ProcessCreate\n| where TargetProcessCommandLine contains \"\u202e\"|extend RuleId=\"ad691d92-15f2-4181-9aa4-723c74f9ddc3\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_right_to_left_override.yml\"|extend RuleTitle=\"Potential Defense Evasion Via Right-to-Left Override\"|extend RuleDescription=\"Detects the presence of the \\\"u202+E\\\" character, which causes a terminal, browser, or operating system to render text in a right-to-left sequence.\\nThis is used as an obfuscation and masquerading techniques.\\n\";\nlet q10=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\cscript.exe\" or TargetProcessName endswith \"\\\\mshta.exe\" or TargetProcessName endswith \"\\\\wscript.exe\") or (TargetProcessCommandLine contains \" -ep bypass \" or TargetProcessCommandLine contains \" -ExecutionPolicy bypass \" or TargetProcessCommandLine contains \" -w hidden \" or TargetProcessCommandLine contains \"/e:javascript \" or TargetProcessCommandLine contains \"/e:Jscript \" or TargetProcessCommandLine contains \"/e:vbscript \") or (TargetProcessFilename =~ \"cscript.exe\" or TargetProcessFilename =~ \"mshta.exe\" or TargetProcessFilename =~ \"wscript.exe\")) and ((TargetProcessCommandLine contains \":\\\\Perflogs\\\\\" or TargetProcessCommandLine contains \":\\\\Users\\\\Public\\\\\" or TargetProcessCommandLine contains \"\\\\AppData\\\\Local\\\\Temp\" or TargetProcessCommandLine contains \"\\\\AppData\\\\Roaming\\\\Temp\" or TargetProcessCommandLine contains \"\\\\Temporary Internet\" or TargetProcessCommandLine contains \"\\\\Windows\\\\Temp\") or ((TargetProcessCommandLine contains \":\\\\Users\\\\\" and TargetProcessCommandLine contains \"\\\\Favorites\\\\\") or (TargetProcessCommandLine contains \":\\\\Users\\\\\" and TargetProcessCommandLine contains \"\\\\Favourites\\\\\") or (TargetProcessCommandLine contains \":\\\\Users\\\\\" and TargetProcessCommandLine contains \"\\\\Contacts\\\\\"))))|extend RuleId=\"1228c958-e64e-4e71-92ad-7d429f4138ba\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_script_exec_from_env_folder.yml\"|extend RuleTitle=\"Script Interpreter Execution From Suspicious Folder\"|extend RuleDescription=\"Detects a suspicious script execution in temporary folders or folders accessible by environment variables\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["LateralMovement", "DefenseEvasion", "CredentialAccess", "Exfiltration", "Persistence", "Execution"],
+                "techniques": ["T1003", "T1021", "T1218", "T1112", "T1059", "T1048", "T1036"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000236",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

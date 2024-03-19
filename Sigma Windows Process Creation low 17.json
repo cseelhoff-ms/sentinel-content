@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000117')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000117')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation low 17",
+                "description": "Sigma Windows Process Creation low 17",
+                "severity": "low",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where (TargetProcessFileDescription =~ \"Radmin Viewer\" or TargetProcessFileProduct =~ \"Radmin Viewer\" or TargetProcessFilename =~ \"Radmin.exe\")|extend RuleId=\"5817e76f-4804-41e6-8f1d-5fa0b3ecae2d\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_pua_radmin.yml\"|extend RuleTitle=\"PUA - Radmin Viewer Utility Execution\"|extend RuleDescription=\"Detects the execution of Radmin which can be abused by an adversary to remotely control Windows machines\";\nlet q1=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\rcedit-x64.exe\" or TargetProcessName endswith \"\\\\rcedit-x86.exe\") or TargetProcessFileDescription =~ \"Edit resources of exe\" or TargetProcessFileProduct =~ \"rcedit\") and TargetProcessCommandLine contains \"--set-\" and (TargetProcessCommandLine contains \"OriginalFileName\" or TargetProcessCommandLine contains \"CompanyName\" or TargetProcessCommandLine contains \"FileDescription\" or TargetProcessCommandLine contains \"ProductName\" or TargetProcessCommandLine contains \"ProductVersion\" or TargetProcessCommandLine contains \"LegalCopyright\"))|extend RuleId=\"0c92f2e6-f08f-4b73-9216-ecb0ca634689\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_pua_rcedit_execution.yml\"|extend RuleTitle=\"PUA - Potential PE Metadata Tamper Using Rcedit\"|extend RuleDescription=\"Detects the use of rcedit to potentially alter executable PE metadata properties, which could conceal efforts to rename system utilities for defense evasion.\";\nlet q2=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\SystemInformer.exe\" or TargetProcessFilename =~ \"SystemInformer.exe\" or TargetProcessFileDescription =~ \"System Informer\" or TargetProcessFileProduct =~ \"System Informer\") or (TargetProcessIMPHASH=~\"MD5=19426363A37C03C3ED6FEDF57B6696EC\" or TargetProcessIMPHASH=~\"SHA1=8B12C6DA8FAC0D5E8AB999C31E5EA04AF32D53DC\" or TargetProcessIMPHASH=~\"SHA256=8EE9D84DE50803545937A63C686822388A3338497CDDB660D5D69CF68B68F287\" or TargetProcessIMPHASH=~\"B68908ADAEB5D662F87F2528AF318F12\") or (TargetProcessMD5 =~ \"19426363A37C03C3ED6FEDF57B6696EC\" or TargetProcessIMPHASH =~ \"8B12C6DA8FAC0D5E8AB999C31E5EA04AF32D53DC\" or TargetProcessSHA256 =~ \"8EE9D84DE50803545937A63C686822388A3338497CDDB660D5D69CF68B68F287\" or TargetProcessIMPHASH =~ \"B68908ADAEB5D662F87F2528AF318F12\"))|extend RuleId=\"5722dff1-4bdd-4949-86ab-fbaf707e767a\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_pua_system_informer.yml\"|extend RuleTitle=\"PUA - System Informer Execution\"|extend RuleDescription=\"Detects the execution of System Informer, a task manager tool to view and manipulate processes, kernel options and other low level operations\";\nlet q3=_Im_ProcessCreate\n| where (TargetProcessFileDescription =~ \"Web Browser Password Viewer\" or TargetProcessName endswith \"\\\\WebBrowserPassView.exe\")|extend RuleId=\"d0dae994-26c6-4d2d-83b5-b3c8b79ae513\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_pua_webbrowserpassview.yml\"|extend RuleTitle=\"PUA - WebBrowserPassView Execution\"|extend RuleDescription=\"Detects the execution of WebBrowserPassView.exe. A password recovery tool that reveals the passwords stored by the following Web browsers, Internet Explorer (Version 4.0 - 11.0), Mozilla Firefox (All Versions), Google Chrome, Safari, and Opera\";\nlet q4=_Im_ProcessCreate\n| where (((TargetProcessFilename =~ \"python.exe\" or (TargetProcessName endswith \"python.exe\" or TargetProcessName endswith \"python3.exe\" or TargetProcessName endswith \"python2.exe\")) and TargetProcessCommandLine contains \" -c\") and (not(((ActingProcessName startswith \"C:\\\\Program Files\\\\Python\" and ActingProcessName endswith \"\\\\python.exe\" and ActingProcessCommandLine contains \"-E -s -m ensurepip -U --default-pip\") or ActingProcessName endswith \"\\\\AppData\\\\Local\\\\Programs\\\\Microsoft VS Code\\\\Code.exe\"))))|extend RuleId=\"899133d5-4d7c-4a7f-94ee-27355c879d90\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_python_inline_command_execution.yml\"|extend RuleTitle=\"Python Inline Command Execution\"|extend RuleDescription=\"Detects execution of python using the \\\"-c\\\" flag. This is could be used as a way to launch a reverse shell or execute live python code.\";\nlet q5=_Im_ProcessCreate\n| where (TargetProcessName endswith \":\\\\Windows\\\\System32\\\\query.exe\" and (TargetProcessCommandLine contains \"session >\" or TargetProcessCommandLine contains \"process >\"))|extend RuleId=\"53ef0cef-fa24-4f25-a34a-6c72dfa2e6e2\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_query_session_exfil.yml\"|extend RuleTitle=\"Query Usage To Exfil Data\"|extend RuleDescription=\"Detects usage of \\\"query.exe\\\" a system binary to exfil information such as \\\"sessions\\\" and \\\"processes\\\" for later use\";\nlet q6=_Im_ProcessCreate\n| where TargetProcessName endswith \"rasdial.exe\"|extend RuleId=\"6bba49bf-7f8c-47d6-a1bb-6b4dece4640e\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rasdial_execution.yml\"|extend RuleTitle=\"Suspicious RASdial Activity\"|extend RuleDescription=\"Detects suspicious process related to rasdial.exe\";\nlet q7=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\Regsvcs.exe\" or TargetProcessName endswith \"\\\\Regasm.exe\") or (TargetProcessFilename =~ \"RegSvcs.exe\" or TargetProcessFilename =~ \"RegAsm.exe\")) and (TargetProcessCommandLine contains \".dat\" or TargetProcessCommandLine contains \".gif\" or TargetProcessCommandLine contains \".jpeg\" or TargetProcessCommandLine contains \".jpg\" or TargetProcessCommandLine contains \".png\" or TargetProcessCommandLine contains \".txt\"))|extend RuleId=\"e9f8f8cc-07cc-4e81-b724-f387db9175e4\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_regasm_regsvcs_uncommon_extension_execution.yml\"|extend RuleTitle=\"Potentially Suspicious Execution Of Regasm/Regsvcs With Uncommon Extension\"|extend RuleDescription=\"Detects potentially suspicious execution of the Regasm/Regsvcs utilities with an uncommon extension.\";\nlet q8=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\Regsvcs.exe\" or TargetProcessName endswith \"\\\\Regasm.exe\") or (TargetProcessFilename =~ \"RegSvcs.exe\" or TargetProcessFilename =~ \"RegAsm.exe\")) and (TargetProcessCommandLine contains \"\\\\AppData\\\\Local\\\\Temp\\\\\" or TargetProcessCommandLine contains \"\\\\Microsoft\\\\Windows\\\\Start Menu\\\\Programs\\\\Startup\\\\\" or TargetProcessCommandLine contains \"\\\\PerfLogs\\\\\" or TargetProcessCommandLine contains \"\\\\Users\\\\Public\\\\\" or TargetProcessCommandLine contains \"\\\\Windows\\\\Temp\\\\\"))|extend RuleId=\"cc368ed0-2411-45dc-a222-510ace303cb2\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_regasm_regsvcs_uncommon_location_execution.yml\"|extend RuleTitle=\"Potentially Suspicious Execution Of Regasm/Regsvcs From Uncommon Location\"|extend RuleDescription=\"Detects potentially suspicious execution of the Regasm/Regsvcs utilities from a potentially suspicious location\";\nlet q9=_Im_ProcessCreate\n| where TargetProcessCommandLine contains \" -e \"\n| where TargetProcessCommandLine contains \" /e \"\n| where TargetProcessCommandLine contains \" -a \"\n| where TargetProcessCommandLine contains \" /a \"\n| where TargetProcessCommandLine contains \" -c \"\n| where TargetProcessCommandLine contains \" /c \"\n| where (((TargetProcessName endswith \"\\\\regedit.exe\" or TargetProcessFilename =~ \"REGEDIT.EXE\") and (TargetProcessCommandLine contains \" /i \" or TargetProcessCommandLine contains \" /s \" or TargetProcessCommandLine contains \".reg\")) and (not((( or  or ) and TargetProcessCommandLine matches regex \":[^ \\\\\\\\]\"))))|extend RuleId=\"73bba97f-a82d-42ce-b315-9182e76c57b1\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_regedit_import_keys.yml\"|extend RuleTitle=\"Imports Registry Key From a File\"|extend RuleDescription=\"Detects the import of the specified file to the registry with regedit.exe.\";\nlet q10=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\register-cimprovider.exe\" and (TargetProcessCommandLine contains \"-path\" and TargetProcessCommandLine contains \"dll\"))|extend RuleId=\"a2910908-e86f-4687-aeba-76a5f996e652\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_registry_cimprovider_dll_load.yml\"|extend RuleTitle=\"DLL Execution Via Register-cimprovider.exe\"|extend RuleDescription=\"Detects using register-cimprovider.exe to execute arbitrary dll file.\";\nlet q11=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"\\\\Software\\\\SimonTatham\\\\PuTTY\\\\Sessions\" or TargetProcessCommandLine contains \"\\\\Software\\\\SimonTatham\\\\PuTTY\\\\SshHostKeys\\\\\" or TargetProcessCommandLine contains \"\\\\Software\\\\Mobatek\\\\MobaXterm\\\\\" or TargetProcessCommandLine contains \"\\\\Software\\\\WOW6432Node\\\\Radmin\\\\v3.0\\\\Server\\\\Parameters\\\\Radmin\" or TargetProcessCommandLine contains \"\\\\Software\\\\Aerofox\\\\FoxmailPreview\" or TargetProcessCommandLine contains \"\\\\Software\\\\Aerofox\\\\Foxmail\\\\V3.1\" or TargetProcessCommandLine contains \"\\\\Software\\\\IncrediMail\\\\Identities\" or TargetProcessCommandLine contains \"\\\\Software\\\\Qualcomm\\\\Eudora\\\\CommandLine\" or TargetProcessCommandLine contains \"\\\\Software\\\\RimArts\\\\B2\\\\Settings\" or TargetProcessCommandLine contains \"\\\\Software\\\\OpenVPN-GUI\\\\configs\" or TargetProcessCommandLine contains \"\\\\Software\\\\Martin Prikryl\\\\WinSCP 2\\\\Sessions\" or TargetProcessCommandLine contains \"\\\\Software\\\\FTPWare\\\\COREFTP\\\\Sites\" or TargetProcessCommandLine contains \"\\\\Software\\\\DownloadManager\\\\Passwords\" or TargetProcessCommandLine contains \"\\\\Software\\\\OpenSSH\\\\Agent\\\\Keys\" or TargetProcessCommandLine contains \"\\\\Software\\\\TightVNC\\\\Server\" or TargetProcessCommandLine contains \"\\\\Software\\\\ORL\\\\WinVNC3\\\\Password\" or TargetProcessCommandLine contains \"\\\\Software\\\\RealVNC\\\\WinVNC4\")|extend RuleId=\"87a476dc-0079-4583-a985-dee7a20a03de\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_registry_enumeration_for_credentials_cli.yml\"|extend RuleTitle=\"Enumeration for 3rd Party Creds From CLI\"|extend RuleDescription=\"Detects processes that query known 3rd party registry keys that holds credentials via commandline\";\nlet q12=_Im_ProcessCreate\n| where TargetProcessCommandLine contains \"\\\\Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Explorer\\\\TypedPaths\"|extend RuleId=\"ec88289a-7e1a-4cc3-8d18-bd1f60e4b9ba\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_registry_typed_paths_persistence.yml\"|extend RuleTitle=\"Persistence Via TypedPaths - CommandLine\"|extend RuleDescription=\"Detects modification addition to the 'TypedPaths' key in the user or admin registry via the commandline. Which might indicate persistence attempt\";\nlet q13=_Im_ProcessCreate\n| where TargetProcessCommandLine contains \" -i:\"\n| where TargetProcessCommandLine contains \" /i:\"\n| where TargetProcessCommandLine contains \" -n \"\n| where TargetProcessCommandLine contains \" /n \"\n| where ((TargetProcessName endswith \"\\\\regsvr32.exe\" and ()) and (not()))|extend RuleId=\"b236190c-1c61-41e9-84b3-3fe03f6d76b0\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_regsvr32_flags_anomaly.yml\"|extend RuleTitle=\"Potential Regsvr32 Commandline Flag Anomaly\"|extend RuleDescription=\"Detects a potential command line flag anomaly related to \\\"regsvr32\\\" in which the \\\"/i\\\" flag is used without the \\\"/n\\\" which should be uncommon.\";\nlet q14=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\regsvr32.exe\" or TargetProcessFilename =~ \"REGSVR32.EXE\") and (TargetProcessCommandLine contains \" /i\" or TargetProcessCommandLine contains \" -i\") and (TargetProcessCommandLine contains \"ftp\" or TargetProcessCommandLine contains \"http\"))|extend RuleId=\"867356ee-9352-41c9-a8f2-1be690d78216\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_regsvr32_network_pattern.yml\"|extend RuleTitle=\"Potentially Suspicious Regsvr32 HTTP/FTP Pattern\"|extend RuleDescription=\"Detects regsvr32 execution to download/install/register new DLLs that are hosted on Web or FTP servers.\";\nlet q15=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\regsvr32.exe\" or TargetProcessFilename =~ \"REGSVR32.EXE\") and (TargetProcessCommandLine contains \":\\\\ProgramData\\\\\" or TargetProcessCommandLine contains \":\\\\Temp\\\\\" or TargetProcessCommandLine contains \":\\\\Users\\\\Public\\\\\" or TargetProcessCommandLine contains \":\\\\Windows\\\\Temp\\\\\" or TargetProcessCommandLine contains \"\\\\AppData\\\\Local\\\\Temp\\\\\" or TargetProcessCommandLine contains \"\\\\AppData\\\\Roaming\\\\\"))|extend RuleId=\"9525dc73-0327-438c-8c04-13c0e037e9da\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_regsvr32_susp_exec_path_1.yml\"|extend RuleTitle=\"Regsvr32 Execution From Potential Suspicious Location\"|extend RuleDescription=\"Detects execution of regsvr32 where the DLL is located in a potentially suspicious location.\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion", "CredentialAccess", "Execution", "Persistence", "PrivilegeEscalation", "Discovery", "LateralMovement"],
+                "techniques": ["T1218", "T1112", "T1543", "T1027", "T1082", "T1574", "T1072", "T1552", "T1555", "T1059", "T1564", "T1036"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000117",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

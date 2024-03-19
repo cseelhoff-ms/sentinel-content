@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000105')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000105')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation low 05",
+                "description": "Sigma Windows Process Creation low 05",
+                "severity": "low",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where TargetProcessCommandLine contains \"-F:\"\n| where TargetProcessCommandLine contains \"/F:\"\n| where ((TargetProcessName endswith \"\\\\expand.exe\" and ()) and ((TargetProcessCommandLine contains \":\\\\Perflogs\\\\\" or TargetProcessCommandLine contains \":\\\\Users\\\\Public\\\\\" or TargetProcessCommandLine contains \"\\\\Temporary Internet\" or TargetProcessCommandLine contains \":\\\\ProgramData\" or TargetProcessCommandLine contains \"\\\\AppData\\\\Local\\\\Temp\" or TargetProcessCommandLine contains \"\\\\AppData\\\\Roaming\\\\Temp\" or TargetProcessCommandLine contains \":\\\\Windows\\\\Temp\") or ((TargetProcessCommandLine contains \":\\\\Users\\\\\" and TargetProcessCommandLine contains \"\\\\Favorites\\\\\") or (TargetProcessCommandLine contains \":\\\\Users\\\\\" and TargetProcessCommandLine contains \"\\\\Favourites\\\\\") or (TargetProcessCommandLine contains \":\\\\Users\\\\\" and TargetProcessCommandLine contains \"\\\\Contacts\\\\\"))) and (not((ActingProcessName =~ \"C:\\\\Program Files (x86)\\\\Dell\\\\UpdateService\\\\ServiceShell.exe\" and TargetProcessCommandLine contains \"C:\\\\ProgramData\\\\Dell\\\\UpdateService\\\\Temp\\\\\"))))|extend RuleId=\"9f107a84-532c-41af-b005-8d12a607639f\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_expand_cabinet_files.yml\"|extend RuleTitle=\"Potentially Suspicious Cabinet File Expansion\"|extend RuleDescription=\"Detects the expansion or decompression of cabinet files from potentially suspicious or uncommon locations, e.g. seen in Iranian MeteorExpress related attacks\";\nlet q1=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"/factory,{75dff2b7-6936-4c06-a8bb-676a7b00b24b}\" or (TargetProcessCommandLine contains \"explorer.exe\" and TargetProcessCommandLine contains \" /root,\"))|extend RuleId=\"949f1ffb-6e85-4f00-ae1e-c3c5b190d605\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_explorer_break_process_tree.yml\"|extend RuleTitle=\"Explorer Process Tree Break\"|extend RuleDescription=\"Detects a command line process that uses explorer.exe to launch arbitrary commands or binaries,\\nwhich is similar to cmd.exe /c, only it breaks the process tree and makes its parent a new instance of explorer spawning from \\\"svchost\\\"\\n\";\nlet q2=_Im_ProcessCreate\n| where TargetProcessCommandLine contains \" -v \"\n| where TargetProcessCommandLine contains \" /v \"\n| where TargetProcessCommandLine contains \" -l \"\n| where TargetProcessCommandLine contains \" /l \"\n| where ((TargetProcessCommandLine contains \"findstr\" or TargetProcessName endswith \"findstr.exe\" or TargetProcessFilename =~ \"FINDSTR.EXE\") and (() and () and TargetProcessCommandLine contains \"\\\\\\\\\"))|extend RuleId=\"587254ee-a24b-4335-b3cd-065c0f1f4baa\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_findstr_download.yml\"|extend RuleTitle=\"Remote File Download Via Findstr.EXE\"|extend RuleDescription=\"Detects execution of \\\"findstr\\\" with specific flags and a remote share path. This specific set of CLI flags would allow \\\"findstr\\\" to download the content of the file located on the remote share as described in the LOLBAS entry.\\n\";\nlet q3=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\find.exe\" or TargetProcessName endswith \"\\\\findstr.exe\") or (TargetProcessFilename =~ \"FIND.EXE\" or TargetProcessFilename =~ \"FINDSTR.EXE\")) and (TargetProcessCommandLine endswith \".lnk\" or TargetProcessCommandLine endswith \".lnk\\\"\" or TargetProcessCommandLine endswith \".lnk'\"))|extend RuleId=\"33339be3-148b-4e16-af56-ad16ec6c7e7b\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_findstr_lnk.yml\"|extend RuleTitle=\"Findstr Launching .lnk File\"|extend RuleDescription=\"Detects usage of findstr to identify and execute a lnk file as seen within the HHS redirect attack\";\nlet q4=_Im_ProcessCreate\n| where ((((TargetProcessName endswith \"\\\\find.exe\" or TargetProcessName endswith \"\\\\findstr.exe\") or (TargetProcessFilename =~ \"FIND.EXE\" or TargetProcessFilename =~ \"FINDSTR.EXE\")) and (TargetProcessCommandLine contains \"\\\"Everyone\\\"\" or TargetProcessCommandLine contains \"'Everyone'\" or TargetProcessCommandLine contains \"\\\"BUILTIN\\\\\\\"\" or TargetProcessCommandLine contains \"'BUILTIN\\\\'\")) or (TargetProcessCommandLine contains \"icacls \" and TargetProcessCommandLine contains \"findstr \" and TargetProcessCommandLine contains \"Everyone\"))|extend RuleId=\"47e4bab7-c626-47dc-967b-255608c9a920\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_findstr_recon_everyone.yml\"|extend RuleTitle=\"Permission Misconfiguration Reconnaissance Via Findstr.EXE\"|extend RuleDescription=\"Detects usage of findstr with the \\\"EVERYONE\\\" or \\\"BUILTIN\\\" keywords. This is seen being used in combination with \\\"icacls\\\" to look for misconfigured files or folders permissions\";\nlet q5=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"ipconfig /all | find \" or TargetProcessCommandLine contains \"ipconfig /all | findstr \" or TargetProcessCommandLine contains \"ipconfig | find \" or TargetProcessCommandLine contains \"ipconfig | findstr \" or TargetProcessCommandLine contains \"ipconfig.exe /all | find \" or TargetProcessCommandLine contains \"ipconfig.exe /all | findstr \" or TargetProcessCommandLine contains \"ipconfig.exe | find \" or TargetProcessCommandLine contains \"ipconfig.exe | findstr \" or TargetProcessCommandLine contains \"net start | find\" or TargetProcessCommandLine contains \"net start | findstr\" or TargetProcessCommandLine contains \"net.exe start | find\" or TargetProcessCommandLine contains \"net.exe start | findstr\" or TargetProcessCommandLine contains \"net1 start | find\" or TargetProcessCommandLine contains \"net1 start | findstr\" or TargetProcessCommandLine contains \"net1.exe start | find\" or TargetProcessCommandLine contains \"net1.exe start | findstr\" or TargetProcessCommandLine contains \"netstat -ano | find\" or TargetProcessCommandLine contains \"netstat -ano | findstr\" or TargetProcessCommandLine contains \"netstat | find\" or TargetProcessCommandLine contains \"netstat | findstr\" or TargetProcessCommandLine contains \"netstat.exe -ano | find\" or TargetProcessCommandLine contains \"netstat.exe -ano | findstr\" or TargetProcessCommandLine contains \"netstat.exe | find\" or TargetProcessCommandLine contains \"netstat.exe | findstr\" or TargetProcessCommandLine contains \"ping | find\" or TargetProcessCommandLine contains \"ping | findstr\" or TargetProcessCommandLine contains \"ping.exe | find\" or TargetProcessCommandLine contains \"ping.exe | findstr\" or TargetProcessCommandLine contains \"systeminfo | find \" or TargetProcessCommandLine contains \"systeminfo | findstr \" or TargetProcessCommandLine contains \"systeminfo.exe | find \" or TargetProcessCommandLine contains \"systeminfo.exe | findstr \" or TargetProcessCommandLine contains \"tasklist | find \" or TargetProcessCommandLine contains \"tasklist | findstr \" or TargetProcessCommandLine contains \"tasklist.exe | find \" or TargetProcessCommandLine contains \"tasklist.exe | findstr \" or TargetProcessCommandLine contains \"whoami /all | find \" or TargetProcessCommandLine contains \"whoami /all | findstr \" or TargetProcessCommandLine contains \"whoami.exe /all | find \" or TargetProcessCommandLine contains \"whoami.exe /all | findstr \")|extend RuleId=\"ccb5742c-c248-4982-8c5c-5571b9275ad3\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_findstr_recon_pipe_output.yml\"|extend RuleTitle=\"Recon Command Output Piped To Findstr.EXE\"|extend RuleDescription=\"Detects the excution of a potential recon command where the results are piped to \\\"findstr\\\". This is meant to trigger on inline calls of \\\"cmd.exe\\\" via the \\\"/c\\\" or \\\"/k\\\" for example. Attackers often time use this to extract specific information they require in their chain.\\n\";\nlet q6=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\find.exe\" or TargetProcessName endswith \"\\\\findstr.exe\") or (TargetProcessFilename =~ \"FIND.EXE\" or TargetProcessFilename =~ \"FINDSTR.EXE\")) and (TargetProcessCommandLine endswith \" avira\" or TargetProcessCommandLine endswith \" avira\\\"\" or TargetProcessCommandLine endswith \" cb\" or TargetProcessCommandLine endswith \" cb\\\"\" or TargetProcessCommandLine endswith \" cylance\" or TargetProcessCommandLine endswith \" cylance\\\"\" or TargetProcessCommandLine endswith \" defender\" or TargetProcessCommandLine endswith \" defender\\\"\" or TargetProcessCommandLine endswith \" kaspersky\" or TargetProcessCommandLine endswith \" kaspersky\\\"\" or TargetProcessCommandLine endswith \" kes\" or TargetProcessCommandLine endswith \" kes\\\"\" or TargetProcessCommandLine endswith \" mc\" or TargetProcessCommandLine endswith \" mc\\\"\" or TargetProcessCommandLine endswith \" sec\" or TargetProcessCommandLine endswith \" sec\\\"\" or TargetProcessCommandLine endswith \" sentinel\" or TargetProcessCommandLine endswith \" sentinel\\\"\" or TargetProcessCommandLine endswith \" symantec\" or TargetProcessCommandLine endswith \" symantec\\\"\" or TargetProcessCommandLine endswith \" virus\" or TargetProcessCommandLine endswith \" virus\\\"\"))|extend RuleId=\"4fe074b4-b833-4081-8f24-7dcfeca72b42\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_findstr_security_keyword_lookup.yml\"|extend RuleTitle=\"Security Tools Keyword Lookup Via Findstr.EXE\"|extend RuleDescription=\"Detects execution of \\\"findstr\\\" to search for common names of security tools. Attackers often pipe the results of recon commands such as \\\"tasklist\\\" or \\\"whoami\\\" to \\\"findstr\\\" in order to filter out the results.\\nThis detection focuses on the keywords that the attacker might use as a filter.\\n\";\nlet q7=_Im_ProcessCreate\n| where TargetProcessCommandLine contains \" -c \"\n| where TargetProcessCommandLine contains \" /c \"\n| where ((TargetProcessName endswith \"\\\\forfiles.exe\" or TargetProcessFilename =~ \"forfiles.exe\") and ())|extend RuleId=\"9aa5106d-bce3-4b13-86df-3a20f1d5cf0b\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_forfiles_proxy_execution_.yml\"|extend RuleTitle=\"Forfiles Command Execution\"|extend RuleDescription=\"Detects the execution of \\\"forfiles\\\" with the \\\"/c\\\" flag.\\nWhile this is an expected behavior of the tool, it can be abused in order to proxy execution through it with any binary.\\nCan be used to bypass application whitelisting.\\n\";\nlet q8=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\fsutil.exe\" or TargetProcessFilename =~ \"fsutil.exe\") and (TargetProcessCommandLine contains \"behavior \" and TargetProcessCommandLine contains \"set \" and TargetProcessCommandLine contains \"SymlinkEvaluation\"))|extend RuleId=\"c0b2768a-dd06-4671-8339-b16ca8d1f27f\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_fsutil_symlinkevaluation.yml\"|extend RuleTitle=\"Fsutil Behavior Set SymlinkEvaluation\"|extend RuleDescription=\"A symbolic link is a type of file that contains a reference to another file.\\nThis is probably done to make sure that the ransomware is able to follow shortcuts on the machine in order to find the original file to encrypt\\n\";\nlet q9=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\GfxDownloadWrapper.exe\" and (TargetProcessCommandLine contains \"http://\" or TargetProcessCommandLine contains \"https://\")) and (not(TargetProcessCommandLine contains \"https://gameplayapi.intel.com/\")))|extend RuleId=\"eee00933-a761-4cd0-be70-c42fe91731e7\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_gfxdownloadwrapper_arbitrary_file_download.yml\"|extend RuleTitle=\"Arbitrary File Download Via GfxDownloadWrapper.EXE\"|extend RuleDescription=\"Detects execution of GfxDownloadWrapper.exe with a URL as an argument to download file.\";\nlet q10=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\git.exe\" or TargetProcessName endswith \"\\\\git-remote-https.exe\") or TargetProcessFilename =~ \"git.exe\") and (TargetProcessCommandLine contains \" clone \" or TargetProcessCommandLine contains \"git-remote-https \") and (TargetProcessCommandLine contains \"exploit\" or TargetProcessCommandLine contains \"Vulns\" or TargetProcessCommandLine contains \"vulnerability\" or TargetProcessCommandLine contains \"RemoteCodeExecution\" or TargetProcessCommandLine contains \"Invoke-\" or TargetProcessCommandLine contains \"CVE-\" or TargetProcessCommandLine contains \"poc-\" or TargetProcessCommandLine contains \"ProofOfConcept\" or TargetProcessCommandLine contains \"proxyshell\" or TargetProcessCommandLine contains \"log4shell\" or TargetProcessCommandLine contains \"eternalblue\" or TargetProcessCommandLine contains \"eternal-blue\" or TargetProcessCommandLine contains \"MS17-\"))|extend RuleId=\"aef9d1f1-7396-4e92-a927-4567c7a495c1\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_git_susp_clone.yml\"|extend RuleTitle=\"Suspicious Git Clone\"|extend RuleDescription=\"Detects execution of \\\"git\\\" in order to clone a remote repository that contain suspicious keywords which might be suspicious\";\nlet q11=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\gpg.exe\" or TargetProcessName endswith \"\\\\gpg2.exe\") or TargetProcessFileDescription =~ \"GnuPG\u2019s OpenPGP tool\") and (TargetProcessCommandLine contains \" -d \" and TargetProcessCommandLine contains \"passphrase\"))|extend RuleId=\"037dcd71-33a8-4392-bb01-293c94663e5a\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_gpg4win_decryption.yml\"|extend RuleTitle=\"File Decryption Using Gpg4win\"|extend RuleDescription=\"Detects usage of Gpg4win to decrypt files\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion", "CredentialAccess", "CommandAndControl", "Reconnaissance", "Discovery", "Execution"],
+                "techniques": ["T1036", "T1593", "T1027", "T1518", "T1057", "T1105", "T1059", "T1552", "T1202", "T1564", "T1218"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000105",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

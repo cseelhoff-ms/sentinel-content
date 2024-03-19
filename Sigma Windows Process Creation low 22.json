@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000122')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000122')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation low 22",
+                "description": "Sigma Windows Process Creation low 22",
+                "severity": "low",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\schtasks.exe\" or TargetProcessFilename =~ \"schtasks.exe\") and (TargetProcessCommandLine contains \"/create\" or TargetProcessCommandLine contains \"-create\") and (TargetProcessCommandLine contains \"/xml\" or TargetProcessCommandLine contains \"-xml\")) and (not((TargetProcessCommandLine contains \".xml\" or TargetProcessIntegrityLevel =~ \"System\" or (ActingProcessName endswith \"\\\\rundll32.exe\" and (ActingProcessCommandLine contains \":\\\\WINDOWS\\\\Installer\\\\MSI\" and ActingProcessCommandLine contains \".tmp,zzzzInvokeManagedCustomActionOutOfProc\"))))) and (not((ActingProcessName contains \"*:\\\\ProgramData\\\\OEM\\\\UpgradeTool\\\\CareCenter_*\\\\BUnzip\\\\Setup_msi.exe\" or ActingProcessName endswith \":\\\\Program Files\\\\Axis Communications\\\\AXIS Camera Station\\\\SetupActions.exe\" or ActingProcessName endswith \":\\\\Program Files\\\\Axis Communications\\\\AXIS Device Manager\\\\AdmSetupActions.exe\" or ActingProcessName endswith \":\\\\Program Files (x86)\\\\Zemana\\\\AntiMalware\\\\AntiMalware.exe\" or ActingProcessName endswith \":\\\\Program Files\\\\Dell\\\\SupportAssist\\\\pcdrcui.exe\"))))|extend RuleId=\"dd2a821e-3b07-4d3b-a9ac-929fe4c6ca0c\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_schtasks_schedule_via_masqueraded_xml_file.yml\"|extend RuleTitle=\"Suspicious Scheduled Task Creation via Masqueraded XML File\"|extend RuleDescription=\"Detects the creation of a scheduled task using the \\\"-XML\\\" flag with a file without the '.xml' extension. This behavior could be indicative of potential defense evasion attempt during persistence\";\nlet q1=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\sc.exe\" or TargetProcessFilename =~ \"sc.exe\") and ((TargetProcessCommandLine contains \" config \" and TargetProcessCommandLine contains \"start\") and (TargetProcessCommandLine contains \"disabled\" or TargetProcessCommandLine contains \"demand\")))|extend RuleId=\"85c312b7-f44d-4a51-a024-d671c40b49fc\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sc_disable_service.yml\"|extend RuleTitle=\"Service StartupType Change Via Sc.EXE\"|extend RuleDescription=\"Detect the use of \\\"sc.exe\\\" to change the startup type of a service to \\\"disabled\\\" or \\\"demand\\\"\";\nlet q2=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\sc.exe\" and (TargetProcessCommandLine contains \"create\" or TargetProcessCommandLine contains \"config\") and (TargetProcessCommandLine contains \"binPath\" and TargetProcessCommandLine contains \"type\" and TargetProcessCommandLine contains \"kernel\"))|extend RuleId=\"431a1fdb-4799-4f3b-91c3-a683b003fc49\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sc_new_kernel_driver.yml\"|extend RuleTitle=\"New Kernel Driver Via SC.EXE\"|extend RuleDescription=\"Detects creation of a new service (kernel driver) with the type \\\"kernel\\\"\";\nlet q3=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\sc.exe\" or TargetProcessFilename =~ \"sc.exe\") and TargetProcessCommandLine contains \"sdset\")|extend RuleId=\"98c5aeef-32d5-492f-b174-64a691896d25\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sc_sdset_modification.yml\"|extend RuleTitle=\"Service Security Descriptor Tampering Via Sc.EXE\"|extend RuleDescription=\"Detection of sc.exe utility adding a new service with special permission which hides that service.\";\nlet q4=_Im_ProcessCreate\n| where (((TargetProcessCommandLine contains \"sc \" and TargetProcessCommandLine contains \"config \" and TargetProcessCommandLine contains \"binpath=\") or (TargetProcessCommandLine contains \"sc \" and TargetProcessCommandLine contains \"failure\" and TargetProcessCommandLine contains \"command=\")) or (((TargetProcessCommandLine contains \"reg \" and TargetProcessCommandLine contains \"add \" and TargetProcessCommandLine contains \"FailureCommand\") or (TargetProcessCommandLine contains \"reg \" and TargetProcessCommandLine contains \"add \" and TargetProcessCommandLine contains \"ImagePath\")) and (TargetProcessCommandLine contains \".sh\" or TargetProcessCommandLine contains \".exe\" or TargetProcessCommandLine contains \".dll\" or TargetProcessCommandLine contains \".bin$\" or TargetProcessCommandLine contains \".bat\" or TargetProcessCommandLine contains \".cmd\" or TargetProcessCommandLine contains \".js\" or TargetProcessCommandLine contains \".msh$\" or TargetProcessCommandLine contains \".reg$\" or TargetProcessCommandLine contains \".scr\" or TargetProcessCommandLine contains \".ps\" or TargetProcessCommandLine contains \".vb\" or TargetProcessCommandLine contains \".jar\" or TargetProcessCommandLine contains \".pl\")))|extend RuleId=\"38879043-7e1e-47a9-8d46-6bec88e201df\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sc_service_tamper_for_persistence.yml\"|extend RuleTitle=\"Potential Persistence Attempt Via Existing Service Tampering\"|extend RuleDescription=\"Detects the modification of an existing service in order to execute an arbitrary payload when the service is started or killed as a potential method for persistence.\";\nlet q5=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\sdbinst.exe\" or TargetProcessFilename =~ \"sdbinst.exe\") and TargetProcessCommandLine contains \".sdb\") and (not((ActingProcessName endswith \"\\\\msiexec.exe\" and (TargetProcessCommandLine contains \":\\\\Program Files (x86)\\\\IIS Express\\\\iisexpressshim.sdb\" or TargetProcessCommandLine contains \":\\\\Program Files\\\\IIS Express\\\\iisexpressshim.sdb\")))))|extend RuleId=\"517490a7-115a-48c6-8862-1a481504d5a8\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sdbinst_shim_persistence.yml\"|extend RuleTitle=\"Potential Shim Database Persistence via Sdbinst.EXE\"|extend RuleDescription=\"Detects installation of a new shim using sdbinst.exe.\\nAdversaries may establish persistence and/or elevate privileges by executing malicious content triggered by application shims\\n\";\nlet q6=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\sdbinst.exe\" or TargetProcessFilename =~ \"sdbinst.exe\") and (not((TargetProcessCommandLine contains \".sdb\" or ((TargetProcessCommandLine endswith \" -c\" or TargetProcessCommandLine endswith \" -f\" or TargetProcessCommandLine endswith \" -mm\" or TargetProcessCommandLine endswith \" -t\") or TargetProcessCommandLine contains \" -m -bg\") or isempty(TargetProcessCommandLine) or TargetProcessCommandLine =~ \"\"))))|extend RuleId=\"18ee686c-38a3-4f65-9f44-48a077141f42\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sdbinst_susp_extension.yml\"|extend RuleTitle=\"Uncommon Extension Shim Database Installation Via Sdbinst.EXE\"|extend RuleDescription=\"Detects installation of a potentially suspicious new shim with an uncommon extension using sdbinst.exe.\\nAdversaries may establish persistence and/or elevate privileges by executing malicious content triggered by application shims\\n\";\nlet q7=_Im_ProcessCreate\n| where ActingProcessName endswith \"\\\\sdclt.exe\"|extend RuleId=\"da2738f2-fadb-4394-afa7-0a0674885afa\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sdclt_child_process.yml\"|extend RuleTitle=\"Sdclt Child Processes\"|extend RuleDescription=\"A General detection for sdclt spawning new processes. This could be an indicator of sdclt being used for bypass UAC techniques.\";\nlet q8=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\secedit.exe\" or TargetProcessFilename =~ \"SeCEdit\") and ((TargetProcessCommandLine contains \"/export\" and TargetProcessCommandLine contains \"/cfg\") or (TargetProcessCommandLine contains \"/configure\" and TargetProcessCommandLine contains \"/db\")))|extend RuleId=\"c2c76b77-32be-4d1f-82c9-7e544bdfe0eb\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_secedit_execution.yml\"|extend RuleTitle=\"Potential Suspicious Activity Using SeCEdit\"|extend RuleDescription=\"Detects potential suspicious behaviour using secedit.exe. Such as exporting or modifying the security policy\";\nlet q9=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\setspn.exe\" or TargetProcessFilename =~ \"setspn.exe\" or (TargetProcessFileDescription contains \"Query or reset the computer\" and TargetProcessFileDescription contains \"SPN attribute\")) and (TargetProcessCommandLine contains \" -q \" or TargetProcessCommandLine contains \" /q \"))|extend RuleId=\"1eeed653-dbc8-4187-ad0c-eeebb20e6599\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_setspn_spn_enumeration.yml\"|extend RuleTitle=\"Potential SPN Enumeration Via Setspn.EXE\"|extend RuleDescription=\"Detects service principal name (SPN) enumeration used for Kerberoasting\";\nlet q10=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\shutdown.exe\" and (TargetProcessCommandLine contains \"/r \" or TargetProcessCommandLine contains \"/s \"))|extend RuleId=\"34ebb878-1b15-4895-b352-ca2eeb99b274\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_shutdown_execution.yml\"|extend RuleTitle=\"Suspicious Execution of Shutdown\"|extend RuleDescription=\"Use of the commandline to shutdown or reboot windows\";\nlet q11=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\shutdown.exe\" and TargetProcessCommandLine contains \"/l\")|extend RuleId=\"ec290c06-9b6b-4338-8b6b-095c0f284f10\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_shutdown_logoff.yml\"|extend RuleTitle=\"Suspicious Execution of Shutdown to Log Out\"|extend RuleDescription=\"Detects the rare use of the command line tool shutdown to logoff a user\";\nlet q12=_Im_ProcessCreate\n| where (ActingProcessName endswith \"\\\\SndVol.exe\" and (not((TargetProcessName endswith \"\\\\rundll32.exe\" and TargetProcessCommandLine contains \" shell32.dll,Control_RunDLL \"))))|extend RuleId=\"ba42babc-0666-4393-a4f7-ceaf5a69191e\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sndvol_susp_child_processes.yml\"|extend RuleTitle=\"Uncommon Child Processes Of SndVol.exe\"|extend RuleDescription=\"Detects potentially uncommon child processes of SndVol.exe (the Windows volume mixer)\";\nlet q13=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\SoundRecorder.exe\" and TargetProcessCommandLine contains \"/FILE\")|extend RuleId=\"83865853-59aa-449e-9600-74b9d89a6d6e\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_soundrecorder_audio_capture.yml\"|extend RuleTitle=\"Audio Capture via SoundRecorder\"|extend RuleDescription=\"Detect attacker collecting audio via SoundRecorder application.\";\nlet q14=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\sqlcmd.exe\" and (TargetProcessCommandLine contains \"VeeamBackup\" and TargetProcessCommandLine contains \"From \")) and (TargetProcessCommandLine contains \"BackupRepositories\" or TargetProcessCommandLine contains \"Backups\" or TargetProcessCommandLine contains \"Credentials\" or TargetProcessCommandLine contains \"HostCreds\" or TargetProcessCommandLine contains \"SmbFileShares\" or TargetProcessCommandLine contains \"Ssh_creds\" or TargetProcessCommandLine contains \"VSphereInfo\"))|extend RuleId=\"696bfb54-227e-4602-ac5b-30d9d2053312\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sqlcmd_veeam_db_recon.yml\"|extend RuleTitle=\"Veeam Backup Database Suspicious Query\"|extend RuleDescription=\"Detects potentially suspicious SQL queries using SQLCmd targeting the Veeam backup databases in order to steal information.\";\nlet q15=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\squirrel.exe\" or TargetProcessName endswith \"\\\\update.exe\") and (TargetProcessCommandLine contains \" --download \" or TargetProcessCommandLine contains \" --update \" or TargetProcessCommandLine contains \" --updateRollback=\") and TargetProcessCommandLine contains \"http\")|extend RuleId=\"1e75c1cc-c5d4-42aa-ac3d-91b0b68b3b4c\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_squirrel_download.yml\"|extend RuleTitle=\"Arbitrary File Download Via Squirrel.EXE\"|extend RuleDescription=\"Detects the usage of the \\\"Squirrel.exe\\\" to download arbitrary files. This binary is part of multiple Electron based software installations (Slack, Teams, Discord, etc.)\\n\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["PrivilegeEscalation", "Discovery", "Impact", "DefenseEvasion", "CredentialAccess", "Collection", "Persistence", "Execution"],
+                "techniques": ["T1547", "T1123", "T1053", "T1546", "T1556", "T1562", "T1557", "T1529", "T1005", "T1564", "T1036", "T1548", "T1543", "T1082", "T1558", "T1505", "T1574", "T1218"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000122",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000118')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000118')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation low 18",
+                "description": "Sigma Windows Process Creation low 18",
+                "severity": "low",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where (((ActingProcessName endswith \"\\\\cmd.exe\" or ActingProcessName endswith \"\\\\cscript.exe\" or ActingProcessName endswith \"\\\\mshta.exe\" or ActingProcessName endswith \"\\\\powershell_ise.exe\" or ActingProcessName endswith \"\\\\powershell.exe\" or ActingProcessName endswith \"\\\\pwsh.exe\" or ActingProcessName endswith \"\\\\wscript.exe\") and TargetProcessName endswith \"\\\\regsvr32.exe\") and (not((ActingProcessName =~ \"C:\\\\Windows\\\\System32\\\\cmd.exe\" and TargetProcessCommandLine endswith \" /s C:\\\\Windows\\\\System32\\\\RpcProxy\\\\RpcProxy.dll\"))))|extend RuleId=\"ab37a6ec-6068-432b-a64e-2c7bf95b1d22\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_regsvr32_susp_parent.yml\"|extend RuleTitle=\"Scripting/CommandLine Process Spawned Regsvr32\"|extend RuleDescription=\"Detects various command line and scripting engines/processes such as \\\"PowerShell\\\", \\\"Wscript\\\", \\\"Cmd\\\", etc. spawning a \\\"regsvr32\\\" instance.\";\nlet q1=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\regsvr32.exe\" or TargetProcessFilename =~ \"REGSVR32.EXE\") and (not(((TargetProcessCommandLine contains \".ax\" or TargetProcessCommandLine contains \".cpl\" or TargetProcessCommandLine contains \".dll\" or TargetProcessCommandLine contains \".ocx\") or isempty(TargetProcessCommandLine) or TargetProcessCommandLine =~ \"\"))) and (not((TargetProcessCommandLine contains \".ppl\" or TargetProcessCommandLine contains \".bav\"))))|extend RuleId=\"50919691-7302-437f-8e10-1fe088afa145\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_regsvr32_uncommon_extension.yml\"|extend RuleTitle=\"Regsvr32 DLL Execution With Uncommon Extension\"|extend RuleDescription=\"Detects a \\\"regsvr32\\\" execution where the DLL doesn't contain a common file extension.\";\nlet q2=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"reg\" and TargetProcessCommandLine contains \" ADD \" and TargetProcessCommandLine contains \"Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Run\")|extend RuleId=\"de587dce-915e-4218-aac4-835ca6af6f70\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_reg_add_run_key.yml\"|extend RuleTitle=\"Potential Persistence Attempt Via Run Keys Using Reg.EXE\"|extend RuleDescription=\"Detects suspicious command line reg.exe tool adding key to RUN key in Registry\";\nlet q3=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"HKLM\\\\SYSTEM\\\\CurrentControlSet\\\\Control\\\\Lsa\" and TargetProcessCommandLine contains \"scecli\\\\0\" and TargetProcessCommandLine contains \"reg add\")|extend RuleId=\"b7966f4a-b333-455b-8370-8ca53c229762\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_reg_credential_access_via_password_filter.yml\"|extend RuleTitle=\"Dropping Of Password Filter DLL\"|extend RuleDescription=\"Detects dropping of dll files in system32 that may be used to retrieve user credentials from LSASS\";\nlet q4=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\reg.exe\" and (TargetProcessCommandLine contains \"SOFTWARE\\\\Microsoft\\\\Windows Defender\\\\Exclusions\\\\Paths\" or TargetProcessCommandLine contains \"SOFTWARE\\\\Microsoft\\\\Microsoft Antimalware\\\\Exclusions\\\\Paths\") and (TargetProcessCommandLine contains \"ADD \" and TargetProcessCommandLine contains \"/t \" and TargetProcessCommandLine contains \"REG_DWORD \" and TargetProcessCommandLine contains \"/v \" and TargetProcessCommandLine contains \"/d \" and TargetProcessCommandLine contains \"0\"))|extend RuleId=\"48917adc-a28e-4f5d-b729-11e75da8941f\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_reg_defender_exclusion.yml\"|extend RuleTitle=\"Suspicious Windows Defender Folder Exclusion Added Via Reg.EXE\"|extend RuleDescription=\"Detects the usage of \\\"reg.exe\\\" to add Defender folder exclusions. Qbot has been seen using this technique to add exclusions for folders within AppData and ProgramData.\";\nlet q5=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\reg.exe\" or TargetProcessFilename =~ \"reg.exe\") and TargetProcessCommandLine contains \"add\") and (TargetProcessCommandLine contains \"Control Panel\\\\Desktop\" or TargetProcessCommandLine contains \"CurrentVersion\\\\Policies\\\\ActiveDesktop\" or TargetProcessCommandLine contains \"CurrentVersion\\\\Policies\\\\System\") and ((TargetProcessCommandLine contains \"/v NoChangingWallpaper\" and TargetProcessCommandLine contains \"/d 1\") or (TargetProcessCommandLine contains \"/v Wallpaper\" and TargetProcessCommandLine contains \"/t REG_SZ\") or (TargetProcessCommandLine contains \"/v WallpaperStyle\" and TargetProcessCommandLine contains \"/d 2\")))|extend RuleId=\"8cbc9475-8d05-4e27-9c32-df960716c701\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_reg_desktop_background_change.yml\"|extend RuleTitle=\"Potentially Suspicious Desktop Background Change Using Reg.EXE\"|extend RuleDescription=\"Detects the execution of \\\"reg.exe\\\" to alter registry keys that would replace the user's desktop background.\\nThis is a common technique used by malware to change the desktop background to a ransom note or other image.\\n\";\nlet q6=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\reg.exe\" and TargetProcessCommandLine contains \"add\") and (TargetProcessCommandLine contains \"\\\\software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Run\" or TargetProcessCommandLine contains \"\\\\software\\\\Microsoft\\\\Windows NT\\\\CurrentVersion\\\\Winlogon\\\\Userinit\" or TargetProcessCommandLine contains \"\\\\software\\\\Microsoft\\\\Windows NT\\\\CurrentVersion\\\\Winlogon\\\\Shell\" or TargetProcessCommandLine contains \"\\\\software\\\\Microsoft\\\\Windows NT\\\\CurrentVersion\\\\Windows\" or TargetProcessCommandLine contains \"\\\\software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Explorer\\\\User Shell Folders\" or TargetProcessCommandLine contains \"\\\\system\\\\CurrentControlSet\\\\Control\\\\SafeBoot\\\\AlternateShell\"))|extend RuleId=\"24357373-078f-44ed-9ac4-6d334a668a11\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_reg_direct_asep_registry_keys_modification.yml\"|extend RuleTitle=\"Direct Autorun Keys Modification\"|extend RuleDescription=\"Detects direct modification of autostart extensibility point (ASEP) in registry using reg.exe.\";\nlet q7=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\reg.exe\" and (TargetProcessCommandLine contains \" query \" and TargetProcessCommandLine contains \"/t \" and TargetProcessCommandLine contains \"REG_SZ\" and TargetProcessCommandLine contains \"/s\")) and ((TargetProcessCommandLine contains \"/f \" and TargetProcessCommandLine contains \"HKLM\") or (TargetProcessCommandLine contains \"/f \" and TargetProcessCommandLine contains \"HKCU\") or TargetProcessCommandLine contains \"HKCU\\\\Software\\\\SimonTatham\\\\PuTTY\\\\Sessions\"))|extend RuleId=\"e0b0c2ab-3d52-46d9-8cb7-049dc775fbd1\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_reg_enumeration_for_credentials_in_registry.yml\"|extend RuleTitle=\"Enumeration for Credentials in Registry\"|extend RuleDescription=\"Adversaries may search the Registry on compromised systems for insecurely stored credentials.\\nThe Windows Registry stores configuration information that can be used by the system or other programs.\\nAdversaries may query the Registry looking for credentials and passwords that have been stored for use by other programs or services\\n\";\nlet q8=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\reg.exe\" or TargetProcessFilename =~ \"reg.exe\") and TargetProcessCommandLine contains \" import \" and (TargetProcessCommandLine contains \"C:\\\\Users\\\\\" or TargetProcessCommandLine contains \"%temp%\" or TargetProcessCommandLine contains \"%tmp%\" or TargetProcessCommandLine contains \"%appdata%\" or TargetProcessCommandLine contains \"\\\\AppData\\\\Local\\\\Temp\\\\\" or TargetProcessCommandLine contains \"C:\\\\Windows\\\\Temp\\\\\" or TargetProcessCommandLine contains \"C:\\\\ProgramData\\\\\"))|extend RuleId=\"62e0298b-e994-4189-bc87-bc699aa62d97\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_reg_import_from_suspicious_paths.yml\"|extend RuleTitle=\"Potential Suspicious Registry File Imported Via Reg.EXE\"|extend RuleDescription=\"Detects the import of '.reg' files from suspicious paths using the 'reg.exe' utility\";\nlet q9=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\reg.exe\" or TargetProcessFilename =~ \"reg.exe\") and TargetProcessCommandLine contains \"\\\\SOFTWARE\\\\Policies\\\\Microsoft\\\\Windows\\\\System\" and (TargetProcessCommandLine contains \"GroupPolicyRefreshTimeDC\" or TargetProcessCommandLine contains \"GroupPolicyRefreshTimeOffsetDC\" or TargetProcessCommandLine contains \"GroupPolicyRefreshTime\" or TargetProcessCommandLine contains \"GroupPolicyRefreshTimeOffset\" or TargetProcessCommandLine contains \"EnableSmartScreen\" or TargetProcessCommandLine contains \"ShellSmartScreenLevel\"))|extend RuleId=\"ada4b0c4-758b-46ac-9033-9004613a150d\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_reg_modify_group_policy_settings.yml\"|extend RuleTitle=\"Modify Group Policy Settings\"|extend RuleDescription=\"Detect malicious GPO modifications can be used to implement many other malicious behaviors.\";\nlet q10=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \"reg\" and TargetProcessCommandLine contains \"add\" and TargetProcessCommandLine contains \"hkcu\\\\software\\\\classes\\\\ms-settings\\\\shell\\\\open\\\\command\" and TargetProcessCommandLine contains \"/ve \" and TargetProcessCommandLine contains \"/d\") or (TargetProcessCommandLine contains \"reg\" and TargetProcessCommandLine contains \"add\" and TargetProcessCommandLine contains \"hkcu\\\\software\\\\classes\\\\ms-settings\\\\shell\\\\open\\\\command\" and TargetProcessCommandLine contains \"/v\" and TargetProcessCommandLine contains \"DelegateExecute\") or (TargetProcessCommandLine contains \"reg\" and TargetProcessCommandLine contains \"delete\" and TargetProcessCommandLine contains \"hkcu\\\\software\\\\classes\\\\ms-settings\"))|extend RuleId=\"dd3ee8cc-f751-41c9-ba53-5a32ed47e563\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_reg_open_command.yml\"|extend RuleTitle=\"Suspicious Reg Add Open Command\"|extend RuleDescription=\"Threat actors performed dumping of SAM, SECURITY and SYSTEM registry hives using DelegateExecute key\";\nlet q11=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\reg.exe\" or TargetProcessFilename =~ \"reg.exe\") and TargetProcessCommandLine contains \"query\" and (TargetProcessCommandLine contains \"currentVersion\\\\windows\" or TargetProcessCommandLine contains \"winlogon\\\\\" or TargetProcessCommandLine contains \"currentVersion\\\\shellServiceObjectDelayLoad\" or TargetProcessCommandLine contains \"currentVersion\\\\run\" or TargetProcessCommandLine contains \"currentVersion\\\\policies\\\\explorer\\\\run\" or TargetProcessCommandLine contains \"currentcontrolset\\\\services\"))|extend RuleId=\"970007b7-ce32-49d0-a4a4-fbef016950bd\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_reg_query_registry.yml\"|extend RuleTitle=\"Potential Configuration And Service Reconnaissance Via Reg.EXE\"|extend RuleDescription=\"Detects the usage of \\\"reg.exe\\\" in order to query reconnaissance information from the registry. Adversaries may interact with the Windows registry to gather information about credentials, the system, configuration, and installed software.\";\nlet q12=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\reg.exe\" and (TargetProcessCommandLine contains \"HKEY_CURRENT_USER\\\\Control Panel\\\\Desktop\" or TargetProcessCommandLine contains \"HKCU\\\\Control Panel\\\\Desktop\")) and ((TargetProcessCommandLine contains \"/v ScreenSaveActive\" and TargetProcessCommandLine contains \"/t REG_SZ\" and TargetProcessCommandLine contains \"/d 1\" and TargetProcessCommandLine contains \"/f\") or (TargetProcessCommandLine contains \"/v ScreenSaveTimeout\" and TargetProcessCommandLine contains \"/t REG_SZ\" and TargetProcessCommandLine contains \"/d \" and TargetProcessCommandLine contains \"/f\") or (TargetProcessCommandLine contains \"/v ScreenSaverIsSecure\" and TargetProcessCommandLine contains \"/t REG_SZ\" and TargetProcessCommandLine contains \"/d 0\" and TargetProcessCommandLine contains \"/f\") or (TargetProcessCommandLine contains \"/v SCRNSAVE.EXE\" and TargetProcessCommandLine contains \"/t REG_SZ\" and TargetProcessCommandLine contains \"/d \" and TargetProcessCommandLine contains \".scr\" and TargetProcessCommandLine contains \"/f\")))|extend RuleId=\"0fc35fc3-efe6-4898-8a37-0b233339524f\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_reg_screensaver.yml\"|extend RuleTitle=\"Suspicious ScreenSave Change by Reg.exe\"|extend RuleDescription=\"Adversaries may establish persistence by executing malicious content triggered by user inactivity.\\nScreensavers are programs that execute after a configurable time of user inactivity and consist of Portable Executable (PE) files with a .scr file extension\\n\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["Impact", "DefenseEvasion", "CredentialAccess", "Persistence", "PrivilegeEscalation", "Discovery", "Execution"],
+                "techniques": ["T1003", "T1547", "T1112", "T1012", "T1007", "T1546", "T1556", "T1484", "T1552", "T1491", "T1562", "T1574", "T1218"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000118",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

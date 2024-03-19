@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000123')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000123')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation low 23",
+                "description": "Sigma Windows Process Creation low 23",
+                "severity": "low",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\squirrel.exe\" or TargetProcessName endswith \"\\\\update.exe\") and (TargetProcessCommandLine contains \"--processStart\" or TargetProcessCommandLine contains \"--processStartAndWait\" or TargetProcessCommandLine contains \"--createShortcut\")) and (not(((TargetProcessCommandLine contains \":\\\\Users\\\\\" and TargetProcessCommandLine contains \"\\\\AppData\\\\Local\\\\Discord\\\\Update.exe\" and TargetProcessCommandLine contains \" --processStart\" and TargetProcessCommandLine contains \"Discord.exe\") or ((TargetProcessCommandLine contains \":\\\\Users\\\\\" and TargetProcessCommandLine contains \"\\\\AppData\\\\Local\\\\GitHubDesktop\\\\Update.exe\" and TargetProcessCommandLine contains \"GitHubDesktop.exe\") and (TargetProcessCommandLine contains \"--createShortcut\" or TargetProcessCommandLine contains \"--processStartAndWait\")) or ((TargetProcessCommandLine contains \":\\\\Users\\\\\" and TargetProcessCommandLine contains \"\\\\AppData\\\\Local\\\\Microsoft\\\\Teams\\\\Update.exe\" and TargetProcessCommandLine contains \"Teams.exe\") and (TargetProcessCommandLine contains \"--processStart\" or TargetProcessCommandLine contains \"--createShortcut\")) or ((TargetProcessCommandLine contains \":\\\\Users\\\\\" and TargetProcessCommandLine contains \"\\\\AppData\\\\Local\\\\yammerdesktop\\\\Update.exe\" and TargetProcessCommandLine contains \"Yammer.exe\") and (TargetProcessCommandLine contains \"--processStart\" or TargetProcessCommandLine contains \"--createShortcut\"))))))|extend RuleId=\"45239e6a-b035-4aaf-b339-8ad379fcb67e\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_squirrel_proxy_execution.yml\"|extend RuleTitle=\"Process Proxy Execution Via Squirrel.EXE\"|extend RuleDescription=\"Detects the usage of the \\\"Squirrel.exe\\\" binary to execute arbitrary processes. This binary is part of multiple Electron based software installations (Slack, Teams, Discord, etc.)\\n\";\nlet q1=_Im_ProcessCreate\n| where TargetProcessCommandLine contains \" -R \"\n| where TargetProcessCommandLine contains \" /R \"\n| where (TargetProcessName endswith \"\\\\ssh.exe\" and ())|extend RuleId=\"327f48c1-a6db-4eb8-875a-f6981f1b0183\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_ssh_port_forward.yml\"|extend RuleTitle=\"Port Forwarding Activity Via SSH.EXE\"|extend RuleDescription=\"Detects port forwarding activity via SSH.exe\";\nlet q2=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\amazon-ssm-agent.exe\" and (TargetProcessCommandLine contains \"-register \" and TargetProcessCommandLine contains \"-code \" and TargetProcessCommandLine contains \"-id \" and TargetProcessCommandLine contains \"-region \"))|extend RuleId=\"d20ee2f4-822c-4827-9e15-41500b1fff10\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_ssm_agent_abuse.yml\"|extend RuleTitle=\"Potential Amazon SSM Agent Hijacking\"|extend RuleDescription=\"Detects potential Amazon SSM agent hijack attempts as outlined in the Mitiga research report.\";\nlet q3=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\ntvdm.exe\" or TargetProcessName endswith \"\\\\csrstub.exe\")|extend RuleId=\"16905e21-66ee-42fe-b256-1318ada2d770\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_16bit_application.yml\"|extend RuleTitle=\"Start of NT Virtual DOS Machine\"|extend RuleDescription=\"Ntvdm.exe allows the execution of 16-bit Windows applications on 32-bit Windows operating systems, as well as the execution of both 16-bit and 32-bit DOS applications\";\nlet q4=_Im_ProcessCreate\n| where (((TargetProcessCommandLine contains \"localgroup \" and TargetProcessCommandLine contains \" /add\") or (TargetProcessCommandLine contains \"Add-LocalGroupMember \" and TargetProcessCommandLine contains \" -Group \")) and (TargetProcessCommandLine contains \" administrators \" or TargetProcessCommandLine contains \" administrateur\"))|extend RuleId=\"ad720b90-25ad-43ff-9b5e-5c841facc8e5\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_add_user_local_admin_group.yml\"|extend RuleTitle=\"User Added to Local Administrators Group\"|extend RuleDescription=\"Detects addition of users to the local administrator group via \\\"Net\\\" or \\\"Add-LocalGroupMember\\\".\";\nlet q5=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"txt:\" and ((TargetProcessCommandLine contains \"type \" and TargetProcessCommandLine contains \" > \") or (TargetProcessCommandLine contains \"makecab \" and TargetProcessCommandLine contains \".cab\") or (TargetProcessCommandLine contains \"reg \" and TargetProcessCommandLine contains \" export \") or (TargetProcessCommandLine contains \"regedit \" and TargetProcessCommandLine contains \" /E \") or (TargetProcessCommandLine contains \"esentutl \" and TargetProcessCommandLine contains \" /y \" and TargetProcessCommandLine contains \" /d \" and TargetProcessCommandLine contains \" /o \")))|extend RuleId=\"7f43c430-5001-4f8b-aaa9-c3b88f18fa5c\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_alternate_data_streams.yml\"|extend RuleTitle=\"Execute From Alternate Data Streams\"|extend RuleDescription=\"Detects execution from an Alternate Data Stream (ADS). Adversaries may use NTFS file attributes to hide their malicious data in order to evade detection\";\nlet q6=_Im_ProcessCreate\n| where ((((TargetProcessName contains \"\\\\Windows\\\\Installer\\\\\" and TargetProcessName contains \"msi\") and TargetProcessName endswith \"tmp\") or (TargetProcessName endswith \"\\\\msiexec.exe\" and TargetProcessIntegrityLevel =~ \"System\")) and (TargetUsername contains \"AUTHORI\" or TargetUsername contains \"AUTORI\") and (not((ActingProcessName =~ \"C:\\\\Windows\\\\System32\\\\services.exe\" or (TargetProcessCommandLine endswith \"\\\\system32\\\\msiexec.exe /V\" or ActingProcessCommandLine endswith \"\\\\system32\\\\msiexec.exe /V\") or ActingProcessName startswith \"C:\\\\ProgramData\\\\Sophos\\\\\" or ActingProcessName startswith \"C:\\\\ProgramData\\\\Avira\\\\\" or (ActingProcessName startswith \"C:\\\\Program Files\\\\Avast Software\\\\\" or ActingProcessName startswith \"C:\\\\Program Files (x86)\\\\Avast Software\\\\\") or (ActingProcessName startswith \"C:\\\\Program Files\\\\Google\\\\Update\\\\\" or ActingProcessName startswith \"C:\\\\Program Files (x86)\\\\Google\\\\Update\\\\\")))))|extend RuleId=\"cd951fdc-4b2f-47f5-ba99-a33bf61e3770\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_always_install_elevated_windows_installer.yml\"|extend RuleTitle=\"Always Install Elevated Windows Installer\"|extend RuleDescription=\"Detects Windows Installer service (msiexec.exe) trying to install MSI packages with SYSTEM privilege\";\nlet q7=_Im_ProcessCreate\n| where (ActingProcessName contains \"C:\\\\Program Files\\\\WindowsApps\\\\\" and ((TargetProcessName endswith \"\\\\cmd.exe\" or TargetProcessName endswith \"\\\\cscript.exe\" or TargetProcessName endswith \"\\\\mshta.exe\" or TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\" or TargetProcessName endswith \"\\\\regsvr32.exe\" or TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessName endswith \"\\\\wscript.exe\") or (TargetProcessCommandLine contains \"cmd /c\" or TargetProcessCommandLine contains \"Invoke-\" or TargetProcessCommandLine contains \"Base64\")) and (not((ActingProcessName contains \":\\\\Program Files\\\\WindowsApps\\\\Microsoft.WindowsTerminal\" and ActingProcessName endswith \"\\\\WindowsTerminal.exe\" and (TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\cmd.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\")))))|extend RuleId=\"f91ed517-a6ba-471d-9910-b3b4a398c0f3\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_appx_execution.yml\"|extend RuleTitle=\"Potentially Suspicious Windows App Activity\"|extend RuleDescription=\"Detects potentially suspicious child process of applications launched from inside the WindowsApps directory. This could be a sign of a rogue \\\".appx\\\" package installation/execution\";\nlet q8=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \".SettingContent-ms\" and (not(TargetProcessCommandLine contains \"immersivecontrolpanel\")))|extend RuleId=\"24de4f3b-804c-4165-b442-5a06a2302c7e\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_arbitrary_shell_execution_via_settingcontent.yml\"|extend RuleTitle=\"Arbitrary Shell Command Execution Via Settingcontent-Ms\"|extend RuleDescription=\"The .SettingContent-ms file type was introduced in Windows 10 and allows a user to create \\\"shortcuts\\\" to various Windows 10 setting pages. These files are simply XML and contain paths to various Windows 10 settings binaries.\";\nlet q9=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \".doc\" or TargetProcessCommandLine contains \".docx\" or TargetProcessCommandLine contains \".xls\" or TargetProcessCommandLine contains \".xlsx\" or TargetProcessCommandLine contains \".ppt\" or TargetProcessCommandLine contains \".pptx\" or TargetProcessCommandLine contains \".rtf\" or TargetProcessCommandLine contains \".pdf\" or TargetProcessCommandLine contains \".txt\") and ((TargetProcessCommandLine contains \"dir \" and TargetProcessCommandLine contains \" /b \" and TargetProcessCommandLine contains \" /s \") or (TargetProcessFilename =~ \"FINDSTR.EXE\" and (TargetProcessCommandLine contains \" /e \" or TargetProcessCommandLine contains \" /si \"))))|extend RuleId=\"f576a613-2392-4067-9d1a-9345fb58d8d1\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_automated_collection.yml\"|extend RuleTitle=\"Automated Collection Command Prompt\"|extend RuleDescription=\"Once established within a system or network, an adversary may use automated techniques for collecting internal data.\";\nlet q10=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"h^t^t^p\" or TargetProcessCommandLine contains \"h\\\"t\\\"t\\\"p\")|extend RuleId=\"f0cdd048-82dc-4f7a-8a7a-b87a52b6d0fd\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_cli_obfuscation_escape_char.yml\"|extend RuleTitle=\"Potential Commandline Obfuscation Using Escape Characters\"|extend RuleDescription=\"Detects potential commandline obfuscation using known escape characters\";\nlet q11=_Im_ProcessCreate\n| where (((TargetProcessName contains \"\\\\Windows\\\\\" and (TargetProcessCommandLine contains \"\\\\..\\\\Windows\\\\\" or TargetProcessCommandLine contains \"\\\\..\\\\System32\\\\\" or TargetProcessCommandLine contains \"\\\\..\\\\..\\\\\")) or TargetProcessCommandLine contains \".exe\\\\..\\\\\") and (not((TargetProcessCommandLine contains \"\\\\Google\\\\Drive\\\\googledrivesync.exe\\\\..\\\\\" or TargetProcessCommandLine contains \"\\\\Citrix\\\\Virtual Smart Card\\\\Citrix.Authentication.VirtualSmartcard.Launcher.exe\\\\..\\\\\"))))|extend RuleId=\"1327381e-6ab0-4f38-b583-4c1b8346a56b\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_commandline_path_traversal_evasion.yml\"|extend RuleTitle=\"Potential Command Line Path Traversal Evasion Attempt\"|extend RuleDescription=\"Detects potential evasion or obfuscation attempts using bogus path traversal via the commandline\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["LateralMovement", "CommandAndControl", "PrivilegeEscalation", "DefenseEvasion", "InitialAccess", "CredentialAccess", "Collection", "Persistence", "Execution"],
+                "techniques": ["T1036", "T1548", "T1219", "T1140", "T1119", "T1566", "T1098", "T1021", "T1552", "T1204", "T1564", "T1572", "T1218"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000123",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

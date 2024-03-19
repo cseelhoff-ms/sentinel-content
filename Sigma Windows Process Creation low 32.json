@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000132')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000132')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation low 32",
+                "description": "Sigma Windows Process Creation low 32",
+                "severity": "low",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where ((ActingProcessName endswith \"\\\\wscript.exe\" or ActingProcessName endswith \"\\\\cscript.exe\") and (TargetProcessName endswith \"\\\\rundll32.exe\" or ((TargetProcessName endswith \"\\\\cmd.exe\" or TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\") and ((TargetProcessCommandLine contains \"mshta\" and TargetProcessCommandLine contains \"http\") or (TargetProcessCommandLine contains \"rundll32\" or TargetProcessCommandLine contains \"regsvr32\" or TargetProcessCommandLine contains \"msiexec\")))) and (not((TargetProcessName endswith \"\\\\rundll32.exe\" and (TargetProcessCommandLine contains \"UpdatePerUserSystemParameters\" or TargetProcessCommandLine contains \"PrintUIEntry\" or TargetProcessCommandLine contains \"ClearMyTracksByProcess\")))))|extend RuleId=\"b6676963-0353-4f88-90f5-36c20d443c6a\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wscript_cscript_susp_child_processes.yml\"|extend RuleTitle=\"Cscript/Wscript Potentially Suspicious Child Process\"|extend RuleDescription=\"Detects potentially suspicious child processes of Wscript/Cscript. These include processes such as rundll32 with uncommon exports or PowerShell spawning rundll32 or regsvr32.\\nMalware such as Pikabot and Qakbot were seen using similar techniques as well as many others.\\n\";\nlet q1=_Im_ProcessCreate\n| where ((ActingProcessName endswith \"\\\\wsl.exe\" or ActingProcessName endswith \"\\\\wslhost.exe\") and ((TargetProcessName endswith \"\\\\calc.exe\" or TargetProcessName endswith \"\\\\cmd.exe\" or TargetProcessName endswith \"\\\\cscript.exe\" or TargetProcessName endswith \"\\\\mshta.exe\" or TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\" or TargetProcessName endswith \"\\\\regsvr32.exe\" or TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessName endswith \"\\\\wscript.exe\") or (TargetProcessName contains \"\\\\AppData\\\\Local\\\\Temp\\\\\" or TargetProcessName contains \"C:\\\\Users\\\\Public\\\\\" or TargetProcessName contains \"C:\\\\Windows\\\\Temp\\\\\" or TargetProcessName contains \"C:\\\\Temp\\\\\" or TargetProcessName contains \"\\\\Downloads\\\\\" or TargetProcessName contains \"\\\\Desktop\\\\\")))|extend RuleId=\"2267fe65-0681-42ad-9a6d-46553d3f3480\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wsl_child_processes_anomalies.yml\"|extend RuleTitle=\"WSL Child Process Anomaly\"|extend RuleDescription=\"Detects uncommon or suspicious child processes spawning from a WSL process. This could indicate an attempt to evade parent/child relationship detections or persistence attempts via cron using WSL\";\nlet q2=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\wsl.exe\" or TargetProcessFilename =~ \"wsl.exe\") and (TargetProcessCommandLine contains \" -e \" or TargetProcessCommandLine contains \" --exec\" or TargetProcessCommandLine contains \" --system\" or TargetProcessCommandLine contains \" --shell-type \" or TargetProcessCommandLine contains \" /mnt/c\" or TargetProcessCommandLine contains \" --user root\" or TargetProcessCommandLine contains \" -u root\" or TargetProcessCommandLine contains \"--debug-shell\")) and (not((ActingProcessName endswith \"\\\\cmd.exe\" and (TargetProcessCommandLine contains \" -d \" and TargetProcessCommandLine contains \" -e kill \")))))|extend RuleId=\"dec44ca7-61ad-493c-bfd7-8819c5faa09b\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wsl_lolbin_execution.yml\"|extend RuleTitle=\"Arbitrary Command Execution Using WSL\"|extend RuleDescription=\"Detects potential abuse of Windows Subsystem for Linux (WSL) binary as a LOLBIN to execute arbitrary Linux or Windows commands\";\nlet q3=_Im_ProcessCreate\n| where (TargetProcessName matches regex \"[a-zA-Z]:\\\\\\\\\" and TargetProcessCurrentDirectory contains \"\\\\\\\\wsl.localhost\")|extend RuleId=\"ed825c86-c009-4014-b413-b76003e33d35\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wsl_windows_binaries_execution.yml\"|extend RuleTitle=\"Windows Binary Executed From WSL\"|extend RuleDescription=\"Detects the execution of Windows binaries from within a WSL instance. This could be used to masquerade parent-child relationships\";\nlet q4=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\wusa.exe\" and TargetProcessCommandLine contains \"/extract:\")|extend RuleId=\"59b39960-5f9d-4a49-9cef-1e4d2c1d0cb9\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wusa_cab_files_extraction.yml\"|extend RuleTitle=\"Wusa Extracting Cab Files\"|extend RuleDescription=\"Detects usage of the \\\"wusa.exe\\\" (Windows Update Standalone Installer) utility to extract cab using the \\\"/extract\\\" argument which is not longer supported. This could indicate an attacker using an old technique\";\nunion q0, q1, q2, q3, q4;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion", "Execution"],
+                "techniques": ["T1202", "T1218"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000132",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000242')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000242')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation medium 42",
+                "description": "Sigma Windows Process Creation medium 42",
+                "severity": "medium",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where (ActingProcessName endswith \"\\\\userinit.exe\" and (not(TargetProcessName endswith \":\\\\WINDOWS\\\\explorer.exe\")) and (not(((TargetProcessCommandLine contains \"netlogon.bat\" or TargetProcessCommandLine contains \"UsrLogon.cmd\") or TargetProcessCommandLine =~ \"PowerShell.exe\" or (TargetProcessName endswith \":\\\\Windows\\\\System32\\\\proquota.exe\" or TargetProcessName endswith \":\\\\Windows\\\\SysWOW64\\\\proquota.exe\") or (TargetProcessName endswith \":\\\\Program Files (x86)\\\\Citrix\\\\HDX\\\\bin\\\\cmstart.exe\" or TargetProcessName endswith \":\\\\Program Files (x86)\\\\Citrix\\\\HDX\\\\bin\\\\icast.exe\" or TargetProcessName endswith \":\\\\Program Files (x86)\\\\Citrix\\\\System32\\\\icast.exe\" or TargetProcessName endswith \":\\\\Program Files\\\\Citrix\\\\HDX\\\\bin\\\\cmstart.exe\" or TargetProcessName endswith \":\\\\Program Files\\\\Citrix\\\\HDX\\\\bin\\\\icast.exe\" or TargetProcessName endswith \":\\\\Program Files\\\\Citrix\\\\System32\\\\icast.exe\") or isempty(TargetProcessName)))))|extend RuleId=\"0a98a10c-685d-4ab0-bddc-b6bdd1d48458\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_userinit_uncommon_child_processes.yml\"|extend RuleTitle=\"Uncommon Userinit Child Process\"|extend RuleDescription=\"Detects uncommon \\\"userinit.exe\\\" child processes, which could be a sign of uncommon shells or login scripts used for persistence.\";\nlet q1=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\VMwareToolBoxCmd.exe\" or TargetProcessFilename =~ \"toolbox-cmd.exe\") and (TargetProcessCommandLine contains \" script \" and TargetProcessCommandLine contains \" set \") and (TargetProcessCommandLine contains \":\\\\PerfLogs\\\\\" or TargetProcessCommandLine contains \":\\\\Temp\\\\\" or TargetProcessCommandLine contains \":\\\\Windows\\\\System32\\\\Tasks\\\\\" or TargetProcessCommandLine contains \":\\\\Windows\\\\Tasks\\\\\" or TargetProcessCommandLine contains \":\\\\Windows\\\\Temp\\\\\" or TargetProcessCommandLine contains \"\\\\AppData\\\\Local\\\\Temp\"))|extend RuleId=\"236d8e89-ed95-4789-a982-36f4643738ba\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_vmware_toolbox_cmd_persistence_susp.yml\"|extend RuleTitle=\"Suspicious Persistence Via VMwareToolBoxCmd.EXE VM State Change Script\"|extend RuleDescription=\"Detects execution of the \\\"VMwareToolBoxCmd.exe\\\" with the \\\"script\\\" and \\\"set\\\" flag to setup a specific script that's located in a potentially suspicious location to run for a specific VM state\";\nlet q2=_Im_ProcessCreate\n| where ((ActingProcessName endswith \"\\\\vmtoolsd.exe\" and ((TargetProcessName endswith \"\\\\cmd.exe\" or TargetProcessName endswith \"\\\\cscript.exe\" or TargetProcessName endswith \"\\\\mshta.exe\" or TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\" or TargetProcessName endswith \"\\\\regsvr32.exe\" or TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessName endswith \"\\\\wscript.exe\") or (TargetProcessFilename =~ \"Cmd.Exe\" or TargetProcessFilename =~ \"cscript.exe\" or TargetProcessFilename =~ \"MSHTA.EXE\" or TargetProcessFilename =~ \"PowerShell.EXE\" or TargetProcessFilename =~ \"pwsh.dll\" or TargetProcessFilename =~ \"REGSVR32.EXE\" or TargetProcessFilename =~ \"RUNDLL32.EXE\" or TargetProcessFilename =~ \"wscript.exe\"))) and (not(((TargetProcessName endswith \"\\\\cmd.exe\" and (TargetProcessCommandLine contains \"\\\\VMware\\\\VMware Tools\\\\poweron-vm-default.bat\" or TargetProcessCommandLine contains \"\\\\VMware\\\\VMware Tools\\\\poweroff-vm-default.bat\" or TargetProcessCommandLine contains \"\\\\VMware\\\\VMware Tools\\\\resume-vm-default.bat\" or TargetProcessCommandLine contains \"\\\\VMware\\\\VMware Tools\\\\suspend-vm-default.bat\")) or (TargetProcessName endswith \"\\\\cmd.exe\" and TargetProcessCommandLine =~ \"\") or (TargetProcessName endswith \"\\\\cmd.exe\" and isempty(TargetProcessCommandLine))))))|extend RuleId=\"5687f942-867b-4578-ade7-1e341c46e99a\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_vmware_vmtoolsd_susp_child_process.yml\"|extend RuleTitle=\"VMToolsd Suspicious Child Process\"|extend RuleDescription=\"Detects suspicious child process creations of VMware Tools process which may indicate persistence setup\";\nlet q3=_Im_ProcessCreate\n| where ((((isempty(TargetProcessFilename) and TargetProcessCommandLine endswith \".exe tunnel\") or (TargetProcessCommandLine contains \".exe tunnel\" and TargetProcessCommandLine contains \"--name \" and TargetProcessCommandLine contains \"--accept-server-license-terms\") or (TargetProcessCommandLine contains \"tunnel \" and TargetProcessCommandLine contains \"service\" and TargetProcessCommandLine contains \"internal-run\" and TargetProcessCommandLine contains \"tunnel-service.log\")) and (not((TargetProcessName endswith \"\\\\code-tunnel.exe\" or TargetProcessName endswith \"\\\\code.exe\")))) or ((ActingProcessCommandLine endswith \" tunnel\" and TargetProcessName endswith \"\\\\cmd.exe\" and (TargetProcessCommandLine contains \"/d /c \" and TargetProcessCommandLine contains \"\\\\servers\\\\Stable-\" and TargetProcessCommandLine contains \"code-server.cmd\")) and (not((ActingProcessName endswith \"\\\\code-tunnel.exe\" or ActingProcessName endswith \"\\\\code.exe\")))))|extend RuleId=\"2cf29f11-e356-4f61-98c0-1bdb9393d6da\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_vscode_tunnel_renamed_execution.yml\"|extend RuleTitle=\"Renamed Visual Studio Code Tunnel Execution\"|extend RuleDescription=\"Detects renamed Visual Studio Code tunnel execution. Attackers can abuse this functionality to establish a C2 channel\";\nlet q4=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\w32tm.exe\" or TargetProcessFilename =~ \"w32time.dll\") and (TargetProcessCommandLine contains \"/stripchart\" and TargetProcessCommandLine contains \"/computer:\" and TargetProcessCommandLine contains \"/period:\" and TargetProcessCommandLine contains \"/dataonly\" and TargetProcessCommandLine contains \"/samples:\"))|extend RuleId=\"6da2c9f5-7c53-401b-aacb-92c040ce1215\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_w32tm.yml\"|extend RuleTitle=\"Use of W32tm as Timer\"|extend RuleDescription=\"When configured with suitable command line arguments, w32tm can act as a delay mechanism\";\nlet q5=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\wab.exe\" or TargetProcessName endswith \"\\\\wabmig.exe\") and (not((TargetProcessName startswith \"C:\\\\Windows\\\\WinSxS\\\\\" or TargetProcessName startswith \"C:\\\\Program Files\\\\Windows Mail\\\\\" or TargetProcessName startswith \"C:\\\\Program Files (x86)\\\\Windows Mail\\\\\"))))|extend RuleId=\"395907ee-96e5-4666-af2e-2ca91688e151\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wab_execution_from_non_default_location.yml\"|extend RuleTitle=\"Wab Execution From Non Default Location\"|extend RuleDescription=\"Detects execution of wab.exe (Windows Contacts) and Wabmig.exe (Microsoft Address Book Import Tool) from non default locations as seen with bumblebee activity\";\nlet q6=_Im_ProcessCreate\n| where (((ActingProcessName endswith \"\\\\WmiPrvSE.exe\" or ActingProcessName endswith \"\\\\svchost.exe\" or ActingProcessName endswith \"\\\\dllhost.exe\") and (TargetProcessName endswith \"\\\\wab.exe\" or TargetProcessName endswith \"\\\\wabmig.exe\")) or (ActingProcessName endswith \"\\\\wab.exe\" or ActingProcessName endswith \"\\\\wabmig.exe\"))|extend RuleId=\"63d1ccc0-2a43-4f4b-9289-361b308991ff\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wab_unusual_parents.yml\"|extend RuleTitle=\"Wab/Wabmig Unusual Parent Or Child Processes\"|extend RuleDescription=\"Detects unusual parent or children of the wab.exe (Windows Contacts) and Wabmig.exe (Microsoft Address Book Import Tool) processes as seen being used with bumblebee activity\";\nlet q7=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\wbadmin.exe\" or TargetProcessFilename =~ \"WBADMIN.EXE\") and (TargetProcessCommandLine contains \"delete \" and TargetProcessCommandLine contains \"systemstatebackup \" and TargetProcessCommandLine contains \"-keepVersions:0\"))|extend RuleId=\"89f75308-5b1b-4390-b2d8-d6b2340efaf8\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wbadmin_delete_systemstatebackup.yml\"|extend RuleTitle=\"SystemStateBackup Deleted Using Wbadmin.EXE\"|extend RuleDescription=\"Deletes the Windows systemstatebackup using wbadmin.exe.\\nThis technique is used by numerous ransomware families.\\nThis may only be successful on server platforms that have Windows Backup enabled.\\n\";\nlet q8=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\w3wp.exe\" or ActingProcessName endswith \"\\\\w3wp.exe\") and (TargetProcessCommandLine contains \"&ipconfig&echo\" or TargetProcessCommandLine contains \"&quser&echo\" or TargetProcessCommandLine contains \"&whoami&echo\" or TargetProcessCommandLine contains \"&c:&echo\" or TargetProcessCommandLine contains \"&cd&echo\" or TargetProcessCommandLine contains \"&dir&echo\" or TargetProcessCommandLine contains \"&echo [E]\" or TargetProcessCommandLine contains \"&echo [S]\"))|extend RuleId=\"fa3c117a-bc0d-416e-a31b-0c0e80653efb\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_webshell_chopper.yml\"|extend RuleTitle=\"Chopper Webshell Process Pattern\"|extend RuleDescription=\"Detects patterns found in process executions cause by China Chopper like tiny (ASPX) webshells\";\nlet q9=_Im_ProcessCreate\n| where (((ActingProcessName endswith \"\\\\caddy.exe\" or ActingProcessName endswith \"\\\\httpd.exe\" or ActingProcessName endswith \"\\\\nginx.exe\" or ActingProcessName endswith \"\\\\php-cgi.exe\" or ActingProcessName endswith \"\\\\w3wp.exe\" or ActingProcessName endswith \"\\\\ws_tomcatservice.exe\") or ((ActingProcessName endswith \"\\\\java.exe\" or ActingProcessName endswith \"\\\\javaw.exe\") and (ActingProcessName contains \"-tomcat-\" or ActingProcessName contains \"\\\\tomcat\")) or ((ActingProcessName endswith \"\\\\java.exe\" or ActingProcessName endswith \"\\\\javaw.exe\") and (TargetProcessCommandLine contains \"catalina.jar\" or TargetProcessCommandLine contains \"CATALINA_HOME\"))) and ((TargetProcessCommandLine contains \"rundll32\" and TargetProcessCommandLine contains \"comsvcs\") or (TargetProcessCommandLine contains \" -hp\" and TargetProcessCommandLine contains \" a \" and TargetProcessCommandLine contains \" -m\") or (TargetProcessCommandLine contains \"net\" and TargetProcessCommandLine contains \" user \" and TargetProcessCommandLine contains \" /add\") or (TargetProcessCommandLine contains \"net\" and TargetProcessCommandLine contains \" localgroup \" and TargetProcessCommandLine contains \" administrators \" and TargetProcessCommandLine contains \"/add\") or (TargetProcessName endswith \"\\\\ntdsutil.exe\" or TargetProcessName endswith \"\\\\ldifde.exe\" or TargetProcessName endswith \"\\\\adfind.exe\" or TargetProcessName endswith \"\\\\procdump.exe\" or TargetProcessName endswith \"\\\\Nanodump.exe\" or TargetProcessName endswith \"\\\\vssadmin.exe\" or TargetProcessName endswith \"\\\\fsutil.exe\") or (TargetProcessCommandLine contains \" -decode \" or TargetProcessCommandLine contains \" -NoP \" or TargetProcessCommandLine contains \" -W Hidden \" or TargetProcessCommandLine contains \" /decode \" or TargetProcessCommandLine contains \" /ticket:\" or TargetProcessCommandLine contains \" sekurlsa\" or TargetProcessCommandLine contains \".dmp full\" or TargetProcessCommandLine contains \".downloadfile(\" or TargetProcessCommandLine contains \".downloadstring(\" or TargetProcessCommandLine contains \"FromBase64String\" or TargetProcessCommandLine contains \"process call create\" or TargetProcessCommandLine contains \"reg save \" or TargetProcessCommandLine contains \"whoami /priv\")))|extend RuleId=\"4ebc877f-4612-45cb-b3a5-8e3834db36c9\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_webshell_hacking.yml\"|extend RuleTitle=\"Webshell Hacking Activity Patterns\"|extend RuleDescription=\"Detects certain parent child patterns found in cases in which a web shell is used to perform certain credential dumping or exfiltration activities on a compromised system\\n\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["CommandAndControl", "PrivilegeEscalation", "Discovery", "Impact", "DefenseEvasion", "Persistence", "Execution"],
+                "techniques": ["T1124", "T1071", "T1037", "T1018", "T1490", "T1505", "T1087", "T1059", "T1033"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000242",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

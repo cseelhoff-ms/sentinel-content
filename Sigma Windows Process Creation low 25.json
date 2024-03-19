@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000125')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000125')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation low 25",
+                "description": "Sigma Windows Process Creation low 25",
+                "severity": "low",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where (((TargetProcessCommandLine contains \"Microsoft-Windows-TerminalServices-LocalSessionManager/Operational\" or TargetProcessCommandLine contains \"Microsoft-Windows-Terminal-Services-RemoteConnectionManager/Operational\" or TargetProcessCommandLine contains \"Security\") or (TargetProcessCommandLine contains \"-InstanceId 4624\" or TargetProcessCommandLine contains \"System[EventID=4624]\" or TargetProcessCommandLine contains \"*EventCode=4624*\" or TargetProcessCommandLine contains \"*EventIdentifier=4624*\" or TargetProcessCommandLine contains \"-InstanceId 4778\" or TargetProcessCommandLine contains \"System[EventID=4778]\" or TargetProcessCommandLine contains \"*EventCode=4778*\" or TargetProcessCommandLine contains \"*EventIdentifier=4778*\" or TargetProcessCommandLine contains \"-InstanceId 25\" or TargetProcessCommandLine contains \"System[EventID=25]\" or TargetProcessCommandLine contains \"*EventCode=25*\" or TargetProcessCommandLine contains \"*EventIdentifier=25*\")) and ((TargetProcessCommandLine contains \"Select\" and TargetProcessCommandLine contains \"Win32_NTLogEvent\") or ((TargetProcessName endswith \"\\\\wevtutil.exe\" or TargetProcessFilename =~ \"wevtutil.exe\") and (TargetProcessCommandLine contains \" qe \" or TargetProcessCommandLine contains \" query-events \")) or ((TargetProcessName endswith \"\\\\wmic.exe\" or TargetProcessFilename =~ \"wmic.exe\") and TargetProcessCommandLine contains \" ntevent\") or (TargetProcessCommandLine contains \"Get-WinEvent \" or TargetProcessCommandLine contains \"get-eventlog \")))|extend RuleId=\"beaa66d6-aa1b-4e3c-80f5-e0145369bfaf\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_eventlog_content_recon.yml\"|extend RuleTitle=\"Potentially Suspicious EventLog Recon Activity Using Log Query Utilities\"|extend RuleDescription=\"Detects execution of different log query utilities and commands to search and dump the content of specific event logs or look for specific event IDs.\\nThis technique is used by threat actors in order to extract sensitive information from events logs such as usernames, IP addresses, hostnames, etc.\\n\";\nlet q1=_Im_ProcessCreate\n| where (((TargetProcessCommandLine contains \"\\\\AppData\\\\Roaming\\\\\" or TargetProcessCommandLine contains \"\\\\AppData\\\\Local\\\\Temp\\\\\") and (TargetProcessCommandLine contains \"\\\\{\" and TargetProcessCommandLine contains \"}\\\\\")) and (not(((TargetProcessName contains \"\\\\{\" and TargetProcessName contains \"}\\\\\") or isempty(TargetProcessName) or TargetProcessName =~ \"C:\\\\Windows\\\\System32\\\\drvinst.exe\"))))|extend RuleId=\"90b63c33-2b97-4631-a011-ceb0f47b77c3\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_execution_from_guid_folder_names.yml\"|extend RuleTitle=\"Suspicious Execution From GUID Like Folder Names\"|extend RuleDescription=\"Detects potential suspicious execution of a GUID like folder name located in a suspicious location such as %TEMP% as seen being used in IcedID attacks\";\nlet q2=_Im_ProcessCreate\n| where (((TargetProcessFileDescription =~ \"?\" and TargetProcessFileVersion =~ \"?\") or (TargetProcessFileDescription =~ \"?\" and TargetProcessFileProduct =~ \"?\") or (TargetProcessFileDescription =~ \"?\" and TargetProcessFileCompany =~ \"?\")) and TargetProcessName contains \"\\\\Downloads\\\\\")|extend RuleId=\"9637e8a5-7131-4f7f-bdc7-2b05d8670c43\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_file_characteristics.yml\"|extend RuleTitle=\"Suspicious File Characteristics Due to Missing Fields\"|extend RuleDescription=\"Detects Executables in the Downloads folder without FileVersion,Description,Product,Company likely created with py2exe\";\nlet q3=_Im_ProcessCreate\n| where TargetProcessCommandLine contains \"::$index_allocation\"|extend RuleId=\"0900463c-b33b-49a8-be1d-552a3b553dae\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_hidden_dir_index_allocation.yml\"|extend RuleTitle=\"Potential Hidden Directory Creation Via NTFS INDEX_ALLOCATION Stream - CLI\"|extend RuleDescription=\"Detects command line containing reference to the \\\"::$index_allocation\\\" stream, which can be used as a technique to prevent access to folders or files from tooling such as \\\"explorer.exe\\\" or \\\"powershell.exe\\\"\\n\";\nlet q4=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \"echo\" or TargetProcessCommandLine contains \"copy\" or TargetProcessCommandLine contains \"type\" or TargetProcessCommandLine contains \"file createnew\" or TargetProcessCommandLine contains \"cacls\") and TargetProcessCommandLine contains \"C:\\\\Windows\\\\Fonts\\\\\" and (TargetProcessCommandLine contains \".sh\" or TargetProcessCommandLine contains \".exe\" or TargetProcessCommandLine contains \".dll\" or TargetProcessCommandLine contains \".bin\" or TargetProcessCommandLine contains \".bat\" or TargetProcessCommandLine contains \".cmd\" or TargetProcessCommandLine contains \".js\" or TargetProcessCommandLine contains \".msh\" or TargetProcessCommandLine contains \".reg\" or TargetProcessCommandLine contains \".scr\" or TargetProcessCommandLine contains \".ps\" or TargetProcessCommandLine contains \".vb\" or TargetProcessCommandLine contains \".jar\" or TargetProcessCommandLine contains \".pl\" or TargetProcessCommandLine contains \".inf\" or TargetProcessCommandLine contains \".cpl\" or TargetProcessCommandLine contains \".hta\" or TargetProcessCommandLine contains \".msi\" or TargetProcessCommandLine contains \".vbs\"))|extend RuleId=\"ae9b0bd7-8888-4606-b444-0ed7410cb728\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_hiding_malware_in_fonts_folder.yml\"|extend RuleTitle=\"Writing Of Malicious Files To The Fonts Folder\"|extend RuleDescription=\"Monitors for the hiding possible malicious files in the C:\\\\Windows\\\\Fonts\\\\ location. This folder doesn't require admin privillege to be written and executed from.\";\nlet q5=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \"\u0410\" or TargetProcessCommandLine contains \"\u0412\" or TargetProcessCommandLine contains \"\u0415\" or TargetProcessCommandLine contains \"\u041a\" or TargetProcessCommandLine contains \"\u041c\" or TargetProcessCommandLine contains \"\u041d\" or TargetProcessCommandLine contains \"\u041e\" or TargetProcessCommandLine contains \"\u0420\" or TargetProcessCommandLine contains \"\u0421\" or TargetProcessCommandLine contains \"\u0422\" or TargetProcessCommandLine contains \"\u0425\" or TargetProcessCommandLine contains \"\u0405\" or TargetProcessCommandLine contains \"\u0406\" or TargetProcessCommandLine contains \"\u0408\" or TargetProcessCommandLine contains \"\u04ae\" or TargetProcessCommandLine contains \"\u04c0\" or TargetProcessCommandLine contains \"\u050c\" or TargetProcessCommandLine contains \"\u051a\" or TargetProcessCommandLine contains \"\u051c\" or TargetProcessCommandLine contains \"\u0391\" or TargetProcessCommandLine contains \"\u0392\" or TargetProcessCommandLine contains \"\u0395\" or TargetProcessCommandLine contains \"\u0396\" or TargetProcessCommandLine contains \"\u0397\" or TargetProcessCommandLine contains \"\u0399\" or TargetProcessCommandLine contains \"\u039a\" or TargetProcessCommandLine contains \"\u039c\" or TargetProcessCommandLine contains \"\u039d\" or TargetProcessCommandLine contains \"\u039f\" or TargetProcessCommandLine contains \"\u03a1\" or TargetProcessCommandLine contains \"\u03a4\" or TargetProcessCommandLine contains \"\u03a5\" or TargetProcessCommandLine contains \"\u03a7\") or (TargetProcessCommandLine contains \"\u0430\" or TargetProcessCommandLine contains \"\u0435\" or TargetProcessCommandLine contains \"\u043e\" or TargetProcessCommandLine contains \"\u0440\" or TargetProcessCommandLine contains \"\u0441\" or TargetProcessCommandLine contains \"\u0445\" or TargetProcessCommandLine contains \"\u0455\" or TargetProcessCommandLine contains \"\u0456\" or TargetProcessCommandLine contains \"\u04cf\" or TargetProcessCommandLine contains \"\u0458\" or TargetProcessCommandLine contains \"\u04bb\" or TargetProcessCommandLine contains \"\u0501\" or TargetProcessCommandLine contains \"\u051b\" or TargetProcessCommandLine contains \"\u051d\" or TargetProcessCommandLine contains \"\u03bf\"))|extend RuleId=\"32e280f1-8ad4-46ef-9e80-910657611fbc\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_homoglyph_cyrillic_lookalikes.yml\"|extend RuleTitle=\"Potential Homoglyph Attack Using Lookalike Characters\"|extend RuleDescription=\"Detects the presence of unicode characters which are homoglyphs, or identical in appearance, to ASCII letter characters.\\nThis is used as an obfuscation and masquerading techniques. Only \\\"perfect\\\" homoglyphs are included; these are characters that\\nare indistinguishable from ASCII characters and thus may make excellent candidates for homoglyph attack characters.\\n\";\nlet q6=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\calc.exe\" or TargetProcessName endswith \"\\\\certutil.exe\" or TargetProcessName endswith \"\\\\cmstp.exe\" or TargetProcessName endswith \"\\\\cscript.exe\" or TargetProcessName endswith \"\\\\installutil.exe\" or TargetProcessName endswith \"\\\\mshta.exe\" or TargetProcessName endswith \"\\\\regsvr32.exe\" or TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessName endswith \"\\\\wscript.exe\") or (TargetProcessFilename =~ \"CALC.EXE\" or TargetProcessFilename =~ \"CertUtil.exe\" or TargetProcessFilename =~ \"CMSTP.EXE\" or TargetProcessFilename =~ \"cscript.exe\" or TargetProcessFilename =~ \"installutil.exe\" or TargetProcessFilename =~ \"MSHTA.EXE\" or TargetProcessFilename =~ \"REGSVR32.EXE\" or TargetProcessFilename =~ \"RUNDLL32.EXE\" or TargetProcessFilename =~ \"wscript.exe\")) and (not((TargetProcessCurrentDirectory contains \"C:\\\\\" or TargetProcessCurrentDirectory =~ \"\" or isempty(TargetProcessCurrentDirectory)))))|extend RuleId=\"d4ca7c59-e9e4-42d8-bf57-91a776efcb87\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_lolbin_exec_from_non_c_drive.yml\"|extend RuleTitle=\"LOLBIN Execution From Abnormal Drive\"|extend RuleDescription=\"Detects LOLBINs executing from an abnormal or uncommon drive such as a mounted ISO.\";\nlet q7=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"*ms-appinstaller://source=*\" and TargetProcessCommandLine contains \"http\")|extend RuleId=\"180c7c5c-d64b-4a63-86e9-68910451bc8b\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_ms_appinstaller_download.yml\"|extend RuleTitle=\"Potential File Download Via MS-AppInstaller Protocol Handler\"|extend RuleDescription=\"Detects usage of the \\\"ms-appinstaller\\\" protocol handler via command line to potentially download arbitrary files via AppInstaller.EXE\\nThe downloaded files are temporarly stored in \\\":\\\\Users\\\\%username%\\\\AppData\\\\Local\\\\Packages\\\\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\\\\AC\\\\INetCache\\\\<RANDOM-8-CHAR-DIRECTORY>\\\"\\n\";\nlet q8=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \"for \" or TargetProcessCommandLine contains \"foreach \") and (TargetProcessCommandLine contains \"nslookup\" or TargetProcessCommandLine contains \"ping\"))|extend RuleId=\"f8ad2e2c-40b6-4117-84d7-20b89896ab23\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_network_scan_loop.yml\"|extend RuleTitle=\"Suspicious Scan Loop Network\"|extend RuleDescription=\"Adversaries may attempt to get a listing of other systems by IP address, hostname, or other logical identifier on a network that may be used for Lateral Movement from the current system\";\nlet q9=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\tshark.exe\" and TargetProcessCommandLine contains \"-i\") or TargetProcessName endswith \"\\\\windump.exe\")|extend RuleId=\"ba1f7802-adc7-48b4-9ecb-81e227fddfd5\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_network_sniffing.yml\"|extend RuleTitle=\"Potential Network Sniffing Activity Using Network Tools\"|extend RuleDescription=\"Detects potential network sniffing via use of network tools such as \\\"tshark\\\", \\\"windump\\\".\\nNetwork sniffing refers to using the network interface on a system to monitor or capture information sent over a wired or wireless connection.\\nAn adversary may place a network interface into promiscuous mode to passively access data in transit over the network, or use span ports to capture a larger amount of data.\\n\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion", "CredentialAccess", "Persistence", "Discovery", "Execution"],
+                "techniques": ["T1036", "T1564", "T1027", "T1018", "T1040", "T1552", "T1059", "T1211", "T1218"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000125",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

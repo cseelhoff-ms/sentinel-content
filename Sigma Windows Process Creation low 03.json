@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000103')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000103')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation low 03",
+                "description": "Sigma Windows Process Creation low 03",
+                "severity": "low",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where ((TargetProcessFilename =~ \"Cmd.Exe\" or TargetProcessName endswith \"\\\\cmd.exe\") and TargetProcessCommandLine contains \"<\")|extend RuleId=\"241e802a-b65e-484f-88cd-c2dc10f9206d\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_cmd_stdin_redirect.yml\"|extend RuleTitle=\"Read Contents From Stdin Via Cmd.EXE\"|extend RuleDescription=\"Detect the use of \\\"<\\\" to read and potentially execute a file via cmd.exe\";\nlet q1=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\cmd.exe\" and (ActingProcessName endswith \"\\\\csrss.exe\" or ActingProcessName endswith \"\\\\ctfmon.exe\" or ActingProcessName endswith \"\\\\dllhost.exe\" or ActingProcessName endswith \"\\\\epad.exe\" or ActingProcessName endswith \"\\\\FlashPlayerUpdateService.exe\" or ActingProcessName endswith \"\\\\GoogleUpdate.exe\" or ActingProcessName endswith \"\\\\jucheck.exe\" or ActingProcessName endswith \"\\\\jusched.exe\" or ActingProcessName endswith \"\\\\LogonUI.exe\" or ActingProcessName endswith \"\\\\lsass.exe\" or ActingProcessName endswith \"\\\\regsvr32.exe\" or ActingProcessName endswith \"\\\\SearchIndexer.exe\" or ActingProcessName endswith \"\\\\SearchProtocolHost.exe\" or ActingProcessName endswith \"\\\\SIHClient.exe\" or ActingProcessName endswith \"\\\\sihost.exe\" or ActingProcessName endswith \"\\\\slui.exe\" or ActingProcessName endswith \"\\\\spoolsv.exe\" or ActingProcessName endswith \"\\\\sppsvc.exe\" or ActingProcessName endswith \"\\\\taskhostw.exe\" or ActingProcessName endswith \"\\\\unsecapp.exe\" or ActingProcessName endswith \"\\\\WerFault.exe\" or ActingProcessName endswith \"\\\\wermgr.exe\" or ActingProcessName endswith \"\\\\wlanext.exe\" or ActingProcessName endswith \"\\\\WUDFHost.exe\"))|extend RuleId=\"4b991083-3d0e-44ce-8fc4-b254025d8d4b\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_cmd_unusual_parent.yml\"|extend RuleTitle=\"Unusual Parent Process For Cmd.EXE\"|extend RuleDescription=\"Detects suspicious parent process for cmd.exe\";\nlet q2=_Im_ProcessCreate\n| where (ActingProcessName endswith \"\\\\conhost.exe\" and (not((TargetProcessName endswith \":\\\\Windows\\\\System32\\\\conhost.exe\" or isempty(TargetProcessName) or TargetProcessName =~ \"\"))) and (not(Provider_Name =~ \"SystemTraceProvider-Process\")))|extend RuleId=\"7dc2dedd-7603-461a-bc13-15803d132355\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_conhost_susp_child_process.yml\"|extend RuleTitle=\"Uncommon Child Process Of Conhost.EXE\"|extend RuleDescription=\"Detects uncommon \\\"conhost\\\" child processes. This could be a sign of \\\"conhost\\\" usage as a LOLBIN or potential process injection activity.\";\nlet q3=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\conhost.exe\" and (ActingProcessName endswith \"\\\\explorer.exe\" or ActingProcessName endswith \"\\\\lsass.exe\" or ActingProcessName endswith \"\\\\regsvr32.exe\" or ActingProcessName endswith \"\\\\rundll32.exe\" or ActingProcessName endswith \"\\\\services.exe\" or ActingProcessName endswith \"\\\\smss.exe\" or ActingProcessName endswith \"\\\\spoolsv.exe\" or ActingProcessName endswith \"\\\\svchost.exe\" or ActingProcessName endswith \"\\\\userinit.exe\" or ActingProcessName endswith \"\\\\wininit.exe\" or ActingProcessName endswith \"\\\\winlogon.exe\")) and (not((ActingProcessCommandLine contains \"-k apphost -s AppHostSvc\" or ActingProcessCommandLine contains \"-k imgsvc\" or ActingProcessCommandLine contains \"-k localService -p -s RemoteRegistry\" or ActingProcessCommandLine contains \"-k LocalSystemNetworkRestricted -p -s NgcSvc\" or ActingProcessCommandLine contains \"-k NetSvcs -p -s NcaSvc\" or ActingProcessCommandLine contains \"-k netsvcs -p -s NetSetupSvc\" or ActingProcessCommandLine contains \"-k netsvcs -p -s wlidsvc\" or ActingProcessCommandLine contains \"-k NetworkService -p -s DoSvc\" or ActingProcessCommandLine contains \"-k wsappx -p -s AppXSvc\" or ActingProcessCommandLine contains \"-k wsappx -p -s ClipSVC\"))) and (not((ActingProcessCommandLine contains \"C:\\\\Program Files (x86)\\\\Dropbox\\\\Client\\\\\" or ActingProcessCommandLine contains \"C:\\\\Program Files\\\\Dropbox\\\\Client\\\\\"))))|extend RuleId=\"cbb9e3d1-2386-4e59-912e-62f1484f7a89\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_conhost_uncommon_parent.yml\"|extend RuleTitle=\"Conhost Spawned By Uncommon Parent Process\"|extend RuleDescription=\"Detects when the Console Window Host (conhost.exe) process is spawned by an uncommon parent process, which could be indicative of potential code injection activity.\";\nlet q4=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\csc.exe\" and ((TargetProcessCommandLine contains \":\\\\Perflogs\\\\\" or TargetProcessCommandLine contains \":\\\\Users\\\\Public\\\\\" or TargetProcessCommandLine contains \"\\\\AppData\\\\Local\\\\Temp\\\\\" or TargetProcessCommandLine contains \"\\\\Temporary Internet\" or TargetProcessCommandLine contains \"\\\\Windows\\\\Temp\\\\\") or ((TargetProcessCommandLine contains \":\\\\Users\\\\\" and TargetProcessCommandLine contains \"\\\\Favorites\\\\\") or (TargetProcessCommandLine contains \":\\\\Users\\\\\" and TargetProcessCommandLine contains \"\\\\Favourites\\\\\") or (TargetProcessCommandLine contains \":\\\\Users\\\\\" and TargetProcessCommandLine contains \"\\\\Contacts\\\\\") or (TargetProcessCommandLine contains \":\\\\Users\\\\\" and TargetProcessCommandLine contains \"\\\\Pictures\\\\\")) or TargetProcessCommandLine matches regex \"([Pp]rogram[Dd]ata|%([Ll]ocal)?[Aa]pp[Dd]ata%|\\\\\\\\[Aa]pp[Dd]ata\\\\\\\\([Ll]ocal(Ll]ow)?|[Rr]oaming))\\\\\\\\[^\\\\\\\\]{1,256}$\") and (not(((ActingProcessName startswith \"C:\\\\Program Files (x86)\\\\\" or ActingProcessName startswith \"C:\\\\Program Files\\\\\") or ActingProcessName =~ \"C:\\\\Windows\\\\System32\\\\sdiagnhost.exe\" or ActingProcessName =~ \"C:\\\\Windows\\\\System32\\\\inetsrv\\\\w3wp.exe\"))) and (not((ActingProcessName =~ \"C:\\\\ProgramData\\\\chocolatey\\\\choco.exe\" or ActingProcessCommandLine contains \"\\\\ProgramData\\\\Microsoft\\\\Windows Defender Advanced Threat Protection\" or (ActingProcessCommandLine contains \"JwB7ACIAZgBhAGkAbABlAGQAIgA6AHQAcgB1AGUALAAiAG0AcwBnACIAOgAiAEEAbgBzAGkAYgBsAGUAIAByAGUAcQB1AGkAcgBlAHMAIABQAG8AdwBlAHIAUwBoAGUAbABsACAAdgAzAC4AMAAgAG8AcgAgAG4AZQB3AGUAcgAiAH0AJw\" or ActingProcessCommandLine contains \"cAewAiAGYAYQBpAGwAZQBkACIAOgB0AHIAdQBlACwAIgBtAHMAZwAiADoAIgBBAG4AcwBpAGIAbABlACAAcgBlAHEAdQBpAHIAZQBzACAAUABvAHcAZQByAFMAaABlAGwAbAAgAHYAMwAuADAAIABvAHIAIABuAGUAdwBlAHIAIgB9ACcA\" or ActingProcessCommandLine contains \"nAHsAIgBmAGEAaQBsAGUAZAAiADoAdAByAHUAZQAsACIAbQBzAGcAIgA6ACIAQQBuAHMAaQBiAGwAZQAgAHIAZQBxAHUAaQByAGUAcwAgAFAAbwB3AGUAcgBTAGgAZQBsAGwAIAB2ADMALgAwACAAbwByACAAbgBlAHcAZQByACIAfQAnA\")))))|extend RuleId=\"dcaa3f04-70c3-427a-80b4-b870d73c94c4\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_csc_susp_dynamic_compilation.yml\"|extend RuleTitle=\"Dynamic .NET Compilation Via Csc.EXE\"|extend RuleDescription=\"Detects execution of \\\"csc.exe\\\" to compile .NET code. Attackers often leverage this to compile code on the fly and use it in other stages.\";\nlet q5=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\csi.exe\" or TargetProcessName endswith \"\\\\rcsi.exe\") or (TargetProcessFilename =~ \"csi.exe\" or TargetProcessFilename =~ \"rcsi.exe\")) and TargetProcessFileCompany =~ \"Microsoft Corporation\")|extend RuleId=\"40b95d31-1afc-469e-8d34-9a3a667d058e\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_csi_execution.yml\"|extend RuleTitle=\"Suspicious Csi.exe Usage\"|extend RuleDescription=\"Csi.exe is a signed binary from Microsoft that comes with Visual Studio and provides C# interactive capabilities. It can be used to run C# code from a file passed as a parameter in command line. Early version of this utility provided with Microsoft \\u201cRoslyn\\u201d Community Technology Preview was named 'rcsi.exe'\";\nlet q6=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\csvde.exe\" or TargetProcessFilename =~ \"csvde.exe\") and TargetProcessCommandLine contains \" -f\") and (not(TargetProcessCommandLine contains \" -i\")))|extend RuleId=\"e5d36acd-acb4-4c6f-a13f-9eb203d50099\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_csvde_export.yml\"|extend RuleTitle=\"Active Directory Structure Export Via Csvde.EXE\"|extend RuleDescription=\"Detects the execution of \\\"csvde.exe\\\" in order to export organizational Active Directory structure.\";\nlet q7=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\curl.exe\" or TargetProcessFilename =~ \"curl.exe\") and (TargetProcessCommandLine matches regex \"\\\\s-c\\\\s\" or TargetProcessCommandLine contains \"--cookie-jar\"))|extend RuleId=\"5a6e1e16-07de-48d8-8aae-faa766c05e88\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_curl_cookie_hijacking.yml\"|extend RuleTitle=\"Potential Cookies Session Hijacking\"|extend RuleDescription=\"Detects execution of \\\"curl.exe\\\" with the \\\"-c\\\" flag in order to save cookie data.\";\nlet q8=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\curl.exe\" or TargetProcessFilename =~ \"curl.exe\") and (TargetProcessCommandLine matches regex \"\\\\s-H\\\\s\" and TargetProcessCommandLine contains \"User-Agent:\"))|extend RuleId=\"85de1f22-d189-44e4-8239-dc276b45379b\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_curl_custom_user_agent.yml\"|extend RuleTitle=\"Curl Web Request With Potential Custom User-Agent\"|extend RuleDescription=\"Detects execution of \\\"curl.exe\\\" with a potential custom \\\"User-Agent\\\". Attackers can leverage this to download or exfiltrate data via \\\"curl\\\" to a domain that only accept specific \\\"User-Agent\\\" strings\";\nlet q9=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\curl.exe\" or TargetProcessFilename =~ \"curl.exe\") and TargetProcessCommandLine matches regex \"://[0-9]{1,3}\\\\.[0-9]{1,3}\\\\.[0-9]{1,3}\\\\.[0-9]{1,3}\" and TargetProcessCommandLine contains \"http\" and (TargetProcessCommandLine contains \" -O\" or TargetProcessCommandLine contains \"--remote-name\" or TargetProcessCommandLine contains \"--output\")) and (not((TargetProcessCommandLine endswith \".bat\" or TargetProcessCommandLine endswith \".bat\\\"\" or TargetProcessCommandLine endswith \".dat\" or TargetProcessCommandLine endswith \".dat\\\"\" or TargetProcessCommandLine endswith \".dll\" or TargetProcessCommandLine endswith \".dll\\\"\" or TargetProcessCommandLine endswith \".exe\" or TargetProcessCommandLine endswith \".exe\\\"\" or TargetProcessCommandLine endswith \".gif\" or TargetProcessCommandLine endswith \".gif\\\"\" or TargetProcessCommandLine endswith \".hta\" or TargetProcessCommandLine endswith \".hta\\\"\" or TargetProcessCommandLine endswith \".jpeg\" or TargetProcessCommandLine endswith \".jpeg\\\"\" or TargetProcessCommandLine endswith \".log\" or TargetProcessCommandLine endswith \".log\\\"\" or TargetProcessCommandLine endswith \".msi\" or TargetProcessCommandLine endswith \".msi\\\"\" or TargetProcessCommandLine endswith \".png\" or TargetProcessCommandLine endswith \".png\\\"\" or TargetProcessCommandLine endswith \".ps1\" or TargetProcessCommandLine endswith \".ps1\\\"\" or TargetProcessCommandLine endswith \".psm1\" or TargetProcessCommandLine endswith \".psm1\\\"\" or TargetProcessCommandLine endswith \".vbe\" or TargetProcessCommandLine endswith \".vbe\\\"\" or TargetProcessCommandLine endswith \".vbs\" or TargetProcessCommandLine endswith \".vbs\\\"\" or TargetProcessCommandLine endswith \".bat'\" or TargetProcessCommandLine endswith \".dat'\" or TargetProcessCommandLine endswith \".dll'\" or TargetProcessCommandLine endswith \".exe'\" or TargetProcessCommandLine endswith \".gif'\" or TargetProcessCommandLine endswith \".hta'\" or TargetProcessCommandLine endswith \".jpeg'\" or TargetProcessCommandLine endswith \".log'\" or TargetProcessCommandLine endswith \".msi'\" or TargetProcessCommandLine endswith \".png'\" or TargetProcessCommandLine endswith \".ps1'\" or TargetProcessCommandLine endswith \".psm1'\" or TargetProcessCommandLine endswith \".vbe'\" or TargetProcessCommandLine endswith \".vbs'\"))))|extend RuleId=\"9cc85849-3b02-4cb5-b371-3a1ff54f2218\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_curl_download_direct_ip_exec.yml\"|extend RuleTitle=\"File Download From IP URL Via Curl.EXE\"|extend RuleDescription=\"Detects file downloads directly from IP address URL using curl.exe\";\nlet q10=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\curl.exe\" or TargetProcessFilename =~ \"curl.exe\") and (TargetProcessCommandLine matches regex \"\\\\s-k\\\\s\" or TargetProcessCommandLine contains \"--insecure\"))|extend RuleId=\"cb9cc1d1-e84e-4bdc-b7ad-c31b1b7908ec\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_curl_insecure_connection.yml\"|extend RuleTitle=\"Insecure Transfer Via Curl.EXE\"|extend RuleDescription=\"Detects execution of \\\"curl.exe\\\" with the \\\"--insecure\\\" flag.\";\nlet q11=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\curl.exe\" or TargetProcessFilename =~ \"curl.exe\") and (TargetProcessCommandLine contains \"--doh-insecure\" or TargetProcessCommandLine contains \"--proxy-insecure\"))|extend RuleId=\"2c1486f5-02e8-4f86-9099-b97f2da4ed77\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_curl_insecure_porxy_or_doh.yml\"|extend RuleTitle=\"Insecure Proxy/DOH Transfer Via Curl.EXE\"|extend RuleDescription=\"Detects execution of \\\"curl.exe\\\" with the \\\"insecure\\\" flag over proxy or DOH.\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["LateralMovement", "DefenseEvasion", "Exfiltration", "Execution"],
+                "techniques": ["T1072", "T1202", "T1059", "T1027", "T1218"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000103",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

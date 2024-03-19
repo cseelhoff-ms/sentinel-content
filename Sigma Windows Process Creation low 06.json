@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000106')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000106')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation low 06",
+                "description": "Sigma Windows Process Creation low 06",
+                "severity": "low",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\gpg.exe\" or TargetProcessName endswith \"\\\\gpg2.exe\") or TargetProcessFileDescription =~ \"GnuPG\u2019s OpenPGP tool\") and (TargetProcessCommandLine contains \" -c \" and TargetProcessCommandLine contains \"passphrase\"))|extend RuleId=\"550bbb84-ce5d-4e61-84ad-e590f0024dcd\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_gpg4win_encryption.yml\"|extend RuleTitle=\"File Encryption Using Gpg4win\"|extend RuleDescription=\"Detects usage of Gpg4win to encrypt files\";\nlet q1=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\gpg.exe\" or TargetProcessName endswith \"\\\\gpg2.exe\") or TargetProcessFilename =~ \"gpg.exe\" or TargetProcessFileDescription =~ \"GnuPG\u2019s OpenPGP tool\") and (not((TargetProcessName contains \":\\\\Program Files (x86)\\\\GNU\\\\GnuPG\\\\bin\\\\\" or TargetProcessName contains \":\\\\Program Files (x86)\\\\GnuPG VS-Desktop\\\\\" or TargetProcessName contains \":\\\\Program Files (x86)\\\\GnuPG\\\\bin\\\\\" or TargetProcessName contains \":\\\\Program Files (x86)\\\\Gpg4win\\\\bin\\\\\"))))|extend RuleId=\"77df53a5-1d78-4f32-bc5a-0e7465bd8f41\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_gpg4win_portable_execution.yml\"|extend RuleTitle=\"Portable Gpg.EXE Execution\"|extend RuleDescription=\"Detects the execution of \\\"gpg.exe\\\" from uncommon location. Often used by ransomware and loaders to decrypt/encrypt data.\";\nlet q2=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\gpresult.exe\" and (TargetProcessCommandLine contains \"/z\" or TargetProcessCommandLine contains \"/v\"))|extend RuleId=\"e56d3073-83ff-4021-90fe-c658e0709e72\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_gpresult_execution.yml\"|extend RuleTitle=\"Gpresult Display Group Policy Information\"|extend RuleDescription=\"Detects cases in which a user uses the built-in Windows utility gpresult to display the Resultant Set of Policy (RSoP) information\";\nlet q3=_Im_ProcessCreate\n| where ((ActingProcessName endswith \"\\\\gup.exe\" and TargetProcessName endswith \"\\\\explorer.exe\") and (not(((TargetProcessName endswith \"\\\\explorer.exe\" and TargetProcessCommandLine contains \"\\\\Notepad++\\\\notepad++.exe\") or ActingProcessName contains \"\\\\Notepad++\\\\updater\\\\\" or isempty(TargetProcessCommandLine)))))|extend RuleId=\"d65aee4d-2292-4cea-b832-83accd6cfa43\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_gup_arbitrary_binary_execution.yml\"|extend RuleTitle=\"Arbitrary Binary Execution Using GUP Utility\"|extend RuleDescription=\"Detects execution of the Notepad++ updater (gup) to launch other commands or executables\";\nlet q4=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\ruby.exe\" and (TargetProcessCommandLine contains \"-i \" and TargetProcessCommandLine contains \"-u \" and TargetProcessCommandLine contains \"-p \"))|extend RuleId=\"a197e378-d31b-41c0-9635-cfdf1c1bb423\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_hktl_evil_winrm.yml\"|extend RuleTitle=\"HackTool - WinRM Access Via Evil-WinRM\"|extend RuleDescription=\"Adversaries may use Valid Accounts to log into a computer using the Remote Desktop Protocol (RDP). The adversary may then perform actions as the logged-on user.\";\nlet q5=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \"impersonate.exe\" and (TargetProcessCommandLine contains \" list \" or TargetProcessCommandLine contains \" exec \" or TargetProcessCommandLine contains \" adduser \")) or ((TargetProcessIMPHASH=~\"MD5=9520714AB576B0ED01D1513691377D01\" or TargetProcessIMPHASH=~\"SHA256=E81CC96E2118DC4FBFE5BAD1604E0AC7681960143E2101E1A024D52264BB0A8A\" or TargetProcessIMPHASH=~\"0A358FFC1697B7A07D0E817AC740DF62\") or (TargetProcessMD5 =~ \"9520714AB576B0ED01D1513691377D01\" or TargetProcessSHA256 =~ \"E81CC96E2118DC4FBFE5BAD1604E0AC7681960143E2101E1A024D52264BB0A8A\" or TargetProcessIMPHASH =~ \"0A358FFC1697B7A07D0E817AC740DF62\")))|extend RuleId=\"cf0c254b-22f1-4b2b-8221-e137b3c0af94\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_hktl_impersonate.yml\"|extend RuleTitle=\"HackTool - Impersonate Execution\"|extend RuleDescription=\"Detects execution of the Impersonate tool. Which can be used to manipulate tokens on a Windows computers remotely (PsExec/WmiExec) or interactively\";\nlet q6=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \"new-object\" and TargetProcessCommandLine contains \"text.encoding]::ascii\") and (TargetProcessCommandLine contains \"system.io.compression.deflatestream\" or TargetProcessCommandLine contains \"system.io.streamreader\" or TargetProcessCommandLine contains \"readtoend(\"))|extend RuleId=\"7eedcc9d-9fdb-4d94-9c54-474e8affc0c7\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_hktl_invoke_obfuscation_via_compress.yml\"|extend RuleTitle=\"Invoke-Obfuscation COMPRESS OBFUSCATION\"|extend RuleDescription=\"Detects Obfuscated Powershell via COMPRESS OBFUSCATION\";\nlet q7=_Im_ProcessCreate\n| where ((ActingProcessName endswith \"\\\\cmd.exe\" and ActingProcessCommandLine endswith \".bat\") and ((TargetProcessName endswith \"\\\\xcopy.exe\" and (TargetProcessCommandLine contains \"powershell.exe\" and TargetProcessCommandLine contains \".bat.exe\")) or (TargetProcessName endswith \"\\\\xcopy.exe\" and (TargetProcessCommandLine contains \"pwsh.exe\" and TargetProcessCommandLine contains \".bat.exe\")) or (TargetProcessName endswith \"\\\\attrib.exe\" and (TargetProcessCommandLine contains \"+s\" and TargetProcessCommandLine contains \"+h\" and TargetProcessCommandLine contains \".bat.exe\"))))|extend RuleId=\"0a99eb3e-1617-41bd-b095-13dc767f3def\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_hktl_jlaive_batch_execution.yml\"|extend RuleTitle=\"HackTool - Jlaive In-Memory Assembly Execution\"|extend RuleDescription=\"Detects the use of Jlaive to execute assemblies in a copied PowerShell\";\nlet q8=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\SharpLDAPmonitor.exe\" or TargetProcessFilename =~ \"SharpLDAPmonitor.exe\") or (TargetProcessCommandLine contains \"/user:\" and TargetProcessCommandLine contains \"/pass:\" and TargetProcessCommandLine contains \"/dcip:\"))|extend RuleId=\"9f8fc146-1d1a-4dbf-b8fd-dfae15e08541\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_hktl_sharp_ldap_monitor.yml\"|extend RuleTitle=\"HackTool - SharpLDAPmonitor Execution\"|extend RuleDescription=\"Detects execution of the SharpLDAPmonitor. Which can monitor the creation, deletion and changes to LDAP objects.\";\nlet q9=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \"/generic:Microsoft_Windows_Shell_ZipFolder:filename=\" and TargetProcessCommandLine contains \".zip\" and TargetProcessCommandLine contains \"/pass:\" and TargetProcessCommandLine contains \"/user:\") or (TargetProcessCommandLine contains \"/delete\" and TargetProcessCommandLine contains \"Microsoft_Windows_Shell_ZipFolder:filename=\" and TargetProcessCommandLine contains \".zip\"))|extend RuleId=\"90dcf730-1b71-4ae7-9ffc-6fcf62bd0132\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_hktl_zipexec.yml\"|extend RuleTitle=\"Suspicious ZipExec Execution\"|extend RuleDescription=\"ZipExec is a Proof-of-Concept (POC) tool to wrap binary-based tools into a password-protected zip file.\";\nlet q10=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\hxtsr.exe\" and (not((TargetProcessName contains \":\\\\program files\\\\windowsapps\\\\microsoft.windowscommunicationsapps_\" and TargetProcessName endswith \"\\\\hxtsr.exe\"))))|extend RuleId=\"4e762605-34a8-406d-b72e-c1a089313320\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_hxtsr_masquerading.yml\"|extend RuleTitle=\"Potential Fake Instance Of Hxtsr.EXE Executed\"|extend RuleDescription=\"HxTsr.exe is a Microsoft compressed executable file called Microsoft Outlook Communications.\\nHxTsr.exe is part of Outlook apps, because it resides in a hidden \\\"WindowsApps\\\" subfolder of \\\"C:\\\\Program Files\\\".\\nAny instances of hxtsr.exe not in this folder may be malware camouflaging itself as HxTsr.exe\\n\";\nlet q11=_Im_ProcessCreate\n| where ((TargetProcessFilename =~ \"iCACLS.EXE\" or TargetProcessName endswith \"\\\\icacls.exe\") and (TargetProcessCommandLine contains \"C:\\\\Users\\\\\" and TargetProcessCommandLine contains \"/deny\" and TargetProcessCommandLine contains \"S-1-1-0:\"))|extend RuleId=\"4ae81040-fc1c-4249-bfa3-938d260214d9\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_icacls_deny.yml\"|extend RuleTitle=\"Use Icacls to Hide File to Everyone\"|extend RuleDescription=\"Detect use of icacls to deny access for everyone in Users folder sometimes used to hide malicious files\";\nlet q12=_Im_ProcessCreate\n| where TargetProcessCommandLine contains \"-name:\"\n| where TargetProcessCommandLine contains \"/name:\"\n| where (((TargetProcessName endswith \"\\\\appcmd.exe\" or TargetProcessFilename =~ \"appcmd.exe\") and ((TargetProcessCommandLine contains \"install\" and TargetProcessCommandLine contains \"module\") and ())) and (not(ActingProcessName =~ \"C:\\\\Windows\\\\System32\\\\inetsrv\\\\iissetup.exe\")))|extend RuleId=\"9465ddf4-f9e4-4ebd-8d98-702df3a93239\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_iis_appcmd_susp_module_install.yml\"|extend RuleTitle=\"IIS Native-Code Module Command Line Installation\"|extend RuleDescription=\"Detects suspicious IIS native-code module installations via command line\";\nlet q13=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\appcmd.exe\" or TargetProcessFilename =~ \"appcmd.exe\") and (TargetProcessCommandLine contains \"set\" and TargetProcessCommandLine contains \"config\" and TargetProcessCommandLine contains \"section:system.webServer/rewrite/globalRules\" and TargetProcessCommandLine contains \"commit:\"))|extend RuleId=\"7c8af9b2-dcae-41a2-a9db-b28c288b5f08\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_iis_appcmd_susp_rewrite_rule.yml\"|extend RuleTitle=\"Suspicious IIS URL GlobalRules Rewrite Via AppCmd\"|extend RuleDescription=\"Detects usage of \\\"appcmd\\\" to create new global URL rewrite rules. This behaviour has been observed being used by threat actors to add new rules so they can access their webshells.\";\nlet q14=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"InfDefaultInstall.exe \" and TargetProcessCommandLine contains \".inf\")|extend RuleId=\"ce7cf472-6fcc-490a-9481-3786840b5d9b\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_infdefaultinstall_execute_sct_scripts.yml\"|extend RuleTitle=\"InfDefaultInstall.exe .inf Execution\"|extend RuleDescription=\"Executes SCT script using scrobj.dll from a command in entered into a specially prepared INF file.\";\nlet q15=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\InstallUtil.exe\" or TargetProcessFilename =~ \"InstallUtil.exe\") and (TargetProcessCommandLine contains \"ftp://\" or TargetProcessCommandLine contains \"http://\" or TargetProcessCommandLine contains \"https://\"))|extend RuleId=\"75edd216-1939-4c73-8d61-7f3a0d85b5cc\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_installutil_download.yml\"|extend RuleTitle=\"File Download Via InstallUtil.EXE\"|extend RuleDescription=\"Detects use of .NET InstallUtil.exe in order to download arbitrary files. The files will be written to \\\"%LOCALAPPDATA%\\\\Microsoft\\\\Windows\\\\INetCache\\\\IE\\\\\\\"\\n\";\nlet q16=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\InstallUtil.exe\" and TargetProcessName contains \"Microsoft.NET\\\\Framework\" and (TargetProcessCommandLine contains \"/logfile= \" and TargetProcessCommandLine contains \"/LogToConsole=false\"))|extend RuleId=\"d042284c-a296-4988-9be5-f424fadcc28c\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_instalutil_no_log_execution.yml\"|extend RuleTitle=\"Suspicious Execution of InstallUtil Without Log\"|extend RuleDescription=\"Uses the .NET InstallUtil.exe application in order to execute image without log\";\nlet q17=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \"transport=dt_socket,address=\" and (TargetProcessCommandLine contains \"jre1.\" or TargetProcessCommandLine contains \"jdk1.\")) and (not((TargetProcessCommandLine contains \"address=127.0.0.1\" or TargetProcessCommandLine contains \"address=localhost\"))))|extend RuleId=\"8f88e3f6-2a49-48f5-a5c4-2f7eedf78710\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_java_remote_debugging.yml\"|extend RuleTitle=\"Java Running with Remote Debugging\"|extend RuleDescription=\"Detects a JAVA process running with remote debugging allowing more than just localhost to connect\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["Impact", "PrivilegeEscalation", "DefenseEvasion", "Persistence", "Execution", "Discovery", "LateralMovement"],
+                "techniques": ["T1036", "T1202", "T1564", "T1027", "T1203", "T1615", "T1021", "T1505", "T1134", "T1059", "T1486", "T1218"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000106",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

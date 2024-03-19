@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000120')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000120')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation low 20",
+                "description": "Sigma Windows Process Creation low 20",
+                "severity": "low",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where ((TargetProcessName contains \"\\\\JWrapper-Remote Access\\\\\" or TargetProcessName contains \"\\\\JWrapper-Remote Support\\\\\") and TargetProcessName endswith \"\\\\SimpleService.exe\")|extend RuleId=\"95e60a2b-4705-444b-b7da-ba0ea81a3ee2\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_remote_access_tools_simple_help.yml\"|extend RuleTitle=\"Remote Access Tool - Simple Help Execution\"|extend RuleDescription=\"An adversary may use legitimate desktop support and remote access software, such as Team Viewer, Go2Assist, LogMein, AmmyyAdmin, etc, to establish an interactive command and control channel to target systems within networks.\\nThese services are commonly used as legitimate technical support software, and may be allowed by application control within a target environment.\\nRemote access tools like VNC, Ammyy, and Teamviewer are used frequently when compared with other legitimate software commonly used by adversaries. (Citation: Symantec Living off the Land)\\n\";\nlet q1=_Im_ProcessCreate\n| where (TargetProcessFileProduct =~ \"UltraViewer\" or TargetProcessFileCompany =~ \"DucFabulous Co,ltd\" or TargetProcessFilename =~ \"UltraViewer_Desktop.exe\")|extend RuleId=\"88656cec-6c3b-487c-82c0-f73ebb805503\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_remote_access_tools_ultraviewer.yml\"|extend RuleTitle=\"Remote Access Tool - UltraViewer Execution\"|extend RuleDescription=\"An adversary may use legitimate desktop support and remote access software, such as Team Viewer, Go2Assist, LogMein, AmmyyAdmin, etc, to establish an interactive command and control channel to target systems within networks.\\nThese services are commonly used as legitimate technical support software, and may be allowed by application control within a target environment.\\nRemote access tools like VNC, Ammyy, and Teamviewer are used frequently when compared with other legitimate software commonly used by adversaries. (Citation: Symantec Living off the Land)\\n\";\nlet q2=_Im_ProcessCreate\n| where ((TargetProcessFileProduct contains \"AutoHotkey\" or TargetProcessFileDescription contains \"AutoHotkey\" or (TargetProcessFilename =~ \"AutoHotkey.exe\" or TargetProcessFilename =~ \"AutoHotkey.rc\")) and (not(((TargetProcessName endswith \"\\\\AutoHotkey.exe\" or TargetProcessName endswith \"\\\\AutoHotkey32.exe\" or TargetProcessName endswith \"\\\\AutoHotkey32_UIA.exe\" or TargetProcessName endswith \"\\\\AutoHotkey64.exe\" or TargetProcessName endswith \"\\\\AutoHotkey64_UIA.exe\" or TargetProcessName endswith \"\\\\AutoHotkeyA32.exe\" or TargetProcessName endswith \"\\\\AutoHotkeyA32_UIA.exe\" or TargetProcessName endswith \"\\\\AutoHotkeyU32.exe\" or TargetProcessName endswith \"\\\\AutoHotkeyU32_UIA.exe\" or TargetProcessName endswith \"\\\\AutoHotkeyU64.exe\" or TargetProcessName endswith \"\\\\AutoHotkeyU64_UIA.exe\") or TargetProcessName contains \"\\\\AutoHotkey\"))))|extend RuleId=\"0f16d9cf-0616-45c8-8fad-becc11b5a41c\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_renamed_autohotkey.yml\"|extend RuleTitle=\"Renamed AutoHotkey.EXE Execution\"|extend RuleDescription=\"Detects execution of a renamed autohotkey.exe binary based on PE metadata fields\";\nlet q3=_Im_ProcessCreate\n| where ((TargetProcessFilename =~ \"Cmd.Exe\" or TargetProcessFilename =~ \"CONHOST.EXE\" or TargetProcessFilename =~ \"7z.exe\" or TargetProcessFilename =~ \"WinRAR.exe\" or TargetProcessFilename =~ \"wevtutil.exe\" or TargetProcessFilename =~ \"net.exe\" or TargetProcessFilename =~ \"net1.exe\" or TargetProcessFilename =~ \"netsh.exe\" or TargetProcessFilename =~ \"InstallUtil.exe\") and (not((TargetProcessName endswith \"\\\\cmd.exe\" or TargetProcessName endswith \"\\\\conhost.exe\" or TargetProcessName endswith \"\\\\7z.exe\" or TargetProcessName endswith \"\\\\WinRAR.exe\" or TargetProcessName endswith \"\\\\wevtutil.exe\" or TargetProcessName endswith \"\\\\net.exe\" or TargetProcessName endswith \"\\\\net1.exe\" or TargetProcessName endswith \"\\\\netsh.exe\" or TargetProcessName endswith \"\\\\InstallUtil.exe\"))))|extend RuleId=\"36480ae1-a1cb-4eaa-a0d6-29801d7e9142\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_renamed_binary.yml\"|extend RuleTitle=\"Potential Defense Evasion Via Binary Rename\"|extend RuleDescription=\"Detects the execution of a renamed binary often used by attackers or malware leveraging new Sysmon OriginalFileName datapoint.\";\nlet q4=_Im_ProcessCreate\n| where ((TargetProcessFilename =~ \"curl.exe\" or TargetProcessFileDescription =~ \"The curl executable\") and (not(TargetProcessName contains \"\\\\curl\")))|extend RuleId=\"7530cd3d-7671-43e3-b209-976966f6ea48\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_renamed_curl.yml\"|extend RuleTitle=\"Renamed CURL.EXE Execution\"|extend RuleDescription=\"Detects the execution of a renamed \\\"CURL.exe\\\" binary based on the PE metadata fields\";\nlet q5=_Im_ProcessCreate\n| where (TargetProcessFilename =~ \"ftp.exe\" and (not(TargetProcessName endswith \"\\\\ftp.exe\")))|extend RuleId=\"277a4393-446c-449a-b0ed-7fdc7795244c\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_renamed_ftp.yml\"|extend RuleTitle=\"Renamed FTP.EXE Execution\"|extend RuleDescription=\"Detects the execution of a renamed \\\"ftp.exe\\\" binary based on the PE metadata fields\";\nlet q6=_Im_ProcessCreate\n| where (TargetProcessFilename =~ \"Microsoft.NodejsTools.PressAnyKey.exe\" and (not(TargetProcessName endswith \"\\\\Microsoft.NodejsTools.PressAnyKey.exe\")))|extend RuleId=\"65c3ca2c-525f-4ced-968e-246a713d164f\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_renamed_pressanykey.yml\"|extend RuleTitle=\"Visual Studio NodejsTools PressAnyKey Renamed Execution\"|extend RuleDescription=\"Detects renamed execution of \\\"Microsoft.NodejsTools.PressAnyKey.exe\\\", which can be abused as a LOLBIN to execute arbitrary binaries\";\nlet q7=_Im_ProcessCreate\n| where (TargetProcessFileProduct =~ \"Remote Utilities\" and (not((TargetProcessName endswith \"\\\\rutserv.exe\" or TargetProcessName endswith \"\\\\rfusclient.exe\"))))|extend RuleId=\"9ef27c24-4903-4192-881a-3adde7ff92a5\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_renamed_rurat.yml\"|extend RuleTitle=\"Renamed Remote Utilities RAT (RURAT) Execution\"|extend RuleDescription=\"Detects execution of renamed Remote Utilities (RURAT) via Product PE header field\";\nlet q8=_Im_ProcessCreate\n| where TargetProcessCommandLine contains \"-s\"\n| where TargetProcessCommandLine contains \"/s\"\n| where TargetProcessCommandLine contains \"-u\"\n| where TargetProcessCommandLine contains \"/u\"\n| where TargetProcessCommandLine contains \"NTLM\"\n| where TargetProcessCommandLine contains \"-t\"\n| where TargetProcessCommandLine contains \"/t\"\n| where TargetProcessCommandLine contains \"ncacn_np\"\n| where (TargetProcessName endswith \"\\\\rpcping.exe\" and () and ((() and ()) or (() and ())))|extend RuleId=\"93671f99-04eb-4ab4-a161-70d446a84003\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rpcping_credential_capture.yml\"|extend RuleTitle=\"Capture Credentials with Rpcping.exe\"|extend RuleDescription=\"Detects using Rpcping.exe to send a RPC test connection to the target server (-s) and force the NTLM hash to be sent in the process.\";\nlet q9=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\ruby.exe\" or TargetProcessFilename =~ \"ruby.exe\") and TargetProcessCommandLine contains \" -e\")|extend RuleId=\"20a5ffa1-3848-4584-b6f8-c7c7fd9f69c8\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_ruby_inline_command_execution.yml\"|extend RuleTitle=\"Ruby Inline Command Execution\"|extend RuleDescription=\"Detects execution of ruby using the \\\"-e\\\" flag. This is could be used as a way to launch a reverse shell or execute live ruby code.\";\nlet q10=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessFilename =~ \"RUNDLL32.EXE\") and TargetProcessCommandLine contains \"InstallScreenSaver\")|extend RuleId=\"15bd98ea-55f4-4d37-b09a-e7caa0fa2221\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_installscreensaver.yml\"|extend RuleTitle=\"Rundll32 InstallScreenSaver Execution\"|extend RuleDescription=\"An attacker may execute an application as a SCR File using rundll32.exe desk.cpl,InstallScreenSaver\";\nlet q11=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessFilename =~ \"RUNDLL32.EXE\" or TargetProcessCommandLine contains \"rundll32\") and (TargetProcessCommandLine contains \"#+\" or TargetProcessCommandLine contains \"#-\"))|extend RuleId=\"43fa5350-db63-4b8f-9a01-789a427074e1\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_obfuscated_ordinal_call.yml\"|extend RuleTitle=\"Potential Obfuscated Ordinal Call Via Rundll32\"|extend RuleDescription=\"Detects execution of \\\"rundll32\\\" with potential obfuscated ordinal calls\";\nlet q12=_Im_ProcessCreate\n| where ((ActingProcessName endswith \"\\\\explorer.exe\" and (TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessFilename =~ \"RUNDLL32.EXE\")) and (not((TargetProcessCommandLine contains \" C:\\\\Windows\\\\System32\\\\\" or TargetProcessCommandLine endswith \" -localserver 22d8c27b-47a1-48d1-ad08-7da7abd79617\"))))|extend RuleId=\"1723e720-616d-4ddc-ab02-f7e3685a4713\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_parent_explorer.yml\"|extend RuleTitle=\"Rundll32 Spawned Via Explorer.EXE\"|extend RuleDescription=\"Detects execution of \\\"rundll32.exe\\\" with a parent process of Explorer.exe. This has been observed by variants of Raspberry Robin, as first reported by Red Canary.\";\nlet q13=_Im_ProcessCreate\n| where ((TargetProcessName contains \":\\\\RECYCLER\\\\\" or TargetProcessName contains \":\\\\SystemVolumeInformation\\\\\") or (TargetProcessName startswith \"C:\\\\Windows\\\\Tasks\\\\\" or TargetProcessName startswith \"C:\\\\Windows\\\\debug\\\\\" or TargetProcessName startswith \"C:\\\\Windows\\\\fonts\\\\\" or TargetProcessName startswith \"C:\\\\Windows\\\\help\\\\\" or TargetProcessName startswith \"C:\\\\Windows\\\\drivers\\\\\" or TargetProcessName startswith \"C:\\\\Windows\\\\addins\\\\\" or TargetProcessName startswith \"C:\\\\Windows\\\\cursors\\\\\" or TargetProcessName startswith \"C:\\\\Windows\\\\system32\\\\tasks\\\\\"))|extend RuleId=\"15b75071-74cc-47e0-b4c6-b43744a62a2b\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_run_locations.yml\"|extend RuleTitle=\"Suspicious Process Start Locations\"|extend RuleDescription=\"Detects suspicious process run from unusual locations\";\nlet q14=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\runonce.exe\" and ActingProcessName endswith \"\\\\rundll32.exe\" and (ActingProcessCommandLine contains \"setupapi.dll\" and ActingProcessCommandLine contains \"InstallHinfSection\"))|extend RuleId=\"285b85b1-a555-4095-8652-a8a4106af63f\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_setupapi_installhinfsection.yml\"|extend RuleTitle=\"Suspicious Rundll32 Setupapi.dll Activity\"|extend RuleDescription=\"setupapi.dll library provide InstallHinfSection function for processing INF files. INF file may contain instructions allowing to create values in the registry, modify files and install drivers. This technique could be used to obtain persistence via modifying one of Run or RunOnce registry keys, run process or use other DLLs chain calls (see references) InstallHinfSection function in setupapi.dll calls runonce.exe executable regardless of actual content of INF file.\";\nlet q15=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessFilename =~ \"RUNDLL32.EXE\") and TargetProcessCommandLine contains \"RunDll_ShellExecuteW\")|extend RuleId=\"82343930-652f-43f5-ab70-2ee9fdd6d5e9\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_shelldispatch_potential_abuse.yml\"|extend RuleTitle=\"Potential ShellDispatch.DLL Functionality Abuse\"|extend RuleDescription=\"Detects potential \\\"ShellDispatch.dll\\\" functionality abuse to execute arbitrary binaries via \\\"ShellExecute\\\"\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["CommandAndControl", "DefenseEvasion", "CredentialAccess", "Collection", "Discovery", "Execution"],
+                "techniques": ["T1003", "T1059", "T1219", "T1218", "T1202", "T1036"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000120",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

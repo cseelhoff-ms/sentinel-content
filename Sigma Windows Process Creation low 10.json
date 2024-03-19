@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000110')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000110')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation low 10",
+                "description": "Sigma Windows Process Creation low 10",
+                "severity": "low",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\msedge_proxy.exe\" or TargetProcessFilename =~ \"msedge_proxy.exe\") and (TargetProcessCommandLine contains \"http://\" or TargetProcessCommandLine contains \"https://\"))|extend RuleId=\"e84d89c4-f544-41ca-a6af-4b92fd38b023\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_msedge_proxy_download.yml\"|extend RuleTitle=\"Arbitrary File Download Via MSEDGE_PROXY.EXE\"|extend RuleDescription=\"Detects usage of \\\"msedge_proxy.exe\\\" to download arbitrary files\";\nlet q1=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"Wscript.\" and TargetProcessCommandLine contains \".Shell\" and TargetProcessCommandLine contains \".Run\")|extend RuleId=\"2c28c248-7f50-417a-9186-a85b223010ee\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_mshta_inline_vbscript.yml\"|extend RuleTitle=\"Wscript Shell Run In CommandLine\"|extend RuleDescription=\"Detects the presence of the keywords \\\"Wscript\\\", \\\"Shell\\\" and \\\"Run\\\" in the command, which could indicate a suspicious activity\";\nlet q2=_Im_ProcessCreate\n| where TargetProcessCommandLine contains \" -z \"\n| where TargetProcessCommandLine contains \" /z \"\n| where ((TargetProcessName endswith \"\\\\msiexec.exe\" or TargetProcessFilename =~ \"\\\\msiexec.exe\") and () and TargetProcessCommandLine contains \".dll\")|extend RuleId=\"84f52741-8834-4a8c-a413-2eb2269aa6c8\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_msiexec_dll.yml\"|extend RuleTitle=\"DllUnregisterServer Function Call Via Msiexec.EXE\"|extend RuleDescription=\"Detects MsiExec loading a DLL and calling its DllUnregisterServer function\";\nlet q3=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\" or TargetProcessName endswith \"\\\\cmd.exe\") and (ActingProcessCommandLine contains \"MsiExec.exe\" and ActingProcessCommandLine contains \"-Embedding \")) and (not(((TargetProcessName endswith \":\\\\Windows\\\\System32\\\\cmd.exe\" and TargetProcessCommandLine contains \"C:\\\\Program Files\\\\SplunkUniversalForwarder\\\\bin\\\\\") or (TargetProcessCommandLine contains \"\\\\DismFoDInstall.cmd\" or (ActingProcessCommandLine contains \"\\\\MsiExec.exe -Embedding \" and ActingProcessCommandLine contains \"Global\\\\MSI0000\"))))))|extend RuleId=\"4a2a2c3e-209f-4d01-b513-4155a540b469\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_msiexec_embedding.yml\"|extend RuleTitle=\"Suspicious MsiExec Embedding Parent\"|extend RuleDescription=\"Adversaries may abuse msiexec.exe to proxy the execution of malicious payloads\";\nlet q4=_Im_ProcessCreate\n| where TargetProcessCommandLine contains \" -y\"\n| where TargetProcessCommandLine contains \" /y\"\n| where ((TargetProcessName endswith \"\\\\msiexec.exe\" and ()) and (not((TargetProcessCommandLine contains \"\\\\MsiExec.exe\\\" /Y \\\"C:\\\\Program Files\\\\Bonjour\\\\mdnsNSP.dll\" or TargetProcessCommandLine contains \"\\\\MsiExec.exe\\\" /Y \\\"C:\\\\Program Files (x86)\\\\Bonjour\\\\mdnsNSP.dll\" or TargetProcessCommandLine contains \"\\\\MsiExec.exe\\\" /Y \\\"C:\\\\Program Files (x86)\\\\Apple Software Update\\\\ScriptingObjectModel.dll\" or TargetProcessCommandLine contains \"\\\\MsiExec.exe\\\" /Y \\\"C:\\\\Program Files (x86)\\\\Apple Software Update\\\\SoftwareUpdateAdmin.dll\" or TargetProcessCommandLine contains \"\\\\MsiExec.exe\\\" /Y \\\"C:\\\\Windows\\\\CCM\\\\\" or TargetProcessCommandLine contains \"\\\\MsiExec.exe\\\" /Y C:\\\\Windows\\\\CCM\\\\\" or TargetProcessCommandLine contains \"\\\\MsiExec.exe\\\" -Y \\\"C:\\\\Program Files\\\\Bonjour\\\\mdnsNSP.dll\" or TargetProcessCommandLine contains \"\\\\MsiExec.exe\\\" -Y \\\"C:\\\\Program Files (x86)\\\\Bonjour\\\\mdnsNSP.dll\" or TargetProcessCommandLine contains \"\\\\MsiExec.exe\\\" -Y \\\"C:\\\\Program Files (x86)\\\\Apple Software Update\\\\ScriptingObjectModel.dll\" or TargetProcessCommandLine contains \"\\\\MsiExec.exe\\\" -Y \\\"C:\\\\Program Files (x86)\\\\Apple Software Update\\\\SoftwareUpdateAdmin.dll\" or TargetProcessCommandLine contains \"\\\\MsiExec.exe\\\" -Y \\\"C:\\\\Windows\\\\CCM\\\\\" or TargetProcessCommandLine contains \"\\\\MsiExec.exe\\\" -Y C:\\\\Windows\\\\CCM\\\\\"))))|extend RuleId=\"6f4191bb-912b-48a8-9ce7-682769541e6d\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_msiexec_execute_dll.yml\"|extend RuleTitle=\"Suspicious Msiexec Execute Arbitrary DLL\"|extend RuleDescription=\"Adversaries may abuse msiexec.exe to proxy execution of malicious payloads.\\nMsiexec.exe is the command-line utility for the Windows Installer and is thus commonly associated with executing installation packages (.msi)\\n\";\nlet q5=_Im_ProcessCreate\n| where TargetProcessCommandLine contains \"-i\"\n| where TargetProcessCommandLine contains \"/i\"\n| where TargetProcessCommandLine contains \"-package\"\n| where TargetProcessCommandLine contains \"/package\"\n| where TargetProcessCommandLine contains \"-a\"\n| where TargetProcessCommandLine contains \"/a\"\n| where TargetProcessCommandLine contains \"-j\"\n| where TargetProcessCommandLine contains \"/j\"\n| where TargetProcessCommandLine contains \"-q\"\n| where TargetProcessCommandLine contains \"/q\"\n| where (((TargetProcessName endswith \"\\\\msiexec.exe\" or TargetProcessFilename =~ \"msiexec.exe\") and ( or  or  or ) and ()) and (not(((ActingProcessName startswith \"C:\\\\Users\\\\\" and ActingProcessName contains \"\\\\AppData\\\\Local\\\\Temp\\\\\") or ActingProcessName startswith \"C:\\\\Windows\\\\Temp\\\\\" or (ActingProcessName =~ \"C:\\\\Windows\\\\CCM\\\\Ccm32BitLauncher.exe\" and TargetProcessIntegrityLevel =~ \"System\")))))|extend RuleId=\"79a87aa6-e4bd-42fc-a5bb-5e6fbdcd62f5\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_msiexec_install_quiet.yml\"|extend RuleTitle=\"Msiexec Quiet Installation\"|extend RuleDescription=\"Adversaries may abuse msiexec.exe to proxy execution of malicious payloads.\\nMsiexec.exe is the command-line utility for the Windows Installer and is thus commonly associated with executing installation packages (.msi)\\n\";\nlet q6=_Im_ProcessCreate\n| where TargetProcessCommandLine contains \"-i\"\n| where TargetProcessCommandLine contains \"/i\"\n| where TargetProcessCommandLine contains \"-package\"\n| where TargetProcessCommandLine contains \"/package\"\n| where TargetProcessCommandLine contains \"-a\"\n| where TargetProcessCommandLine contains \"/a\"\n| where TargetProcessCommandLine contains \"-j\"\n| where TargetProcessCommandLine contains \"/j\"\n| where TargetProcessCommandLine contains \"-q\"\n| where TargetProcessCommandLine contains \"/q\"\n| where ((TargetProcessName endswith \"\\\\msiexec.exe\" or TargetProcessFilename =~ \"msiexec.exe\") and ( or  or  or ) and () and (TargetProcessCommandLine contains \"http\" or TargetProcessCommandLine contains \"\\\\\\\\\"))|extend RuleId=\"8150732a-0c9d-4a99-82b9-9efb9b90c40c\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_msiexec_install_remote.yml\"|extend RuleTitle=\"Suspicious Msiexec Quiet Install From Remote Location\"|extend RuleDescription=\"Detects usage of Msiexec.exe to install packages hosted remotely quietly\";\nlet q7=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \" msiexec\" and TargetProcessCommandLine contains \"://\")|extend RuleId=\"f7b5f842-a6af-4da5-9e95-e32478f3cd2f\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_msiexec_web_install.yml\"|extend RuleTitle=\"MsiExec Web Install\"|extend RuleDescription=\"Detects suspicious msiexec process starts with web addresses as parameter\";\nlet q8=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\MSOHTMED.exe\" or TargetProcessFilename =~ \"MsoHtmEd.exe\") and (TargetProcessCommandLine contains \"ftp://\" or TargetProcessCommandLine contains \"http://\" or TargetProcessCommandLine contains \"https://\"))|extend RuleId=\"459f2f98-397b-4a4a-9f47-6a5ec2f1c69d\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_msohtmed_download.yml\"|extend RuleTitle=\"Arbitrary File Download Via MSOHTMED.EXE\"|extend RuleDescription=\"Detects usage of \\\"MSOHTMED\\\" to download arbitrary files\";\nlet q9=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\MSPUB.exe\" or TargetProcessFilename =~ \"MSPUB.exe\") and (TargetProcessCommandLine contains \"ftp://\" or TargetProcessCommandLine contains \"http://\" or TargetProcessCommandLine contains \"https://\"))|extend RuleId=\"3b3c7f55-f771-4dd6-8a6e-08d057a17caf\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_mspub_download.yml\"|extend RuleTitle=\"Arbitrary File Download Via MSPUB.EXE\"|extend RuleDescription=\"Detects usage of \\\"MSPUB\\\" (Microsoft Publisher) to download arbitrary files\";\nlet q10=_Im_ProcessCreate\n| where (ActingProcessName endswith \"\\\\sqlps.exe\" or ((TargetProcessName endswith \"\\\\sqlps.exe\" or TargetProcessFilename =~ \"sqlps.exe\") and (not(ActingProcessName endswith \"\\\\sqlagent.exe\"))))|extend RuleId=\"0152550d-3a26-4efd-9f0e-54a0b28ae2f3\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_mssql_sqlps_susp_execution.yml\"|extend RuleTitle=\"Detection of PowerShell Execution via Sqlps.exe\"|extend RuleDescription=\"This rule detects execution of a PowerShell code through the sqlps.exe utility, which is included in the standard set of utilities supplied with the MSSQL Server.\\nScript blocks are not logged in this case, so this utility helps to bypass protection mechanisms based on the analysis of these logs.\\n\";\nlet q11=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\sqltoolsps.exe\" or ActingProcessName endswith \"\\\\sqltoolsps.exe\" or TargetProcessFilename =~ \"\\\\sqltoolsps.exe\") and (not(ActingProcessName endswith \"\\\\smss.exe\")))|extend RuleId=\"a746c9b8-a2fb-4ee5-a428-92bee9e99060\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_mssql_sqltoolsps_susp_execution.yml\"|extend RuleTitle=\"SQL Client Tools PowerShell Session Detection\"|extend RuleDescription=\"This rule detects execution of a PowerShell code through the sqltoolsps.exe utility, which is included in the standard set of utilities supplied with the Microsoft SQL Server Management studio.\\nScript blocks are not logged in this case, so this utility helps to bypass protection mechanisms based on the analysis of these logs.\\n\";\nlet q12=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\mstsc.exe\" or TargetProcessFilename =~ \"mstsc.exe\") and TargetProcessCommandLine contains \" /v:\") and (not((ActingProcessName =~ \"C:\\\\Windows\\\\System32\\\\lxss\\\\wslhost.exe\" and TargetProcessCommandLine contains \"C:\\\\ProgramData\\\\Microsoft\\\\WSL\\\\wslg.rdp\"))))|extend RuleId=\"954f0af7-62dd-418f-b3df-a84bc2c7a774\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_mstsc_remote_connection.yml\"|extend RuleTitle=\"New Remote Desktop Connection Initiated Via Mstsc.EXE\"|extend RuleDescription=\"Detects the usage of \\\"mstsc.exe\\\" with the \\\"/v\\\" flag to initiate a connection to a remote server.\\nAdversaries may use valid accounts to log into a computer using the Remote Desktop Protocol (RDP). The adversary may then perform actions as the logged-on user.\\n\";\nlet q13=_Im_ProcessCreate\n| where TargetProcessName endswith \"\\\\msxsl.exe\"|extend RuleId=\"9e50a8b3-dd05-4eb8-9153-bdb6b79d50b0\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_msxsl_execution.yml\"|extend RuleTitle=\"Msxsl.EXE Execution\"|extend RuleDescription=\"Detects the execution of the MSXSL utility. This can be used to execute Extensible Stylesheet Language (XSL) files. These files are commonly used to describe the processing and rendering of data within XML files.\\nAdversaries can abuse this functionality to execute arbitrary files while potentially bypassing application whitelisting defenses.\\n\";\nlet q14=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\netsh.exe\" or TargetProcessFilename =~ \"netsh.exe\") and (TargetProcessCommandLine contains \" firewall \" and TargetProcessCommandLine contains \" add \")) and (not((TargetProcessCommandLine contains \"*advfirewall firewall add rule name=Dropbox dir=in action=allow \\\"program=:\\\\Program Files (x86)\\\\Dropbox\\\\Client\\\\Dropbox.exe\\\" enable=yes profile=Any*\" or TargetProcessCommandLine contains \"*advfirewall firewall add rule name=Dropbox dir=in action=allow \\\"program=:\\\\Program Files\\\\Dropbox\\\\Client\\\\Dropbox.exe\\\" enable=yes profile=Any*\"))))|extend RuleId=\"cd5cfd80-aa5f-44c0-9c20-108c4ae12e3c\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_netsh_fw_add_rule.yml\"|extend RuleTitle=\"New Firewall Rule Added Via Netsh.EXE\"|extend RuleDescription=\"Detects the addition of a new rule to the Windows firewall via netsh\";\nlet q15=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\netsh.exe\" or TargetProcessFilename =~ \"netsh.exe\") and (TargetProcessCommandLine contains \"firewall\" and TargetProcessCommandLine contains \"delete \")) and (not((ActingProcessName endswith \"\\\\Dropbox.exe\" and TargetProcessCommandLine contains \"name=Dropbox\"))))|extend RuleId=\"1a5fefe6-734f-452e-a07d-fc1c35bce4b2\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_netsh_fw_delete_rule.yml\"|extend RuleTitle=\"Firewall Rule Deleted Via Netsh.EXE\"|extend RuleDescription=\"Detects the removal of a port or application rule in the Windows Firewall configuration using netsh\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion", "CommandAndControl", "Execution", "LateralMovement"],
+                "techniques": ["T1105", "T1021", "T1220", "T1127", "T1562", "T1059", "T1218"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000110",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

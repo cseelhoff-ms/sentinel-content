@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000104')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000104')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation low 04",
+                "description": "Sigma Windows Process Creation low 04",
+                "severity": "low",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\curl.exe\" or TargetProcessFilename =~ \"curl.exe\") and TargetProcessCommandLine contains \"file:///\")|extend RuleId=\"aa6f6ea6-0676-40dd-b510-6e46f02d8867\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_curl_local_file_read.yml\"|extend RuleTitle=\"Local File Read Using Curl.EXE\"|extend RuleDescription=\"Detects execution of \\\"curl.exe\\\" with the \\\"file://\\\" protocol handler in order to read local files.\";\nlet q1=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\desktopimgdownldr.exe\" and ActingProcessName endswith \"\\\\desktopimgdownldr.exe\" and TargetProcessCommandLine contains \"/lockscreenurl:http\")|extend RuleId=\"214641c2-c579-4ecb-8427-0cf19df6842e\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_desktopimgdownldr_remote_file_download.yml\"|extend RuleTitle=\"Remote File Download Via Desktopimgdownldr Utility\"|extend RuleDescription=\"Detects the desktopimgdownldr utility being used to download a remote file. An adversary may use desktopimgdownldr to download arbitrary files as an alternative to certutil.\";\nlet q2=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\deviceenroller.exe\" or TargetProcessFilename =~ \"deviceenroller.exe\") and TargetProcessCommandLine contains \"/PhoneDeepLink\")|extend RuleId=\"e173ad47-4388-4012-ae62-bd13f71c18a8\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_deviceenroller_dll_sideloading.yml\"|extend RuleTitle=\"Potential DLL Sideloading Via DeviceEnroller.EXE\"|extend RuleDescription=\"Detects the use of the PhoneDeepLink parameter to potentially sideload a DLL file that does not exist. This non-existent DLL file is named \\\"ShellChromeAPI.dll\\\".\\nAdversaries can drop their own renamed DLL and execute it via DeviceEnroller.exe using this parameter\\n\";\nlet q3=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \" -t msi-install \" and TargetProcessCommandLine contains \" -i http\")|extend RuleId=\"90d50722-0483-4065-8e35-57efaadd354d\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_devinit_lolbin_usage.yml\"|extend RuleTitle=\"Arbitrary MSI Download Via Devinit.EXE\"|extend RuleDescription=\"Detects a certain command line flag combination used by \\\"devinit.exe\\\", which can be abused as a LOLBIN to download arbitrary MSI packages on a Windows system\";\nlet q4=_Im_ProcessCreate\n| where (ActingProcessName contains \"\\\\AppData\\\\Local\\\\Apps\\\\2.0\\\\\" and (TargetProcessName endswith \"\\\\calc.exe\" or TargetProcessName endswith \"\\\\cmd.exe\" or TargetProcessName endswith \"\\\\cscript.exe\" or TargetProcessName endswith \"\\\\explorer.exe\" or TargetProcessName endswith \"\\\\mshta.exe\" or TargetProcessName endswith \"\\\\net.exe\" or TargetProcessName endswith \"\\\\net1.exe\" or TargetProcessName endswith \"\\\\nltest.exe\" or TargetProcessName endswith \"\\\\notepad.exe\" or TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\" or TargetProcessName endswith \"\\\\reg.exe\" or TargetProcessName endswith \"\\\\regsvr32.exe\" or TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessName endswith \"\\\\schtasks.exe\" or TargetProcessName endswith \"\\\\werfault.exe\" or TargetProcessName endswith \"\\\\wscript.exe\"))|extend RuleId=\"67bc0e75-c0a9-4cfc-8754-84a505b63c04\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_dfsvc_suspicious_child_processes.yml\"|extend RuleTitle=\"Potentially Suspicious Child Process Of ClickOnce Application\"|extend RuleDescription=\"Detects potentially suspicious child processes of a ClickOnce deployment application\";\nlet q5=_Im_ProcessCreate\n| where (ActingProcessName endswith \"\\\\diskshadow.exe\" and (TargetProcessName endswith \"\\\\certutil.exe\" or TargetProcessName endswith \"\\\\cscript.exe\" or TargetProcessName endswith \"\\\\mshta.exe\" or TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\" or TargetProcessName endswith \"\\\\regsvr32.exe\" or TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessName endswith \"\\\\wscript.exe\"))|extend RuleId=\"9f546b25-5f12-4c8d-8532-5893dcb1e4b8\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_diskshadow_child_process_susp.yml\"|extend RuleTitle=\"Potentially Suspicious Child Process Of DiskShadow.EXE\"|extend RuleDescription=\"Detects potentially suspicious child processes of \\\"Diskshadow.exe\\\". This could be an attempt to bypass parent/child relationship detection or application whitelisting rules.\";\nlet q6=_Im_ProcessCreate\n| where TargetProcessCommandLine contains \"-s \"\n| where TargetProcessCommandLine contains \"/s \"\n| where (((TargetProcessFilename =~ \"diskshadow.exe\" or TargetProcessName endswith \"\\\\diskshadow.exe\") and ()) and (not(TargetProcessCommandLine contains \".txt\")))|extend RuleId=\"1dde5376-a648-492e-9e54-4241dd9b0c7f\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_diskshadow_script_mode_susp_ext.yml\"|extend RuleTitle=\"Diskshadow Script Mode - Uncommon Script Extension Execution\"|extend RuleDescription=\"Detects execution of \\\"Diskshadow.exe\\\" in script mode to execute an script with a potentially uncommon extension.\\nInitial baselining of the allowed extension list is required.\\n\";\nlet q7=_Im_ProcessCreate\n| where TargetProcessCommandLine contains \"-s \"\n| where TargetProcessCommandLine contains \"/s \"\n| where ((TargetProcessFilename =~ \"diskshadow.exe\" or TargetProcessName endswith \"\\\\diskshadow.exe\") and () and (TargetProcessCommandLine contains \":\\\\Temp\\\\\" or TargetProcessCommandLine contains \":\\\\Windows\\\\Temp\\\\\" or TargetProcessCommandLine contains \"\\\\AppData\\\\Local\\\\\" or TargetProcessCommandLine contains \"\\\\AppData\\\\Roaming\\\\\" or TargetProcessCommandLine contains \"\\\\ProgramData\\\\\" or TargetProcessCommandLine contains \"\\\\Users\\\\Public\\\\\"))|extend RuleId=\"fa1a7e52-3d02-435b-81b8-00da14dd66c1\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_diskshadow_script_mode_susp_location.yml\"|extend RuleTitle=\"Diskshadow Script Mode - Execution From Potential Suspicious Location\"|extend RuleDescription=\"Detects execution of \\\"Diskshadow.exe\\\" in script mode using the \\\"/s\\\" flag where the script is located in a potentially suspicious location.\";\nlet q8=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\dnscmd.exe\" and (TargetProcessCommandLine contains \"/enumrecords\" or TargetProcessCommandLine contains \"/enumzones\" or TargetProcessCommandLine contains \"/ZonePrint\" or TargetProcessCommandLine contains \"/info\"))|extend RuleId=\"b6457d63-d2a2-4e29-859d-4e7affc153d1\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_dnscmd_discovery.yml\"|extend RuleTitle=\"Potential Discovery Activity Via Dnscmd.EXE\"|extend RuleDescription=\"Detects an attempt to leverage dnscmd.exe to enumerate the DNS zones of a domain. DNS zones used to host the DNS records for a particular domain.\";\nlet q9=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\dotnet-trace.exe\" or TargetProcessFilename =~ \"dotnet-trace.dll\") and (TargetProcessCommandLine contains \"-- \" and TargetProcessCommandLine contains \"collect\"))|extend RuleId=\"9257c05b-4a4a-48e5-a670-b7b073cf401b\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_dotnet_trace_lolbin_execution.yml\"|extend RuleTitle=\"Binary Proxy Execution Via Dotnet-Trace.EXE\"|extend RuleDescription=\"Detects commandline arguments for executing a child process via dotnet-trace.exe\";\nlet q10=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"driverquery.exe\" or TargetProcessFilename =~ \"drvqry.exe\") and (not(((ActingProcessName endswith \"\\\\cscript.exe\" or ActingProcessName endswith \"\\\\mshta.exe\" or ActingProcessName endswith \"\\\\regsvr32.exe\" or ActingProcessName endswith \"\\\\rundll32.exe\" or ActingProcessName endswith \"\\\\wscript.exe\") or (ActingProcessName contains \"\\\\AppData\\\\Local\\\\\" or ActingProcessName contains \"\\\\Users\\\\Public\\\\\" or ActingProcessName contains \"\\\\Windows\\\\Temp\\\\\")))))|extend RuleId=\"a20def93-0709-4eae-9bd2-31206e21e6b2\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_driverquery_usage.yml\"|extend RuleTitle=\"DriverQuery.EXE Execution\"|extend RuleDescription=\"Detect usage of the \\\"driverquery\\\" utility. Which can be used to perform reconnaissance on installed drivers\";\nlet q11=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\dsacls.exe\" or TargetProcessFilename =~ \"DSACLS.EXE\") and TargetProcessCommandLine contains \" /G \" and (TargetProcessCommandLine contains \"GR\" or TargetProcessCommandLine contains \"GE\" or TargetProcessCommandLine contains \"GW\" or TargetProcessCommandLine contains \"GA\" or TargetProcessCommandLine contains \"WP\" or TargetProcessCommandLine contains \"WD\"))|extend RuleId=\"01c42d3c-242d-4655-85b2-34f1739632f7\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_dsacls_abuse_permissions.yml\"|extend RuleTitle=\"Potentially Over Permissive Permissions Granted Using Dsacls.EXE\"|extend RuleDescription=\"Detects usage of Dsacls to grant over permissive permissions\";\nlet q12=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\dsacls.exe\" or TargetProcessFilename =~ \"DSACLS.EXE\") and (TargetProcessCommandLine contains \"/user:\" and TargetProcessCommandLine contains \"/passwd:\"))|extend RuleId=\"bac9fb54-2da7-44e9-988f-11e9a5edbc0c\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_dsacls_password_spray.yml\"|extend RuleTitle=\"Potential Password Spraying Attempt Using Dsacls.EXE\"|extend RuleDescription=\"Detects possible password spraying attempts using Dsacls\";\nlet q13=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\DismHost.exe\" and (ActingProcessCommandLine contains \"/Online\" and ActingProcessCommandLine contains \"/Disable-Feature\")) or (TargetProcessName endswith \"\\\\Dism.exe\" and (TargetProcessCommandLine contains \"/Online\" and TargetProcessCommandLine contains \"/Disable-Feature\")))|extend RuleId=\"43e32da2-fdd0-4156-90de-50dfd62636f9\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_dsim_remove.yml\"|extend RuleTitle=\"Dism Remove Online Package\"|extend RuleDescription=\"Deployment Image Servicing and Management tool. DISM is used to enumerate, install, uninstall, configure, and update features and packages in Windows images\";\nlet q14=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\dsquery.exe\" or TargetProcessFilename =~ \"dsquery.exe\") and TargetProcessCommandLine contains \"trustedDomain\")|extend RuleId=\"3bad990e-4848-4a78-9530-b427d854aac0\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_dsquery_domain_trust_discovery.yml\"|extend RuleTitle=\"Domain Trust Discovery Via Dsquery\"|extend RuleDescription=\"Detects execution of \\\"dsquery.exe\\\" for domain trust discovery\";\nlet q15=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\DumpMinitool.exe\" or TargetProcessName endswith \"\\\\DumpMinitool.x86.exe\" or TargetProcessName endswith \"\\\\DumpMinitool.arm64.exe\") or (TargetProcessFilename =~ \"DumpMinitool.exe\" or TargetProcessFilename =~ \"DumpMinitool.x86.exe\" or TargetProcessFilename =~ \"DumpMinitool.arm64.exe\")) and (TargetProcessCommandLine contains \" Full\" or TargetProcessCommandLine contains \" Mini\" or TargetProcessCommandLine contains \" WithHeap\"))|extend RuleId=\"dee0a7a3-f200-4112-a99b-952196d81e42\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_dumpminitool_execution.yml\"|extend RuleTitle=\"DumpMinitool Execution\"|extend RuleDescription=\"Detects the use of \\\"DumpMinitool.exe\\\" a tool that allows the dump of process memory via the use of the \\\"MiniDumpWriteDump\\\"\";\nlet q16=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"esentutl\" and TargetProcessCommandLine contains \" /p\")|extend RuleId=\"7df1713a-1a5b-4a4b-a071-dc83b144a101\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_esentutl_params.yml\"|extend RuleTitle=\"Esentutl Gather Credentials\"|extend RuleDescription=\"Conti recommendation to its affiliates to use esentutl to access NTDS dumped file. Trickbot also uses this utilities to get MSEdge info via its module pwgrab.\";\nlet q17=_Im_ProcessCreate\n| where TargetProcessCommandLine contains \"-r\"\n| where TargetProcessCommandLine contains \"/r\"\n| where ((TargetProcessName endswith \"\\\\esentutl.exe\" or TargetProcessFilename =~ \"esentutl.exe\") and () and TargetProcessCommandLine contains \"\\\\Windows\\\\WebCache\")|extend RuleId=\"6a69f62d-ce75-4b57-8dce-6351eb55b362\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_esentutl_webcache.yml\"|extend RuleTitle=\"Esentutl Steals Browser Information\"|extend RuleDescription=\"One way Qbot steals sensitive information is by extracting browser data from Internet Explorer and Microsoft Edge by using the built-in utility esentutl.exe\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["CommandAndControl", "DefenseEvasion", "CredentialAccess", "Collection", "PrivilegeEscalation", "Discovery", "Execution"],
+                "techniques": ["T1003", "T1482", "T1218", "T1543", "T1105", "T1562", "T1574", "T1005", "T1036"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000104",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

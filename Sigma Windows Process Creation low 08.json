@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000108')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000108')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation low 08",
+                "description": "Sigma Windows Process Creation low 08",
+                "severity": "low",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\fsianycpu.exe\" or TargetProcessFilename =~ \"fsianycpu.exe\" or TargetProcessName endswith \"\\\\fsi.exe\" or TargetProcessFilename =~ \"fsi.exe\")|extend RuleId=\"b96b2031-7c17-4473-afe7-a30ce714db29\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_fsharp_interpreters.yml\"|extend RuleTitle=\"Use of FSharp Interpreters\"|extend RuleDescription=\"The FSharp Interpreters, FsiAnyCpu.exe and FSi.exe, can be used for AWL bypass and is listed in Microsoft recommended block rules.\";\nlet q1=_Im_ProcessCreate\n| where (ActingProcessName endswith \"\\\\ftp.exe\" or ((TargetProcessName endswith \"\\\\ftp.exe\" or TargetProcessFilename =~ \"ftp.exe\") and (TargetProcessCommandLine contains \"-s:\" or TargetProcessCommandLine contains \"/s:\")))|extend RuleId=\"06b401f4-107c-4ff9-947f-9ec1e7649f1e\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_ftp.yml\"|extend RuleTitle=\"LOLBIN Execution Of The FTP.EXE Binary\"|extend RuleDescription=\"Detects execution of ftp.exe script execution with the \\\"-s\\\" or \\\"/s\\\" flag and any child processes ran by ftp.exe\";\nlet q2=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\cscript.exe\" or TargetProcessName endswith \"\\\\wscript.exe\") or (TargetProcessFilename =~ \"cscript.exe\" or TargetProcessFilename =~ \"wscript.exe\")) and TargetProcessCommandLine contains \"gatherNetworkInfo.vbs\")|extend RuleId=\"575dce0c-8139-4e30-9295-1ee75969f7fe\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_gather_network_info.yml\"|extend RuleTitle=\"Potential Reconnaissance Activity Via GatherNetworkInfo.VBS\"|extend RuleDescription=\"Detects execution of the built-in script located in \\\"C:\\\\Windows\\\\System32\\\\gatherNetworkInfo.vbs\\\". Which can be used to gather information about the target machine\";\nlet q3=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\gpscript.exe\" or TargetProcessFilename =~ \"GPSCRIPT.EXE\") and (TargetProcessCommandLine contains \" /logon\" or TargetProcessCommandLine contains \" /startup\")) and (not(ActingProcessCommandLine =~ \"C:\\\\windows\\\\system32\\\\svchost.exe -k netsvcs -p -s gpsvc\")))|extend RuleId=\"1e59c230-6670-45bf-83b0-98903780607e\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_gpscript.yml\"|extend RuleTitle=\"Gpscript Execution\"|extend RuleDescription=\"Detects the execution of the LOLBIN gpscript, which executes logon or startup scripts configured in Group Policy\";\nlet q4=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\ie4uinit.exe\" or TargetProcessFilename =~ \"IE4UINIT.EXE\") and (not(((TargetProcessCurrentDirectory =~ \"c:\\\\windows\\\\system32\\\\\" or TargetProcessCurrentDirectory =~ \"c:\\\\windows\\\\sysWOW64\\\\\") or isempty(TargetProcessCurrentDirectory)))))|extend RuleId=\"d3bf399f-b0cf-4250-8bb4-dfc192ab81dc\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_ie4uinit.yml\"|extend RuleTitle=\"Ie4uinit Lolbin Use From Invalid Path\"|extend RuleDescription=\"Detect use of ie4uinit.exe to execute commands from a specially prepared ie4uinit.inf file from a directory other than the usual directories\";\nlet q5=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\ilasm.exe\" or TargetProcessFilename =~ \"ilasm.exe\")|extend RuleId=\"850d55f9-6eeb-4492-ad69-a72338f65ba4\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_ilasm.yml\"|extend RuleTitle=\"Ilasm Lolbin Use Compile C-Sharp\"|extend RuleDescription=\"Detect use of Ilasm.exe to compile c# code into dll or exe.\";\nlet q6=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\jsc.exe\" and TargetProcessCommandLine contains \".js\")|extend RuleId=\"52788a70-f1da-40dd-8fbd-73b5865d6568\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_jsc.yml\"|extend RuleTitle=\"JSC Convert Javascript To Executable\"|extend RuleDescription=\"Detects the execution of the LOLBIN jsc.exe used by .NET to compile javascript code to .exe or .dll format\";\nlet q7=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"Launch-VsDevShell.ps1\" and (TargetProcessCommandLine contains \"VsWherePath \" or TargetProcessCommandLine contains \"VsInstallationPath \"))|extend RuleId=\"45d3a03d-f441-458c-8883-df101a3bb146\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_launch_vsdevshell.yml\"|extend RuleTitle=\"Launch-VsDevShell.PS1 Proxy Execution\"|extend RuleDescription=\"Detects the use of the 'Launch-VsDevShell.ps1' Microsoft signed script to execute commands.\";\nlet q8=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \"verb:sync\" and TargetProcessCommandLine contains \"-source:RunCommand\" and TargetProcessCommandLine contains \"-dest:runCommand\") and TargetProcessName endswith \"\\\\msdeploy.exe\")|extend RuleId=\"646bc99f-6682-4b47-a73a-17b1b64c9d34\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_msdeploy.yml\"|extend RuleTitle=\"Execute Files with Msdeploy.exe\"|extend RuleDescription=\"Detects file execution using the msdeploy.exe lolbin\";\nlet q9=_Im_ProcessCreate\n| where ((TargetProcessFilename =~ \"OpenConsole.exe\" or TargetProcessName endswith \"\\\\OpenConsole.exe\") and (not(TargetProcessName startswith \"C:\\\\Program Files\\\\WindowsApps\\\\Microsoft.WindowsTerminal\")))|extend RuleId=\"814c95cc-8192-4378-a70a-f1aafd877af1\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_openconsole.yml\"|extend RuleTitle=\"Use of OpenConsole\"|extend RuleDescription=\"Detects usage of OpenConsole binary as a LOLBIN to launch other binaries to bypass application Whitelisting\";\nlet q10=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\pcalua.exe\" and TargetProcessCommandLine contains \" -a\")|extend RuleId=\"0955e4e1-c281-4fb9-9ee1-5ee7b4b754d2\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_pcalua.yml\"|extend RuleTitle=\"Use of Pcalua For Execution\"|extend RuleDescription=\"Detects execition of commands and binaries from the context of The program compatibility assistant (Pcalua.exe). This can be used as a LOLBIN in order to bypass application whitelisting.\";\nlet q11=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessFilename =~ \"RUNDLL32.EXE\") and (TargetProcessCommandLine contains \"pcwutl\" and TargetProcessCommandLine contains \"LaunchApplication\"))|extend RuleId=\"9386d78a-7207-4048-9c9f-a93a7c2d1c05\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_pcwutl.yml\"|extend RuleTitle=\"Code Execution via Pcwutl.dll\"|extend RuleDescription=\"Detects launch of executable by calling the LaunchApplication function from pcwutl.dll library.\";\nlet q12=_Im_ProcessCreate\n| where (((ActingProcessName endswith \"\\\\powershell.exe\" or ActingProcessName endswith \"\\\\pwsh.exe\") and ActingProcessCommandLine contains \"\\\\WindowsPowerShell\\\\Modules\\\\Pester\\\\\") and (ActingProcessCommandLine contains \"{ Invoke-Pester -EnableExit ;\" or ActingProcessCommandLine contains \"{ Get-Help \\\"\"))|extend RuleId=\"18988e1b-9087-4f8a-82fe-0414dce49878\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_pester.yml\"|extend RuleTitle=\"Execute Code with Pester.bat as Parent\"|extend RuleDescription=\"Detects code execution via Pester.bat (Pester - Powershell Modulte for testing)\";\nlet q13=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\") and (TargetProcessCommandLine contains \"Pester\" and TargetProcessCommandLine contains \"Get-Help\")) or ((TargetProcessName endswith \"\\\\cmd.exe\" and (TargetProcessCommandLine contains \"pester\" and TargetProcessCommandLine contains \";\")) and (TargetProcessCommandLine contains \"help\" or TargetProcessCommandLine contains \"?\")))|extend RuleId=\"59e938ff-0d6d-4dc3-b13f-36cc28734d4e\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_pester_1.yml\"|extend RuleTitle=\"Execute Code with Pester.bat\"|extend RuleDescription=\"Detects code execution via Pester.bat (Pester - Powershell Modulte for testing)\";\nlet q14=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"\\\\pubprn.vbs\" and TargetProcessCommandLine contains \"script:\")|extend RuleId=\"1fb76ab8-fa60-4b01-bddd-71e89bf555da\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_pubprn.yml\"|extend RuleTitle=\"Pubprn.vbs Proxy Execution\"|extend RuleDescription=\"Detects the use of the 'Pubprn.vbs' Microsoft signed script to execute commands.\";\nlet q15=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\rasautou.exe\" or TargetProcessFilename =~ \"rasdlui.exe\") and (TargetProcessCommandLine contains \" -d \" and TargetProcessCommandLine contains \" -p \"))|extend RuleId=\"cd3d1298-eb3b-476c-ac67-12847de55813\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_rasautou_dll_execution.yml\"|extend RuleTitle=\"DLL Execution via Rasautou.exe\"|extend RuleDescription=\"Detects using Rasautou.exe for loading arbitrary .DLL specified in -d option and executes the export specified in -p.\";\nlet q16=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"\\\\register_app.vbs\" and TargetProcessCommandLine contains \"-register\")|extend RuleId=\"1c8774a0-44d4-4db0-91f8-e792359c70bd\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_register_app.yml\"|extend RuleTitle=\"REGISTER_APP.VBS Proxy Execution\"|extend RuleDescription=\"Detects the use of a Microsoft signed script 'REGISTER_APP.VBS' to register a VSS/VDS Provider as a COM+ application.\";\nlet q17=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\remote.exe\" or TargetProcessFilename =~ \"remote.exe\")|extend RuleId=\"4eddc365-79b4-43ff-a9d7-99422dc34b93\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_remote.yml\"|extend RuleTitle=\"Use of Remote.exe\"|extend RuleDescription=\"Remote.exe is part of WinDbg in the Windows SDK and can be used for AWL bypass and running remote files.\";\nlet q18=_Im_ProcessCreate\n| where TargetProcessCommandLine contains \"-a\"\n| where TargetProcessCommandLine contains \"/a\"\n| where (TargetProcessName endswith \"\\\\replace.exe\" and ())|extend RuleId=\"9292293b-8496-4715-9db6-37028dcda4b3\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_replace.yml\"|extend RuleTitle=\"Replace.exe Usage\"|extend RuleDescription=\"Detects the use of Replace.exe which can be used to replace file with another file\";\nlet q19=_Im_ProcessCreate\n| where ActingProcessName endswith \"\\\\runexehelper.exe\"|extend RuleId=\"cd71385d-fd9b-4691-9b98-2b1f7e508714\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_runexehelper.yml\"|extend RuleTitle=\"Lolbin Runexehelper Use As Proxy\"|extend RuleDescription=\"Detect usage of the \\\"runexehelper.exe\\\" binary as a proxy to launch other programs\";\nlet q20=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\Runscripthelper.exe\" and TargetProcessCommandLine contains \"surfacecheck\")|extend RuleId=\"eca49c87-8a75-4f13-9c73-a5a29e845f03\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_runscripthelper.yml\"|extend RuleTitle=\"Suspicious Runscripthelper.exe\"|extend RuleDescription=\"Detects execution of powershell scripts via Runscripthelper.exe\";\nlet q21=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\ScriptRunner.exe\" or TargetProcessFilename =~ \"ScriptRunner.exe\") and TargetProcessCommandLine contains \" -appvscript \")|extend RuleId=\"64760eef-87f7-4ed3-93fd-655668ea9420\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_scriptrunner.yml\"|extend RuleTitle=\"Use of Scriptrunner.exe\"|extend RuleDescription=\"The \\\"ScriptRunner.exe\\\" binary can be abused to proxy execution through it and bypass possible whitelisting\";\nlet q22=_Im_ProcessCreate\n| where (ActingProcessName endswith \"\\\\setres.exe\" and TargetProcessName endswith \"\\\\choice\")|extend RuleId=\"835e75bf-4bfd-47a4-b8a6-b766cac8bcb7\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_setres.yml\"|extend RuleTitle=\"Use of Setres.exe\"|extend RuleDescription=\"Detects the use of Setres.exe to set the screen resolution and then potentially launch a file named \\\"choice\\\" (with any executable extension such as \\\".cmd\\\" or \\\".exe\\\") from the current execution path\";\nlet q23=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\sftp.exe\" and (TargetProcessCommandLine contains \" -D ..\" or TargetProcessCommandLine contains \" -D C:\\\\\"))|extend RuleId=\"a85ffc3a-e8fd-4040-93bf-78aff284d801\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_sftp.yml\"|extend RuleTitle=\"Use Of The SFTP.EXE Binary As A LOLBIN\"|extend RuleDescription=\"Detects the usage of the \\\"sftp.exe\\\" binary as a LOLBIN by abusing the \\\"-D\\\" flag\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18, q19, q20, q21, q22, q23;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion", "CommandAndControl", "Discovery", "Execution"],
+                "techniques": ["T1615", "T1216", "T1105", "T1059", "T1127", "T1202", "T1218"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000108",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

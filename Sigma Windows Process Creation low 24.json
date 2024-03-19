@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000124')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000124')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation low 24",
+                "description": "Sigma Windows Process Creation low 24",
+                "severity": "low",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where (((TargetProcessCommandLine contains \"copy-item\" or TargetProcessCommandLine contains \"copy \" or TargetProcessCommandLine contains \"cpi \" or TargetProcessCommandLine contains \" cp \" or TargetProcessCommandLine contains \"move \" or TargetProcessCommandLine contains \"move-item\" or TargetProcessCommandLine contains \" mi \" or TargetProcessCommandLine contains \" mv \") or (TargetProcessName endswith \"\\\\xcopy.exe\" or TargetProcessName endswith \"\\\\robocopy.exe\") or (TargetProcessFilename =~ \"XCOPY.EXE\" or TargetProcessFilename =~ \"robocopy.exe\")) and (TargetProcessCommandLine contains \"\\\\Amigo\\\\User Data\" or TargetProcessCommandLine contains \"\\\\BraveSoftware\\\\Brave-Browser\\\\User Data\" or TargetProcessCommandLine contains \"\\\\CentBrowser\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Chromium\\\\User Data\" or TargetProcessCommandLine contains \"\\\\CocCoc\\\\Browser\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Comodo\\\\Dragon\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Elements Browser\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Epic Privacy Browser\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Google\\\\Chrome Beta\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Google\\\\Chrome SxS\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Google\\\\Chrome\\\\User Data\\\\\" or TargetProcessCommandLine contains \"\\\\Kometa\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Maxthon5\\\\Users\" or TargetProcessCommandLine contains \"\\\\Microsoft\\\\Edge\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Mozilla\\\\Firefox\\\\Profiles\" or TargetProcessCommandLine contains \"\\\\Nichrome\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Opera Software\\\\Opera GX Stable\\\\\" or TargetProcessCommandLine contains \"\\\\Opera Software\\\\Opera Neon\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Opera Software\\\\Opera Stable\\\\\" or TargetProcessCommandLine contains \"\\\\Orbitum\\\\User Data\" or TargetProcessCommandLine contains \"\\\\QIP Surf\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Sputnik\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Torch\\\\User Data\" or TargetProcessCommandLine contains \"\\\\uCozMedia\\\\Uran\\\\User Data\" or TargetProcessCommandLine contains \"\\\\Vivaldi\\\\User Data\"))|extend RuleId=\"47147b5b-9e17-4d76-b8d2-7bac24c5ce1b\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_copy_browser_data.yml\"|extend RuleTitle=\"Potential Browser Data Stealing\"|extend RuleDescription=\"Adversaries may acquire credentials from web browsers by reading files specific to the target browser.\\nWeb browsers commonly save credentials such as website usernames and passwords so that they do not need to be entered manually in the future.\\nWeb browsers typically store the credentials in an encrypted format within a credential store.\\n\";\nlet q1=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \"*\\\\\\\\*$*\" or TargetProcessCommandLine contains \"\\\\Sysvol\\\\\") and (((TargetProcessName endswith \"\\\\robocopy.exe\" or TargetProcessName endswith \"\\\\xcopy.exe\") or (TargetProcessFilename =~ \"robocopy.exe\" or TargetProcessFilename =~ \"XCOPY.EXE\")) or ((TargetProcessName endswith \"\\\\cmd.exe\" or TargetProcessFilename =~ \"Cmd.Exe\") and TargetProcessCommandLine contains \"copy\") or (((TargetProcessName contains \"\\\\powershell.exe\" or TargetProcessName contains \"\\\\pwsh.exe\") or (TargetProcessFilename =~ \"PowerShell.EXE\" or TargetProcessFilename =~ \"pwsh.dll\")) and (TargetProcessCommandLine contains \"copy-item\" or TargetProcessCommandLine contains \"copy \" or TargetProcessCommandLine contains \"cpi \" or TargetProcessCommandLine contains \" cp \" or TargetProcessCommandLine contains \"move \" or TargetProcessCommandLine contains \"move-item\" or TargetProcessCommandLine contains \" mi \" or TargetProcessCommandLine contains \" mv \"))))|extend RuleId=\"855bc8b5-2ae8-402e-a9ed-b889e6df1900\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_copy_lateral_movement.yml\"|extend RuleTitle=\"Copy From Or To Admin Share Or Sysvol Folder\"|extend RuleDescription=\"Detects a copy command or a copy utility execution to or from an Admin share or remote\";\nlet q2=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\cmd.exe\" and TargetProcessCommandLine contains \"copy \") or ((TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\") and (TargetProcessCommandLine contains \"copy-item\" or TargetProcessCommandLine contains \" copy \" or TargetProcessCommandLine contains \"cpi \" or TargetProcessCommandLine contains \" cp \")) or ((TargetProcessName endswith \"\\\\robocopy.exe\" or TargetProcessName endswith \"\\\\xcopy.exe\") or (TargetProcessFilename =~ \"robocopy.exe\" or TargetProcessFilename =~ \"XCOPY.EXE\"))) and (TargetProcessCommandLine contains \"\\\\System32\" or TargetProcessCommandLine contains \"\\\\SysWOW64\" or TargetProcessCommandLine contains \"\\\\WinSxS\"))|extend RuleId=\"fff9d2b7-e11c-4a69-93d3-40ef66189767\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_copy_system_dir.yml\"|extend RuleTitle=\"Suspicious Copy From or To System Directory\"|extend RuleDescription=\"Detects a suspicious copy operation that tries to copy a program from system (System32, SysWOW64, WinSxS) directories to another on disk.\\nOften used to move LOLBINs such as 'certutil' or 'desktopimgdownldr' to a different location with a different name in order to bypass detections based on locations.\\n\";\nlet q3=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\cmd.exe\" or TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\") or (TargetProcessFilename =~ \"Cmd.Exe\" or TargetProcessFilename =~ \"PowerShell.EXE\" or TargetProcessFilename =~ \"pwsh.dll\")) and ((ActingProcessName contains \"\\\\Windows\\\\Installer\\\\\" and ActingProcessName contains \"msi\") and ActingProcessName endswith \"tmp\"))|extend RuleId=\"1e53dd56-8d83-4eb4-a43e-b790a05510aa\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_elavated_msi_spawned_shell.yml\"|extend RuleTitle=\"Always Install Elevated MSI Spawned Cmd And Powershell\"|extend RuleDescription=\"Detects Windows Installer service (msiexec.exe) spawning \\\"cmd\\\" or \\\"powershell\\\"\";\nlet q4=_Im_ProcessCreate\n| where ((ActingProcessName endswith \"\\\\chrome.exe\" or ActingProcessName endswith \"\\\\discord.exe\" or ActingProcessName endswith \"\\\\GitHubDesktop.exe\" or ActingProcessName endswith \"\\\\keybase.exe\" or ActingProcessName endswith \"\\\\msedge.exe\" or ActingProcessName endswith \"\\\\msedgewebview2.exe\" or ActingProcessName endswith \"\\\\msteams.exe\" or ActingProcessName endswith \"\\\\slack.exe\" or ActingProcessName endswith \"\\\\Teams.exe\") and ((TargetProcessName endswith \"\\\\cmd.exe\" or TargetProcessName endswith \"\\\\cscript.exe\" or TargetProcessName endswith \"\\\\mshta.exe\" or TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\" or TargetProcessName endswith \"\\\\regsvr32.exe\" or TargetProcessName endswith \"\\\\wscript.exe\") or (TargetProcessName contains \"\\\\AppData\\\\Local\\\\Temp\\\\\" or TargetProcessName contains \"\\\\Users\\\\Public\\\\\" or TargetProcessName contains \"\\\\Windows\\\\Temp\\\\\" or TargetProcessName contains \":\\\\Temp\\\\\")) and (not(((ActingProcessName endswith \"\\\\chrome.exe\" and TargetProcessName endswith \"\\\\chrome.exe\") or (ActingProcessName endswith \"\\\\discord.exe\" and TargetProcessName endswith \"\\\\discord.exe\") or (ActingProcessName endswith \"\\\\GitHubDesktop.exe\" and TargetProcessName endswith \"\\\\GitHubDesktop.exe\") or (ActingProcessName endswith \"\\\\keybase.exe\" and TargetProcessName endswith \"\\\\keybase.exe\") or (ActingProcessName endswith \"\\\\msedge.exe\" and TargetProcessName endswith \"\\\\msedge.exe\") or (ActingProcessName endswith \"\\\\msedgewebview2.exe\" and TargetProcessName endswith \"\\\\msedgewebview2.exe\") or (ActingProcessName endswith \"\\\\msteams.exe\" and TargetProcessName endswith \"\\\\msteams.exe\") or (ActingProcessName endswith \"\\\\slack.exe\" and TargetProcessName endswith \"\\\\slack.exe\") or (ActingProcessName endswith \"\\\\teams.exe\" and TargetProcessName endswith \"\\\\teams.exe\") or (TargetProcessName =~ \"C:\\\\Windows\\\\SysWOW64\\\\WerFault.exe\" or TargetProcessName =~ \"C:\\\\Windows\\\\System32\\\\WerFault.exe\")))) and (not((ActingProcessName endswith \"\\\\Discord.exe\" and TargetProcessCommandLine contains \"\\\\NVSMI\\\\nvidia-smi.exe\"))))|extend RuleId=\"f26eb764-fd89-464b-85e2-dc4a8e6e77b8\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_electron_app_children.yml\"|extend RuleTitle=\"Suspicious Electron Application Child Processes\"|extend RuleDescription=\"Detects suspicious child processes of electron apps (teams, discord, slack, etc.). This could be a potential sign of \\\".asar\\\" file tampering (See reference section for more information) or binary execution proxy through specific CLI arguments (see related rule)\\n\";\nlet q5=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\chrome.exe\" or TargetProcessName endswith \"\\\\code.exe\" or TargetProcessName endswith \"\\\\discord.exe\" or TargetProcessName endswith \"\\\\GitHubDesktop.exe\" or TargetProcessName endswith \"\\\\keybase.exe\" or TargetProcessName endswith \"\\\\msedge_proxy.exe\" or TargetProcessName endswith \"\\\\msedge.exe\" or TargetProcessName endswith \"\\\\msedgewebview2.exe\" or TargetProcessName endswith \"\\\\msteams.exe\" or TargetProcessName endswith \"\\\\slack.exe\" or TargetProcessName endswith \"\\\\Teams.exe\") or (TargetProcessFilename =~ \"chrome.exe\" or TargetProcessFilename =~ \"code.exe\" or TargetProcessFilename =~ \"discord.exe\" or TargetProcessFilename =~ \"GitHubDesktop.exe\" or TargetProcessFilename =~ \"keybase.exe\" or TargetProcessFilename =~ \"msedge_proxy.exe\" or TargetProcessFilename =~ \"msedge.exe\" or TargetProcessFilename =~ \"msedgewebview2.exe\" or TargetProcessFilename =~ \"msteams.exe\" or TargetProcessFilename =~ \"slack.exe\" or TargetProcessFilename =~ \"Teams.exe\")) and (TargetProcessCommandLine contains \"--browser-subprocess-path\" or TargetProcessCommandLine contains \"--gpu-launcher\" or TargetProcessCommandLine contains \"--renderer-cmd-prefix\" or TargetProcessCommandLine contains \"--utility-cmd-prefix\"))|extend RuleId=\"378a05d8-963c-46c9-bcce-13c7657eac99\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_electron_exeuction_proxy.yml\"|extend RuleTitle=\"Potentially Suspicious Electron Application CommandLine\"|extend RuleDescription=\"Detects potentially suspicious CommandLine of electron apps (teams, discord, slack, etc.). This could be a sign of abuse to proxy execution through a signed binary.\";\nlet q6=_Im_ProcessCreate\n| where ((((TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\" or TargetProcessName endswith \"\\\\cmd.exe\") or (TargetProcessFilename =~ \"PowerShell.EXE\" or TargetProcessFilename =~ \"pwsh.dll\" or TargetProcessFilename =~ \"Cmd.Exe\")) and ((TargetUsername contains \"AUTHORI\" or TargetUsername contains \"AUTORI\") and LogonId =~ \"0x3e7\")) and (not(((ActingProcessName contains \":\\\\Program Files (x86)\\\\\" or ActingProcessName contains \":\\\\Program Files\\\\\" or ActingProcessName contains \":\\\\ProgramData\\\\\" or ActingProcessName contains \":\\\\Windows\\\\System32\\\\\" or ActingProcessName contains \":\\\\Windows\\\\SysWOW64\\\\\" or ActingProcessName contains \":\\\\Windows\\\\Temp\\\\\" or ActingProcessName contains \":\\\\Windows\\\\WinSxS\\\\\") or isempty(ActingProcessName) or ActingProcessName =~ \"\"))) and (not(((ActingProcessName endswith \":\\\\ManageEngine\\\\ADManager Plus\\\\pgsql\\\\bin\\\\postgres.exe\" and TargetProcessName endswith \"\\\\cmd.exe\") or (TargetProcessCommandLine contains \":\\\\WINDOWS\\\\system32\\\\cmd.exe /c \\\"\" and TargetProcessCurrentDirectory contains \":\\\\WINDOWS\\\\Temp\\\\asgard2-agent\\\\\") or (ActingProcessName contains \":\\\\IBM\\\\SpectrumProtect\\\\webserver\\\\scripts\\\\\" and TargetProcessCommandLine contains \":\\\\IBM\\\\SpectrumProtect\\\\webserver\\\\scripts\\\\\")))))|extend RuleId=\"178e615d-e666-498b-9630-9ed363038101\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_elevated_system_shell_uncommon_parent.yml\"|extend RuleTitle=\"Elevated System Shell Spawned From Uncommon Parent Location\"|extend RuleDescription=\"Detects when a shell program such as the Windows command prompt or PowerShell is launched with system privileges from a uncommon parent location.\";\nlet q7=_Im_ProcessCreate\n| where (ActingProcessName =~ \"C:\\\\Windows\\\\explorer.exe\" and TargetProcessName =~ \"C:\\\\Windows\\\\System32\\\\cmd.exe\" and (TargetProcessCommandLine contains \"powershell\" and TargetProcessCommandLine contains \".lnk\"))|extend RuleId=\"30e92f50-bb5a-4884-98b5-d20aa80f3d7a\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_susp_embed_exe_lnk.yml\"|extend RuleTitle=\"Hidden Powershell in Link File Pattern\"|extend RuleDescription=\"Detects events that appear when a user click on a link file with a powershell command in it\";\nunion q0, q1, q2, q3, q4, q5, q6, q7;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion", "CredentialAccess", "Collection", "Exfiltration", "PrivilegeEscalation", "Execution", "LateralMovement"],
+                "techniques": ["T1039", "T1021", "T1548", "T1555", "T1059", "T1048", "T1036"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000124",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

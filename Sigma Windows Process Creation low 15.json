@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000115')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000115')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation low 15",
+                "description": "Sigma Windows Process Creation low 15",
+                "severity": "low",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\presentationhost.exe\" or TargetProcessFilename =~ \"PresentationHost.exe\") and TargetProcessCommandLine contains \".xbap\") and (not((TargetProcessCommandLine contains \" C:\\\\Windows\\\\\" or TargetProcessCommandLine contains \" C:\\\\Program Files\"))))|extend RuleId=\"d22e2925-cfd8-463f-96f6-89cec9d9bc5f\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_presentationhost_uncommon_location_exec.yml\"|extend RuleTitle=\"XBAP Execution From Uncommon Locations Via PresentationHost.EXE\"|extend RuleDescription=\"Detects the execution of \\\".xbap\\\" (Browser Applications) files via PresentationHost.EXE from an uncommon location. These files can be abused to run malicious \\\".xbap\\\" files any bypass AWL\\n\";\nlet q1=_Im_ProcessCreate\n| where ActingProcessName endswith \"\\\\Microsoft.NodejsTools.PressAnyKey.exe\"|extend RuleId=\"a20391f8-76fb-437b-abc0-dba2df1952c6\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_pressanykey_lolbin_execution.yml\"|extend RuleTitle=\"Visual Studio NodejsTools PressAnyKey Arbitrary Binary Execution\"|extend RuleDescription=\"Detects child processes of Microsoft.NodejsTools.PressAnyKey.exe that can be used to execute any other binary\";\nlet q2=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\print.exe\" and TargetProcessCommandLine startswith \"print\" and (TargetProcessCommandLine contains \"/D\" and TargetProcessCommandLine contains \".exe\")) and (not(TargetProcessCommandLine contains \"print.exe\")))|extend RuleId=\"bafac3d6-7de9-4dd9-8874-4a1194b493ed\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_print_remote_file_copy.yml\"|extend RuleTitle=\"Abusing Print Executable\"|extend RuleDescription=\"Attackers can use print.exe for remote file copy\";\nlet q3=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\protocolhandler.exe\" or TargetProcessFilename =~ \"ProtocolHandler.exe\") and (TargetProcessCommandLine contains \"ftp://\" or TargetProcessCommandLine contains \"http://\" or TargetProcessCommandLine contains \"https://\"))|extend RuleId=\"104cdb48-a7a8-4ca7-a453-32942c6e5dcb\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_protocolhandler_download.yml\"|extend RuleTitle=\"File Download Using ProtocolHandler.exe\"|extend RuleDescription=\"Detects usage of \\\"ProtocolHandler\\\" to download files. Downloaded files will be located in the cache folder (for example - %LOCALAPPDATA%\\\\Microsoft\\\\Windows\\\\INetCache\\\\IE)\\n\";\nlet q4=_Im_ProcessCreate\n| where (ActingProcessName endswith \"\\\\provlaunch.exe\" and (not(((TargetProcessName endswith \"\\\\calc.exe\" or TargetProcessName endswith \"\\\\cmd.exe\" or TargetProcessName endswith \"\\\\cscript.exe\" or TargetProcessName endswith \"\\\\mshta.exe\" or TargetProcessName endswith \"\\\\notepad.exe\" or TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\" or TargetProcessName endswith \"\\\\regsvr32.exe\" or TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessName endswith \"\\\\wscript.exe\") or (TargetProcessName contains \":\\\\PerfLogs\\\\\" or TargetProcessName contains \":\\\\Temp\\\\\" or TargetProcessName contains \":\\\\Users\\\\Public\\\\\" or TargetProcessName contains \"\\\\AppData\\\\Temp\\\\\" or TargetProcessName contains \"\\\\Windows\\\\System32\\\\Tasks\\\\\" or TargetProcessName contains \"\\\\Windows\\\\Tasks\\\\\" or TargetProcessName contains \"\\\\Windows\\\\Temp\\\\\")))))|extend RuleId=\"7f5d1c9a-3e83-48df-95a7-2b98aae6c13c\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_provlaunch_potential_abuse.yml\"|extend RuleTitle=\"Potential Provlaunch.EXE Binary Proxy Execution Abuse\"|extend RuleDescription=\"Detects child processes of \\\"provlaunch.exe\\\" which might indicate potential abuse to proxy execution.\";\nlet q5=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\Psr.exe\" and (TargetProcessCommandLine contains \"/start\" or TargetProcessCommandLine contains \"-start\"))|extend RuleId=\"2158f96f-43c2-43cb-952a-ab4580f32382\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_psr_capture_screenshots.yml\"|extend RuleTitle=\"Screen Capture Activity Via Psr.EXE\"|extend RuleDescription=\"Detects execution of Windows Problem Steps Recorder (psr.exe), a utility used to record the user screen and clicks.\";\nlet q6=_Im_ProcessCreate\n| where (TargetProcessFilename =~ \"AdvancedRun.exe\" or (TargetProcessCommandLine contains \" /EXEFilename \" and TargetProcessCommandLine contains \" /Run\") or (TargetProcessCommandLine contains \" /WindowState 0\" and TargetProcessCommandLine contains \" /RunAs \" and TargetProcessCommandLine contains \" /CommandLine \"))|extend RuleId=\"d2b749ee-4225-417e-b20e-a8d2193cbb84\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_pua_advancedrun.yml\"|extend RuleTitle=\"PUA - AdvancedRun Execution\"|extend RuleDescription=\"Detects the execution of AdvancedRun utility\";\nlet q7=_Im_ProcessCreate\n| where ((TargetProcessName contains \"\\\\advanced_ip_scanner\" or TargetProcessFilename contains \"advanced_ip_scanner\" or TargetProcessFileDescription contains \"Advanced IP Scanner\") or (TargetProcessCommandLine contains \"/portable\" and TargetProcessCommandLine contains \"/lng\"))|extend RuleId=\"bef37fa2-f205-4a7b-b484-0759bfd5f86f\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_pua_advanced_ip_scanner.yml\"|extend RuleTitle=\"PUA - Advanced IP Scanner Execution\"|extend RuleDescription=\"Detects the use of Advanced IP Scanner. Seems to be a popular tool for ransomware groups.\";\nlet q8=_Im_ProcessCreate\n| where ((TargetProcessName contains \"\\\\advanced_port_scanner\" or TargetProcessFilename contains \"advanced_port_scanner\" or TargetProcessFileDescription contains \"Advanced Port Scanner\") or (TargetProcessCommandLine contains \"/portable\" and TargetProcessCommandLine contains \"/lng\"))|extend RuleId=\"54773c5f-f1cc-4703-9126-2f797d96a69d\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_pua_advanced_port_scanner.yml\"|extend RuleTitle=\"PUA - Advanced Port Scanner Execution\"|extend RuleDescription=\"Detects the use of Advanced Port Scanner.\";\nlet q9=_Im_ProcessCreate\n| where (TargetProcessFileProduct contains \"Mouse Lock\" or TargetProcessFileCompany contains \"Misc314\" or TargetProcessCommandLine contains \"Mouse Lock_\")|extend RuleId=\"c9192ad9-75e5-43eb-8647-82a0a5b493e3\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_pua_mouselock_execution.yml\"|extend RuleTitle=\"PUA - Mouse Lock Execution\"|extend RuleDescription=\"In Kaspersky's 2020 Incident Response Analyst Report they listed legitimate tool \\\"Mouse Lock\\\" as being used for both credential access and collection in security incidents.\";\nlet q10=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\NirCmd.exe\" or TargetProcessFilename =~ \"NirCmd.exe\") or (TargetProcessCommandLine contains \" execmd \" or TargetProcessCommandLine contains \".exe script \" or TargetProcessCommandLine contains \".exe shexec \" or TargetProcessCommandLine contains \" runinteractive \")) or ((TargetProcessCommandLine contains \" exec \" or TargetProcessCommandLine contains \" exec2 \") and (TargetProcessCommandLine contains \" show \" or TargetProcessCommandLine contains \" hide \")))|extend RuleId=\"4e2ed651-1906-4a59-a78a-18220fca1b22\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_pua_nircmd.yml\"|extend RuleTitle=\"PUA - NirCmd Execution\"|extend RuleDescription=\"Detects the use of NirCmd tool for command execution, which could be the result of legitimate administrative activity\";\nlet q11=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\nmap.exe\" or TargetProcessName endswith \"\\\\zennmap.exe\") or (TargetProcessFilename =~ \"nmap.exe\" or TargetProcessFilename =~ \"zennmap.exe\"))|extend RuleId=\"f6ecd1cf-19b8-4488-97f6-00f0924991a3\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_pua_nmap_zenmap.yml\"|extend RuleTitle=\"PUA - Nmap/Zenmap Execution\"|extend RuleDescription=\"Detects usage of namp/zenmap. Adversaries may attempt to get a listing of services running on remote hosts, including those that may be vulnerable to remote software exploitation\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion", "CredentialAccess", "Collection", "PrivilegeEscalation", "Discovery", "Execution"],
+                "techniques": ["T1046", "T1056", "T1569", "T1134", "T1059", "T1135", "T1564", "T1113", "T1218"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000115",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

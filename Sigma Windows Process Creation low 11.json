@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000111')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000111')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation low 11",
+                "description": "Sigma Windows Process Creation low 11",
+                "severity": "low",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\netsh.exe\" or TargetProcessFilename =~ \"netsh.exe\") and ((TargetProcessCommandLine contains \"firewall\" and TargetProcessCommandLine contains \"set\" and TargetProcessCommandLine contains \"opmode\" and TargetProcessCommandLine contains \"disable\") or (TargetProcessCommandLine contains \"advfirewall\" and TargetProcessCommandLine contains \"set\" and TargetProcessCommandLine contains \"state\" and TargetProcessCommandLine contains \"off\")))|extend RuleId=\"57c4bf16-227f-4394-8ec7-1b745ee061c3\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_netsh_fw_disable.yml\"|extend RuleTitle=\"Firewall Disabled via Netsh.EXE\"|extend RuleDescription=\"Detects netsh commands that turns off the Windows firewall\";\nlet q1=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\netsh.exe\" or TargetProcessFilename =~ \"netsh.exe\") and (TargetProcessCommandLine contains \"advfirewall\" and TargetProcessCommandLine contains \"firewall\" and TargetProcessCommandLine contains \"set\" and TargetProcessCommandLine contains \"rule\" and TargetProcessCommandLine contains \"group=\" and TargetProcessCommandLine contains \"new\" and TargetProcessCommandLine contains \"enable=Yes\"))|extend RuleId=\"347906f3-e207-4d18-ae5b-a9403d6bcdef\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_netsh_fw_enable_group_rule.yml\"|extend RuleTitle=\"Netsh Allow Group Policy on Microsoft Defender Firewall\"|extend RuleDescription=\"Adversaries may modify system firewalls in order to bypass controls limiting network usage\";\nlet q2=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\netsh.exe\" or TargetProcessFilename =~ \"netsh.exe\") and (TargetProcessCommandLine contains \" firewall \" and TargetProcessCommandLine contains \" set \"))|extend RuleId=\"a70dcb37-3bee-453a-99df-d0c683151be6\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_netsh_fw_set_rule.yml\"|extend RuleTitle=\"Firewall Rule Update Via Netsh.EXE\"|extend RuleDescription=\"Detects execution of netsh with the \\\"advfirewall\\\" and the \\\"set\\\" option in order to set new values for properties of a existing rule\";\nlet q3=_Im_ProcessCreate\n| where ((TargetProcessFilename =~ \"netsh.exe\" or TargetProcessName endswith \"\\\\netsh.exe\") and (TargetProcessCommandLine contains \"add\" and TargetProcessCommandLine contains \"helper\"))|extend RuleId=\"56321594-9087-49d9-bf10-524fe8479452\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_netsh_helper_dll_persistence.yml\"|extend RuleTitle=\"Potential Persistence Via Netsh Helper DLL\"|extend RuleDescription=\"Detects the execution of netsh with \\\"add helper\\\" flag in order to add a custom helper DLL. This technique can be abused to add a malicious helper DLL that can be used as a persistence proxy that gets called when netsh.exe is executed.\\n\";\nlet q4=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\netsh.exe\" or TargetProcessFilename =~ \"netsh.exe\") and (TargetProcessCommandLine contains \"trace\" and TargetProcessCommandLine contains \"start\"))|extend RuleId=\"d3c3861d-c504-4c77-ba55-224ba82d0118\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_netsh_packet_capture.yml\"|extend RuleTitle=\"New Network Trace Capture Started Via Netsh.EXE\"|extend RuleDescription=\"Detects the execution of netsh with the \\\"trace\\\" flag in order to start a network capture\";\nlet q5=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\netsh.exe\" or TargetProcessFilename =~ \"netsh.exe\") and ((TargetProcessCommandLine contains \"interface\" and TargetProcessCommandLine contains \"portproxy\" and TargetProcessCommandLine contains \"add\" and TargetProcessCommandLine contains \"v4tov4\") or (TargetProcessCommandLine contains \"i \" and TargetProcessCommandLine contains \"p \" and TargetProcessCommandLine contains \"a \" and TargetProcessCommandLine contains \"v \") or (TargetProcessCommandLine contains \"connectp\" and TargetProcessCommandLine contains \"listena\" and TargetProcessCommandLine contains \"c=\")))|extend RuleId=\"322ed9ec-fcab-4f67-9a34-e7c6aef43614\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_netsh_port_forwarding.yml\"|extend RuleTitle=\"New Port Forwarding Rule Added Via Netsh.EXE\"|extend RuleDescription=\"Detects the execution of netsh commands that configure a new port forwarding (PortProxy) rule\";\nlet q6=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\netsh.exe\" or TargetProcessFilename =~ \"netsh.exe\") and (TargetProcessCommandLine contains \"wlan\" and TargetProcessCommandLine contains \" s\" and TargetProcessCommandLine contains \" p\" and TargetProcessCommandLine contains \" k\" and TargetProcessCommandLine contains \"=clear\"))|extend RuleId=\"42b1a5b8-353f-4f10-b256-39de4467faff\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_netsh_wifi_credential_harvesting.yml\"|extend RuleTitle=\"Harvesting Of Wifi Credentials Via Netsh.EXE\"|extend RuleDescription=\"Detect the harvesting of wifi credentials using netsh.exe\";\nlet q7=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\net.exe\" or TargetProcessName endswith \"\\\\net1.exe\") or (TargetProcessFilename =~ \"net.exe\" or TargetProcessFilename =~ \"net1.exe\")) and ((((TargetProcessCommandLine contains \" group \" or TargetProcessCommandLine contains \" localgroup \") and (TargetProcessCommandLine contains \"domain admins\" or TargetProcessCommandLine contains \" administrator\" or TargetProcessCommandLine contains \" administrateur\" or TargetProcessCommandLine contains \"enterprise admins\" or TargetProcessCommandLine contains \"Exchange Trusted Subsystem\" or TargetProcessCommandLine contains \"Remote Desktop Users\" or TargetProcessCommandLine contains \"Utilisateurs du Bureau \u00e0 distance\" or TargetProcessCommandLine contains \"Usuarios de escritorio remoto\" or TargetProcessCommandLine contains \" /do\")) and (not(TargetProcessCommandLine contains \" /add\"))) or (TargetProcessCommandLine contains \" accounts \" and TargetProcessCommandLine contains \" /do\")))|extend RuleId=\"d95de845-b83c-4a9a-8a6a-4fc802ebf6c0\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_net_groups_and_accounts_recon.yml\"|extend RuleTitle=\"Suspicious Group And Account Reconnaissance Activity Using Net.EXE\"|extend RuleDescription=\"Detects suspicious reconnaissance command line activity on Windows systems using Net.EXE\\nCheck if the user that executed the commands is suspicious (e.g. service accounts, LOCAL_SYSTEM)\\n\";\nlet q8=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\net.exe\" or TargetProcessName endswith \"\\\\net1.exe\") or (TargetProcessFilename =~ \"net.exe\" or TargetProcessFilename =~ \"net1.exe\")) and (TargetProcessCommandLine contains \"user\" and TargetProcessCommandLine contains \"add\"))|extend RuleId=\"cd219ff3-fa99-45d4-8380-a7d15116c6dc\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_net_user_add.yml\"|extend RuleTitle=\"New User Created Via Net.EXE\"|extend RuleDescription=\"Identifies the creation of local users via the net.exe command.\";\nlet q9=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\net.exe\" or TargetProcessName endswith \"\\\\net1.exe\") or (TargetProcessFilename =~ \"net.exe\" or TargetProcessFilename =~ \"net1.exe\")) and (TargetProcessCommandLine contains \" use \" and TargetProcessCommandLine contains \"* \\\\\\\\*\\\\*$*\"))|extend RuleId=\"3abd6094-7027-475f-9630-8ab9be7b9725\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_net_use_mount_admin_share.yml\"|extend RuleTitle=\"Windows Admin Share Mount Via Net.EXE\"|extend RuleDescription=\"Detects when an admin share is mounted using net.exe\";\nlet q10=_Im_ProcessCreate\n| where ((((TargetProcessName endswith \"\\\\net.exe\" or TargetProcessName endswith \"\\\\net1.exe\") or (TargetProcessFilename =~ \"net.exe\" or TargetProcessFilename =~ \"net1.exe\")) and (TargetProcessCommandLine contains \" use \" and TargetProcessCommandLine contains \"*:*\\\\*\" and TargetProcessCommandLine contains \"*/USER:* *\")) and (not(TargetProcessCommandLine endswith \" \")))|extend RuleId=\"d4498716-1d52-438f-8084-4a603157d131\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_net_use_password_plaintext.yml\"|extend RuleTitle=\"Password Provided In Command Line Of Net.EXE\"|extend RuleDescription=\"Detects a when net.exe is called with a password in the command line\";\nlet q11=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\nltest.exe\" or TargetProcessFilename =~ \"nltestrk.exe\") and ((TargetProcessCommandLine contains \"server\" and TargetProcessCommandLine contains \"query\") or (TargetProcessCommandLine contains \"/user\" or TargetProcessCommandLine contains \"all_trusts\" or TargetProcessCommandLine contains \"dclist:\" or TargetProcessCommandLine contains \"dnsgetdc:\" or TargetProcessCommandLine contains \"domain_trusts\" or TargetProcessCommandLine contains \"dsgetdc:\" or TargetProcessCommandLine contains \"parentdomain\" or TargetProcessCommandLine contains \"trusted_domains\")))|extend RuleId=\"5cc90652-4cbd-4241-aa3b-4b462fa5a248\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_nltest_recon.yml\"|extend RuleTitle=\"Potential Recon Activity Via Nltest.EXE\"|extend RuleDescription=\"Detects nltest commands that can be used for information discovery\";\nlet q12=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\Adobe Creative Cloud Experience\\\\libs\\\\node.exe\" and (not(TargetProcessCommandLine contains \"Adobe Creative Cloud Experience\\\\js\")))|extend RuleId=\"df1f26d3-bea7-4700-9ea2-ad3e990cf90e\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_node_adobe_creative_cloud_abuse.yml\"|extend RuleTitle=\"Node Process Executions\"|extend RuleDescription=\"Detects the execution of other scripts using the Node executable packaged with Adobe Creative Cloud\";\nlet q13=_Im_ProcessCreate\n| where ((TargetProcessName contains \"\\\\nslookup.exe\" or TargetProcessFilename =~ \"\\\\nslookup.exe\") and ((ActingProcessName endswith \"\\\\powershell.exe\" or ActingProcessName endswith \"\\\\pwsh.exe\") and (TargetProcessCommandLine contains \" -q=txt \" or TargetProcessCommandLine contains \" -querytype=txt \")))|extend RuleId=\"1b3b01c7-84e9-4072-86e5-fc285a41ff23\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_nslookup_poweshell_download.yml\"|extend RuleTitle=\"Nslookup PowerShell Download Cradle - ProcessCreation\"|extend RuleDescription=\"Detects suspicious powershell download cradle using nslookup. This cradle uses nslookup to extract payloads from DNS records\";\nlet q14=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\ntdsutil.exe\" or TargetProcessFilename =~ \"ntdsutil.exe\") and ((TargetProcessCommandLine contains \"snapshot\" and TargetProcessCommandLine contains \"mount \") or (TargetProcessCommandLine contains \"ac\" and TargetProcessCommandLine contains \" i\" and TargetProcessCommandLine contains \" ntds\")))|extend RuleId=\"a58353df-af43-4753-bad0-cd83ef35eef5\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_ntdsutil_susp_usage.yml\"|extend RuleTitle=\"Suspicious Usage Of Active Directory Diagnostic Tool (ntdsutil.exe)\"|extend RuleDescription=\"Detects execution of ntdsutil.exe to perform different actions such as restoring snapshots...etc.\";\nlet q15=_Im_ProcessCreate\n| where TargetProcessName endswith \"\\\\ntdsutil.exe\"|extend RuleId=\"2afafd61-6aae-4df4-baed-139fa1f4c345\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_ntdsutil_usage.yml\"|extend RuleTitle=\"Invocation of Active Directory Diagnostic Tool (ntdsutil.exe)\"|extend RuleDescription=\"Detects execution of ntdsutil.exe, which can be used for various attacks against the NTDS database (NTDS.DIT)\";\nlet q16=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\odbcconf.exe\" or TargetProcessFilename =~ \"odbcconf.exe\") and (TargetProcessCommandLine contains \"INSTALLDRIVER \" and TargetProcessCommandLine contains \".dll\"))|extend RuleId=\"3f5491e2-8db8-496b-9e95-1029fce852d4\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_odbcconf_driver_install.yml\"|extend RuleTitle=\"Driver/DLL Installation Via Odbcconf.EXE\"|extend RuleDescription=\"Detects execution of \\\"odbcconf\\\" with \\\"INSTALLDRIVER\\\" which installs a new ODBC driver. Attackers abuse this to install and run malicious DLLs.\";\nlet q17=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\odbcconf.exe\" or TargetProcessFilename =~ \"odbcconf.exe\") and (TargetProcessCommandLine contains \"REGSVR \" and TargetProcessCommandLine contains \".dll\"))|extend RuleId=\"9f0a8bf3-a65b-440a-8c1e-5cb1547c8e70\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_odbcconf_register_dll_regsvr.yml\"|extend RuleTitle=\"New DLL Registered Via Odbcconf.EXE\"|extend RuleDescription=\"Detects execution of \\\"odbcconf\\\" with \\\"REGSVR\\\" in order to register a new DLL (equivalent to running regsvr32). Attackers abuse this to install and run malicious DLLs.\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["CommandAndControl", "PrivilegeEscalation", "Discovery", "DefenseEvasion", "CredentialAccess", "InitialAccess", "Persistence", "Execution", "LateralMovement"],
+                "techniques": ["T1003", "T1016", "T1482", "T1090", "T1546", "T1087", "T1040", "T1021", "T1078", "T1127", "T1562", "T1136", "T1059", "T1218"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000111",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

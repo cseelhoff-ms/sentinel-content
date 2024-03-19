@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000109')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000109')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation low 09",
+                "description": "Sigma Windows Process Creation low 09",
+                "severity": "low",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\link.exe\" and TargetProcessCommandLine contains \"LINK /\") and (not(((ActingProcessName startswith \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\\" or ActingProcessName startswith \"C:\\\\Program Files (x86)\\\\Microsoft Visual Studio\\\\\") and ActingProcessName contains \"\\\\VC\\\\Tools\\\\MSVC\\\\\"))))|extend RuleId=\"6e968eb1-5f05-4dac-94e9-fd0c5cb49fd6\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_sideload_link_binary.yml\"|extend RuleTitle=\"Sideloading Link.EXE\"|extend RuleDescription=\"Detects the execution utitilies often found in Visual Studio tools that hardcode the call to the binary \\\"link.exe\\\". They can be abused to sideload any binary with the same name\";\nlet q1=_Im_ProcessCreate\n| where ActingProcessName endswith \"\\\\sigverif.exe\"|extend RuleId=\"7d4aaec2-08ed-4430-8b96-28420e030e04\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_sigverif.yml\"|extend RuleTitle=\"Suspicious Sigverif Execution\"|extend RuleDescription=\"Detects the execution of sigverif binary as a parent process which could indicate it being used as a LOLBIN to proxy execution\";\nlet q2=_Im_ProcessCreate\n| where (ActingProcessName =~ \"C:\\\\Windows\\\\System32\\\\OpenSSH\\\\sshd.exe\" or (TargetProcessName endswith \"\\\\ssh.exe\" and (TargetProcessCommandLine contains \"ProxyCommand=\" or (TargetProcessCommandLine contains \"PermitLocalCommand\" and TargetProcessCommandLine contains \"LocalCommand\"))))|extend RuleId=\"7d6d30b8-5b91-4b90-a891-46cccaf29598\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_ssh.yml\"|extend RuleTitle=\"Lolbin Ssh.exe Use As Proxy\"|extend RuleDescription=\"Detect usage of the \\\"ssh.exe\\\" binary as a proxy to launch other programs\";\nlet q3=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \"-i\" or TargetProcessCommandLine contains \"/install\" or TargetProcessCommandLine contains \"-a\" or TargetProcessCommandLine contains \"/add-driver\" or TargetProcessCommandLine contains \".inf\") and TargetProcessName endswith \"\\\\pnputil.exe\")|extend RuleId=\"a2ea3ae7-d3d0-40a0-a55c-25a45c87cac1\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_susp_driver_installed_by_pnputil.yml\"|extend RuleTitle=\"Suspicious Driver Install by pnputil.exe\"|extend RuleDescription=\"Detects when a possible suspicious driver is being installed via pnputil.exe lolbin\";\nlet q4=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\DXCap.exe\" or TargetProcessFilename =~ \"DXCap.exe\") and TargetProcessCommandLine contains \" -c \")|extend RuleId=\"60f16a96-db70-42eb-8f76-16763e333590\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_susp_dxcap.yml\"|extend RuleTitle=\"Application Whitelisting Bypass via Dxcap.exe\"|extend RuleDescription=\"Detects execution of of Dxcap.exe\";\nlet q5=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\sqldumper.exe\" and (TargetProcessCommandLine contains \"0x0110\" or TargetProcessCommandLine contains \"0x01100:40\"))|extend RuleId=\"23ceaf5c-b6f1-4a32-8559-f2ff734be516\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_susp_sqldumper_activity.yml\"|extend RuleTitle=\"Dumping Process via Sqldumper.exe\"|extend RuleDescription=\"Detects process dump via legitimate sqldumper.exe binary\";\nlet q6=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\SyncAppvPublishingServer.exe\" or TargetProcessFilename =~ \"syncappvpublishingserver.exe\") and TargetProcessCommandLine contains \"\\\"n; \")|extend RuleId=\"fbd7c32d-db2a-4418-b92c-566eb8911133\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_syncappvpublishingserver_execute_psh.yml\"|extend RuleTitle=\"SyncAppvPublishingServer Execute Arbitrary PowerShell Code\"|extend RuleDescription=\"Executes arbitrary PowerShell code using SyncAppvPublishingServer.exe.\";\nlet q7=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"\\\\SyncAppvPublishingServer.vbs\" and TargetProcessCommandLine contains \";\")|extend RuleId=\"36475a7d-0f6d-4dce-9b01-6aeb473bbaf1\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_syncappvpublishingserver_vbs_execute_psh.yml\"|extend RuleTitle=\"SyncAppvPublishingServer VBS Execute Arbitrary PowerShell Code\"|extend RuleDescription=\"Executes arbitrary PowerShell code using SyncAppvPublishingServer.vbs\";\nlet q8=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\tracker.exe\" or TargetProcessFileDescription =~ \"Tracker\") and (TargetProcessCommandLine contains \" /d \" or TargetProcessCommandLine contains \" /c \")) and (not((TargetProcessCommandLine contains \" /ERRORREPORT:PROMPT \" or (ActingProcessName endswith \"\\\\Msbuild\\\\Current\\\\Bin\\\\MSBuild.exe\" or ActingProcessName endswith \"\\\\Msbuild\\\\Current\\\\Bin\\\\amd64\\\\MSBuild.exe\")))))|extend RuleId=\"148431ce-4b70-403d-8525-fcc2993f29ea\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_tracker.yml\"|extend RuleTitle=\"Potential DLL Injection Or Execution Using Tracker.exe\"|extend RuleDescription=\"Detects potential DLL injection and execution using \\\"Tracker.exe\\\"\";\nlet q9=_Im_ProcessCreate\n| where (TargetProcessName endswith \"ttdinject.exe\" or TargetProcessFilename =~ \"TTDInject.EXE\")|extend RuleId=\"b27077d6-23e6-45d2-81a0-e2b356eea5fd\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_ttdinject.yml\"|extend RuleTitle=\"Use of TTDInject.exe\"|extend RuleDescription=\"Detects the executiob of TTDInject.exe, which is used by Windows 10 v1809 and newer to debug time travel (underlying call of tttracer.exe)\";\nlet q10=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \"type \" and TargetProcessCommandLine contains \" > \\\\\\\\\") or (TargetProcessCommandLine contains \"type \\\\\\\\\" and TargetProcessCommandLine contains \" > \"))|extend RuleId=\"aa0b3a82-eacc-4ec3-9150-b5a9a3e3f82f\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_type.yml\"|extend RuleTitle=\"Potential Download/Upload Activity Using Type Command\"|extend RuleDescription=\"Detects usage of the \\\"type\\\" command to download/upload data from WebDAV server\";\nlet q11=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\unregmp2.exe\" or TargetProcessFilename =~ \"unregmp2.exe\") and TargetProcessCommandLine contains \" /HideWMP\")|extend RuleId=\"727454c0-d851-48b0-8b89-385611ab0704\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_unregmp2.yml\"|extend RuleTitle=\"Lolbin Unregmp2.exe Use As Proxy\"|extend RuleDescription=\"Detect usage of the \\\"unregmp2.exe\\\" binary as a proxy to launch a custom version of \\\"wmpnscfg.exe\\\"\";\nlet q12=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"UtilityFunctions.ps1\" or TargetProcessCommandLine contains \"RegSnapin \")|extend RuleId=\"0403d67d-6227-4ea8-8145-4e72db7da120\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_utilityfunctions.yml\"|extend RuleTitle=\"UtilityFunctions.ps1 Proxy Dll\"|extend RuleDescription=\"Detects the use of a Microsoft signed script executing a managed DLL with PowerShell.\";\nlet q13=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\VisualUiaVerifyNative.exe\" or TargetProcessFilename =~ \"VisualUiaVerifyNative.exe\")|extend RuleId=\"b30a8bc5-e21b-4ca2-9420-0a94019ac56a\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_visualuiaverifynative.yml\"|extend RuleTitle=\"Use of VisualUiaVerifyNative.exe\"|extend RuleDescription=\"VisualUiaVerifyNative.exe is a Windows SDK that can be used for AWL bypass and is listed in Microsoft's recommended block rules.\";\nlet q14=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\VSIISExeLauncher.exe\" or TargetProcessFilename =~ \"VSIISExeLauncher.exe\") and (TargetProcessCommandLine contains \" -p \" or TargetProcessCommandLine contains \" -a \"))|extend RuleId=\"18749301-f1c5-4efc-a4c3-276ff1f5b6f8\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_vsiisexelauncher.yml\"|extend RuleTitle=\"Use of VSIISExeLauncher.exe\"|extend RuleDescription=\"The \\\"VSIISExeLauncher.exe\\\" binary part of the Visual Studio/VS Code can be used to execute arbitrary binaries\";\nlet q15=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\wfc.exe\" or TargetProcessFilename =~ \"wfc.exe\")|extend RuleId=\"49be8799-7b4d-4fda-ad23-cafbefdebbc5\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_wfc.yml\"|extend RuleTitle=\"Use of Wfc.exe\"|extend RuleDescription=\"The Workflow Command-line Compiler can be used for AWL bypass and is listed in Microsoft's recommended block rules.\";\nlet q16=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\Microsoft.Workflow.Compiler.exe\" or TargetProcessFilename =~ \"Microsoft.Workflow.Compiler.exe\")|extend RuleId=\"419dbf2b-8a9b-4bea-bf99-7544b050ec8d\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolbin_workflow_compiler.yml\"|extend RuleTitle=\"Microsoft Workflow Compiler Execution\"|extend RuleDescription=\"Detects invocation of Microsoft Workflow Compiler, which may permit the execution of arbitrary unsigned code.\";\nlet q17=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\cscript.exe\" or TargetProcessName endswith \"\\\\wscript.exe\") or (TargetProcessFilename =~ \"cscript.exe\" or TargetProcessFilename =~ \"wscript.exe\")) and TargetProcessCommandLine contains \".vbs -register \")|extend RuleId=\"28c8f68b-098d-45af-8d43-8089f3e35403\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_lolscript_register_app.yml\"|extend RuleTitle=\"Potential Register_App.Vbs LOLScript Abuse\"|extend RuleDescription=\"Detects potential abuse of the \\\"register_app.vbs\\\" script that is part of the Windows SDK. The script offers the capability to register new VSS/VDS Provider as a COM+ application. Attackers can use this to install malicious DLLs for persistence and execution.\";\nlet q18=_Im_ProcessCreate\n| where ActingProcessName endswith \"\\\\mftrace.exe\"|extend RuleId=\"3d48c9d3-1aa6-418d-98d3-8fd3c01a564e\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_mftrace_child_process.yml\"|extend RuleTitle=\"Potential Mftrace.EXE Abuse\"|extend RuleDescription=\"Detects child processes of the \\\"Trace log generation tool for Media Foundation Tools\\\" (Mftrace.exe) which can abused to execute arbitrary binaries.\";\nlet q19=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\mode.com\" or TargetProcessFilename =~ \"MODE.COM\") and ((TargetProcessCommandLine contains \" con \" and TargetProcessCommandLine contains \" cp \" and TargetProcessCommandLine contains \" select=\") and (TargetProcessCommandLine endswith \"=1251\" or TargetProcessCommandLine endswith \"=866\")))|extend RuleId=\"12fbff88-16b5-4b42-9754-cd001a789fb3\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_mode_codepage_russian.yml\"|extend RuleTitle=\"CodePage Modification Via MODE.COM To Russian Language\"|extend RuleDescription=\"Detects a CodePage modification using the \\\"mode.com\\\" utility to Russian language.\\nThis behavior has been used by threat actors behind Dharma ransomware.\\n\";\nlet q20=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\MSBuild.exe\" or TargetProcessFilename =~ \"MSBuild.exe\") and (not((ActingProcessName endswith \"\\\\devenv.exe\" or ActingProcessName endswith \"\\\\cmd.exe\" or ActingProcessName endswith \"\\\\msbuild.exe\" or ActingProcessName endswith \"\\\\python.exe\" or ActingProcessName endswith \"\\\\explorer.exe\" or ActingProcessName endswith \"\\\\nuget.exe\"))))|extend RuleId=\"33be4333-2c6b-44f4-ae28-102cdbde0a31\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_msbuild_susp_parent_process.yml\"|extend RuleTitle=\"Suspicious Msbuild Execution By Uncommon Parent Process\"|extend RuleDescription=\"Detects suspicious execution of 'Msbuild.exe' by a uncommon parent process\";\nlet q21=_Im_ProcessCreate\n| where TargetProcessCommandLine contains \" -cab \"\n| where TargetProcessCommandLine contains \" /cab \"\n| where ((TargetProcessName endswith \"\\\\msdt.exe\" or TargetProcessFilename =~ \"msdt.exe\") and ())|extend RuleId=\"dc4576d4-7467-424f-9eee-fd2b02855fe0\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_msdt_susp_cab_options.yml\"|extend RuleTitle=\"Suspicious Cabinet File Execution Via Msdt.EXE\"|extend RuleDescription=\"Detects execution of msdt.exe using the \\\"cab\\\" flag which could indicates suspicious diagcab files with embedded answer files leveraging CVE-2022-30190\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18, q19, q20, q21;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion", "CredentialAccess", "CommandAndControl", "Persistence", "PrivilegeEscalation", "Execution"],
+                "techniques": ["T1003", "T1036", "T1547", "T1055", "T1216", "T1105", "T1127", "T1202", "T1218"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000109",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000131')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000131')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation low 31",
+                "description": "Sigma Windows Process Creation low 31",
+                "severity": "low",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\WMIC.exe\" or TargetProcessFilename =~ \"wmic.exe\") and TargetProcessCommandLine contains \"process\") and (not((TargetProcessCommandLine contains \"call\" and TargetProcessCommandLine contains \"create\"))))|extend RuleId=\"221b251a-357a-49a9-920a-271802777cc0\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wmic_recon_process.yml\"|extend RuleTitle=\"Process Reconnaissance Via Wmic.EXE\"|extend RuleDescription=\"Detects the execution of \\\"wmic\\\" with the \\\"process\\\" flag, which adversary might use to list processes running on the compromised host or list installed software hotfixes and patches.\";\nlet q1=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\wmic.exe\" or TargetProcessFilename =~ \"wmic.exe\") and TargetProcessCommandLine contains \"Product\")|extend RuleId=\"15434e33-5027-4914-88d5-3d4145ec25a9\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wmic_recon_product.yml\"|extend RuleTitle=\"Potential Product Reconnaissance Via Wmic.EXE\"|extend RuleDescription=\"Detects the execution of WMIC in order to get a list of firewall and antivirus products\";\nlet q2=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\wmic.exe\" or TargetProcessFilename =~ \"wmic.exe\") and (TargetProcessCommandLine contains \"AntiVirusProduct\" or TargetProcessCommandLine contains \"FirewallProduct\"))|extend RuleId=\"e568650b-5dcd-4658-8f34-ded0b1e13992\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wmic_recon_product_class.yml\"|extend RuleTitle=\"Potential Product Class Reconnaissance Via Wmic.EXE\"|extend RuleDescription=\"Detects the execution of WMIC in order to get a list of firewall and antivirus products\";\nlet q3=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\WMIC.exe\" or TargetProcessFilename =~ \"wmic.exe\") and TargetProcessCommandLine contains \"service\")|extend RuleId=\"76f55eaa-d27f-4213-9d45-7b0e4b60bbae\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wmic_recon_service.yml\"|extend RuleTitle=\"Service Reconnaissance Via Wmic.EXE\"|extend RuleDescription=\"An adversary might use WMI to check if a certain remote service is running on a remote device.\\nWhen the test completes, a service information will be displayed on the screen if it exists.\\nA common feedback message is that \\\"No instance(s) Available\\\" if the service queried is not running.\\nA common error message is \\\"Node - (provided IP or default) ERROR Description =The RPC server is unavailable\\\" if the provided remote host is unreachable\\n\";\nlet q4=_Im_ProcessCreate\n| where ((TargetProcessFileDescription =~ \"WMI Commandline Utility\" or TargetProcessFilename =~ \"wmic.exe\" or TargetProcessName endswith \"\\\\WMIC.exe\") and (TargetProcessCommandLine contains \"LOGICALDISK get Name,Size,FreeSpace\" or TargetProcessCommandLine contains \"os get Caption,OSArchitecture,Version\"))|extend RuleId=\"9d5a1274-922a-49d0-87f3-8c653483b909\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wmic_recon_system_info_uncommon.yml\"|extend RuleTitle=\"Uncommon System Information Discovery Via Wmic.EXE\"|extend RuleDescription=\"Detects the use of the WMI command-line (WMIC) utility to identify and display various system information,\\nincluding OS, CPU, GPU, and disk drive names; memory capacity; display resolution; and baseboard, BIOS,\\nand GPU driver products/versions.\\nSome of these commands were used by Aurora Stealer in late 2022/early 2023.\\n\";\nlet q5=_Im_ProcessCreate\n| where ((TargetProcessFilename =~ \"wmic.exe\" or TargetProcessName endswith \"\\\\WMIC.exe\") and (TargetProcessCommandLine contains \" service get \" and TargetProcessCommandLine contains \"name,displayname,pathname,startmode\"))|extend RuleId=\"68bcd73b-37ef-49cb-95fc-edc809730be6\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wmic_recon_unquoted_service_search.yml\"|extend RuleTitle=\"Potential Unquoted Service Path Reconnaissance Via Wmic.EXE\"|extend RuleDescription=\"Detects known WMI recon method to look for unquoted service paths using wmic. Often used by pentester and attacker enumeration scripts\";\nlet q6=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\WMIC.exe\" or TargetProcessFilename =~ \"wmic.exe\") and (TargetProcessCommandLine contains \"volume\" or TargetProcessCommandLine contains \"path win32_logicaldisk\"))|extend RuleId=\"c79da740-5030-45ec-a2e0-479e824a562c\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wmic_recon_volume.yml\"|extend RuleTitle=\"System Disk And Volume Reconnaissance Via Wmic.EXE\"|extend RuleDescription=\"An adversary might use WMI to discover information about the system, such as the volume name, size,\\nfree space, and other disk information. This can be done using the `wmic` command-line utility and has been\\nobserved being used by threat actors such as Volt Typhoon.\\n\";\nlet q7=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\WMIC.exe\" or TargetProcessFilename =~ \"wmic.exe\") and TargetProcessCommandLine contains \"/node:\") and (not((TargetProcessCommandLine contains \"/node:127.0.0.1 \" or TargetProcessCommandLine contains \"/node:localhost \"))))|extend RuleId=\"7773b877-5abb-4a3e-b9c9-fd0369b59b00\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wmic_remote_execution.yml\"|extend RuleTitle=\"WMIC Remote Command Execution\"|extend RuleDescription=\"Detects the execution of WMIC to query information on a remote system\";\nlet q8=_Im_ProcessCreate\n| where ((TargetProcessFilename =~ \"wmic.exe\" or TargetProcessName endswith \"\\\\WMIC.exe\") and ((TargetProcessCommandLine contains \" service \" and TargetProcessCommandLine contains \" call \") and (TargetProcessCommandLine contains \"stopservice\" or TargetProcessCommandLine contains \"startservice\")))|extend RuleId=\"0b7163dc-7eee-4960-af17-c0cd517f92da\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wmic_service_manipulation.yml\"|extend RuleTitle=\"Service Started/Stopped Via Wmic.EXE\"|extend RuleDescription=\"Detects usage of wmic to start or stop a service\";\nlet q9=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\wmic.exe\" or TargetProcessFilename =~ \"wmic.exe\" or (TargetProcessIMPHASH =~ \"1B1A3F43BF37B5BFE60751F2EE2F326E\" or TargetProcessIMPHASH =~ \"37777A96245A3C74EB217308F3546F4C\" or TargetProcessIMPHASH =~ \"9D87C9D67CE724033C0B40CC4CA1B206\") or (TargetProcessIMPHASH=~\"1B1A3F43BF37B5BFE60751F2EE2F326E\" or TargetProcessIMPHASH=~\"37777A96245A3C74EB217308F3546F4C\" or TargetProcessIMPHASH=~\"9D87C9D67CE724033C0B40CC4CA1B206\")) and (TargetProcessCommandLine contains \"format:\" and TargetProcessCommandLine contains \"http\"))|extend RuleId=\"8d63dadf-b91b-4187-87b6-34a1114577ea\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wmic_squiblytwo_bypass.yml\"|extend RuleTitle=\"Potential SquiblyTwo Technique Execution\"|extend RuleDescription=\"Detects potential SquiblyTwo attack technique with possible renamed WMIC via Imphash and OriginalFileName fields\";\nlet q10=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\WMIC.exe\" or TargetProcessFilename =~ \"wmic.exe\") and (TargetProcessCommandLine contains \"call\" and TargetProcessCommandLine contains \"terminate\"))|extend RuleId=\"49d9671b-0a0a-4c09-8280-d215bfd30662\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wmic_terminate_application.yml\"|extend RuleTitle=\"Application Terminated Via Wmic.EXE\"|extend RuleDescription=\"Detects calls to the \\\"terminate\\\" function via wmic in order to kill an application\";\nlet q11=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\WMIC.exe\" or TargetProcessFilename =~ \"wmic.exe\") and (TargetProcessCommandLine contains \"call\" or TargetProcessCommandLine contains \"uninstall\"))|extend RuleId=\"b53317a0-8acf-4fd1-8de8-a5401e776b96\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wmic_uninstall_application.yml\"|extend RuleTitle=\"Application Removed Via Wmic.EXE\"|extend RuleDescription=\"Uninstall an application with wmic\";\nlet q12=_Im_ProcessCreate\n| where TargetProcessCommandLine contains \"-format\"\n| where TargetProcessCommandLine contains \"/format\"\n| where ((TargetProcessName endswith \"\\\\wmic.exe\" and ()) and (not((TargetProcessCommandLine contains \"Format:List\" or TargetProcessCommandLine contains \"Format:htable\" or TargetProcessCommandLine contains \"Format:hform\" or TargetProcessCommandLine contains \"Format:table\" or TargetProcessCommandLine contains \"Format:mof\" or TargetProcessCommandLine contains \"Format:value\" or TargetProcessCommandLine contains \"Format:rawxml\" or TargetProcessCommandLine contains \"Format:xml\" or TargetProcessCommandLine contains \"Format:csv\"))))|extend RuleId=\"05c36dd6-79d6-4a9a-97da-3db20298ab2d\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wmic_xsl_script_processing.yml\"|extend RuleTitle=\"XSL Script Execution Via WMIC.EXE\"|extend RuleDescription=\"Detects the execution of WMIC with the \\\"format\\\" flag to potentially load XSL files.\\nAdversaries abuse this functionality to execute arbitrary files while potentially bypassing application whitelisting defenses.\\nExtensible Stylesheet Language (XSL) files are commonly used to describe the processing and rendering of data within XML files.\\n\";\nlet q13=_Im_ProcessCreate\n| where (ActingProcessName endswith \"\\\\WmiPrvSe.exe\" and (not(((LogonId =~ \"0x3e7\" or LogonId =~ \"null\") or (TargetUsername contains \"AUTHORI\" or TargetUsername contains \"AUTORI\") or TargetProcessName endswith \"\\\\WmiPrvSE.exe\" or TargetProcessName endswith \"\\\\WerFault.exe\" or isempty(LogonId)))))|extend RuleId=\"d21374ff-f574-44a7-9998-4a8c8bf33d7d\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wmiprvse_spawning_process.yml\"|extend RuleTitle=\"WmiPrvSE Spawned A Process\"|extend RuleDescription=\"Detects WmiPrvSE spawning a process\";\nlet q14=_Im_ProcessCreate\n| where (ActingProcessName endswith \"\\\\WmiPrvSE.exe\" and ((TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\") or (TargetProcessFilename =~ \"PowerShell.EXE\" or TargetProcessFilename =~ \"pwsh.dll\")))|extend RuleId=\"692f0bec-83ba-4d04-af7e-e884a96059b6\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wmiprvse_spawns_powershell.yml\"|extend RuleTitle=\"Potential WMI Lateral Movement WmiPrvSE Spawned PowerShell\"|extend RuleDescription=\"Detects Powershell as a child of the WmiPrvSE process. Which could be a sign of lateral movement via WMI.\";\nlet q15=_Im_ProcessCreate\n| where (TargetProcessName =~ \"C:\\\\WINDOWS\\\\system32\\\\wbem\\\\scrcons.exe\" and ActingProcessName =~ \"C:\\\\Windows\\\\System32\\\\svchost.exe\")|extend RuleId=\"ec1d5e28-8f3b-4188-a6f8-6e8df81dc28e\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wmi_persistence_script_event_consumer.yml\"|extend RuleTitle=\"WMI Persistence - Script Event Consumer\"|extend RuleDescription=\"Detects WMI script event consumers\";\nlet q16=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\wscript.exe\" or TargetProcessName endswith \"\\\\cscript.exe\") and (TargetProcessCommandLine contains \":\\\\Temp\\\\\" or TargetProcessCommandLine contains \":\\\\Tmp\\\\\" or TargetProcessCommandLine contains \":\\\\Users\\\\Public\\\\\" or TargetProcessCommandLine contains \":\\\\Windows\\\\Temp\\\\\" or TargetProcessCommandLine contains \"\\\\AppData\\\\Local\\\\Temp\\\\\") and (TargetProcessCommandLine contains \".js\" or TargetProcessCommandLine contains \".jse\" or TargetProcessCommandLine contains \".vba\" or TargetProcessCommandLine contains \".vbe\" or TargetProcessCommandLine contains \".vbs\" or TargetProcessCommandLine contains \".wsf\"))|extend RuleId=\"cea72823-df4d-4567-950c-0b579eaf0846\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_wscript_cscript_dropper.yml\"|extend RuleTitle=\"Potential Dropper Script Execution Via WScript/CScript\"|extend RuleDescription=\"Detects wscript/cscript executions of scripts located in user directories\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion", "Persistence", "PrivilegeEscalation", "Discovery", "Execution"],
+                "techniques": ["T1047", "T1220", "T1059", "T1082", "T1546"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000131",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

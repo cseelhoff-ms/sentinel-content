@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000119')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000119')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation low 19",
+                "description": "Sigma Windows Process Creation low 19",
+                "severity": "low",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where TargetProcessCommandLine contains \" -d \"\n| where TargetProcessCommandLine contains \" /d \"\n| where ((TargetProcessName endswith \"\\\\reg.exe\" and (TargetProcessCommandLine contains \"add \" and TargetProcessCommandLine contains \"SYSTEM\\\\CurrentControlSet\\\\Services\\\\\" and TargetProcessCommandLine contains \" ImagePath \")) and ())|extend RuleId=\"9b0b7ac3-6223-47aa-a3fd-e8f211e637db\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_reg_service_imagepath_change.yml\"|extend RuleTitle=\"Changing Existing Service ImagePath Value Via Reg.EXE\"|extend RuleDescription=\"Adversaries may execute their own malicious payloads by hijacking the Registry entries used by services.\\nAdversaries may use flaws in the permissions for registry to redirect from the originally specified executable to one that they control, in order to launch their own code at Service start.\\nWindows stores local service configuration information in the Registry under HKLM\\\\SYSTEM\\\\CurrentControlSet\\\\Services\\n\";\nlet q1=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\reg.exe\" and (TargetProcessCommandLine contains \"query\" and TargetProcessCommandLine contains \"\\\\software\\\\\" and TargetProcessCommandLine contains \"/v\" and TargetProcessCommandLine contains \"svcversion\"))|extend RuleId=\"e13f668e-7f95-443d-98d2-1816a7648a7b\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_reg_software_discovery.yml\"|extend RuleTitle=\"Detected Windows Software Discovery\"|extend RuleDescription=\"Adversaries may attempt to enumerate software for a variety of reasons, such as figuring out what security measures are present or if the compromised system has a version of software that is vulnerable.\";\nlet q2=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"\\\\System\\\\CurrentControlSet\\\\Control\" and TargetProcessCommandLine contains \"Write Protection\" and TargetProcessCommandLine contains \"0\" and TargetProcessCommandLine contains \"storage\")|extend RuleId=\"75f7a0e2-7154-4c4d-9eae-5cdb4e0a5c13\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_reg_write_protect_for_storage_disabled.yml\"|extend RuleTitle=\"Write Protect For Storage Disabled\"|extend RuleDescription=\"Detects applications trying to modify the registry in order to disable any write-protect property for storage devices.\\nThis could be a precursor to a ransomware attack and has been an observed technique used by cypherpunk group.\\n\";\nlet q3=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\AnyDesk.exe\" or TargetProcessFileDescription =~ \"AnyDesk\" or TargetProcessFileProduct =~ \"AnyDesk\" or TargetProcessFileCompany =~ \"AnyDesk Software GmbH\")|extend RuleId=\"b52e84a3-029e-4529-b09b-71d19dd27e94\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_remote_access_tools_anydesk.yml\"|extend RuleTitle=\"Remote Access Tool - AnyDesk Execution\"|extend RuleDescription=\"An adversary may use legitimate desktop support and remote access software, such as Team Viewer, Go2Assist, LogMein, AmmyyAdmin, etc, to establish an interactive command and control channel to target systems within networks.\\nThese services are commonly used as legitimate technical support software, and may be allowed by application control within a target environment.\\nRemote access tools like VNC, Ammyy, and Teamviewer are used frequently when compared with other legitimate software commonly used by adversaries. (Citation: Symantec Living off the Land)\\n\";\nlet q4=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"/c \" and TargetProcessCommandLine contains \"echo \" and TargetProcessCommandLine contains \".exe --set-password\")|extend RuleId=\"b1377339-fda6-477a-b455-ac0923f9ec2c\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_remote_access_tools_anydesk_piped_password_via_cli.yml\"|extend RuleTitle=\"Remote Access Tool - AnyDesk Piped Password Via CLI\"|extend RuleDescription=\"Detects piping the password to an anydesk instance via CMD and the '--set-password' flag.\";\nlet q5=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\AnyDesk.exe\" or TargetProcessFileDescription =~ \"AnyDesk\" or TargetProcessFileProduct =~ \"AnyDesk\" or TargetProcessFileCompany =~ \"AnyDesk Software GmbH\") and (TargetProcessFileVersion startswith \"7.0.\" or TargetProcessFileVersion startswith \"7.1.\" or TargetProcessFileVersion startswith \"8.0.1\" or TargetProcessFileVersion startswith \"8.0.2\" or TargetProcessFileVersion startswith \"8.0.3\" or TargetProcessFileVersion startswith \"8.0.4\" or TargetProcessFileVersion startswith \"8.0.5\" or TargetProcessFileVersion startswith \"8.0.6\" or TargetProcessFileVersion startswith \"8.0.7\")) and (not((TargetProcessCommandLine contains \" --remove\" or TargetProcessCommandLine contains \" --uninstall\"))))|extend RuleId=\"41f407b5-3096-44ea-a74f-96d04fbc41be\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_remote_access_tools_anydesk_revoked_cert.yml\"|extend RuleTitle=\"Remote Access Tool - AnyDesk Execution With Known Revoked Signing Certificate\"|extend RuleDescription=\"Detects the execution of an AnyDesk binary with a version prior to 8.0.8.\\nPrior to version 8.0.8, the Anydesk application used a signing certificate that got compromised by threat actors.\\nUse this rule to detect instances of older versions of Anydesk using the compromised certificate\\nThis is recommended in order to avoid attackers leveraging the certificate and signing their binaries to bypass detections.\\n\";\nlet q6=_Im_ProcessCreate\n| where (TargetProcessFileDescription =~ \"GoTo Opener\" or TargetProcessFileProduct =~ \"GoTo Opener\" or TargetProcessFileCompany =~ \"LogMeIn, Inc.\")|extend RuleId=\"b6d98a4f-cef0-4abf-bbf6-24132854a83d\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_remote_access_tools_gotoopener.yml\"|extend RuleTitle=\"Remote Access Tool - GoToAssist Execution\"|extend RuleDescription=\"An adversary may use legitimate desktop support and remote access software, such as Team Viewer, Go2Assist, LogMein, AmmyyAdmin, etc, to establish an interactive command and control channel to target systems within networks.\\nThese services are commonly used as legitimate technical support software, and may be allowed by application control within a target environment.\\nRemote access tools like VNC, Ammyy, and Teamviewer are used frequently when compared with other legitimate software commonly used by adversaries. (Citation: Symantec Living off the Land)\\n\";\nlet q7=_Im_ProcessCreate\n| where (TargetProcessFileDescription =~ \"LMIGuardianSvc\" or TargetProcessFileProduct =~ \"LMIGuardianSvc\" or TargetProcessFileCompany =~ \"LogMeIn, Inc.\")|extend RuleId=\"d85873ef-a0f8-4c48-a53a-6b621f11729d\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_remote_access_tools_logmein.yml\"|extend RuleTitle=\"Remote Access Tool - LogMeIn Execution\"|extend RuleDescription=\"An adversary may use legitimate desktop support and remote access software, such as Team Viewer, Go2Assist, LogMein, AmmyyAdmin, etc, to establish an interactive command and control channel to target systems within networks.\\nThese services are commonly used as legitimate technical support software, and may be allowed by application control within a target environment.\\nRemote access tools like VNC, Ammyy, and Teamviewer are used frequently when compared with other legitimate software commonly used by adversaries. (Citation: Symantec Living off the Land)\\n\";\nlet q8=_Im_ProcessCreate\n| where (TargetProcessFileDescription =~ \"NetSupport Client Configurator\" or TargetProcessFileProduct =~ \"NetSupport Remote Control\" or TargetProcessFileCompany =~ \"NetSupport Ltd\" or TargetProcessFilename =~ \"PCICFGUI.EXE\")|extend RuleId=\"758ff488-18d5-4cbe-8ec4-02b6285a434f\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_remote_access_tools_netsupport.yml\"|extend RuleTitle=\"Remote Access Tool - NetSupport Execution\"|extend RuleDescription=\"An adversary may use legitimate desktop support and remote access software, such as Team Viewer, Go2Assist, LogMein, AmmyyAdmin, etc, to establish an interactive command and control channel to target systems within networks.\\nThese services are commonly used as legitimate technical support software, and may be allowed by application control within a target environment.\\nRemote access tools like VNC, Ammyy, and Teamviewer are used frequently when compared with other legitimate software commonly used by adversaries. (Citation: Symantec Living off the Land)\\n\";\nlet q9=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\client32.exe\" or TargetProcessFileProduct contains \"NetSupport Remote Control\" or TargetProcessFilename contains \"client32.exe\" or TargetProcessIMPHASH =~ \"a9d50692e95b79723f3e76fcf70d023e\" or TargetProcessIMPHASH=~\"a9d50692e95b79723f3e76fcf70d023e\") and (not((TargetProcessName startswith \"C:\\\\Program Files\\\\\" or TargetProcessName startswith \"C:\\\\Program Files (x86)\\\\\"))))|extend RuleId=\"37e8d358-6408-4853-82f4-98333fca7014\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_remote_access_tools_netsupport_susp_exec.yml\"|extend RuleTitle=\"Remote Access Tool - NetSupport Execution From Unusual Location\"|extend RuleDescription=\"Detects execution of client32.exe (NetSupport RAT) from an unusual location (outside of 'C:\\\\Program Files')\";\nlet q10=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\rutserv.exe\" or TargetProcessName endswith \"\\\\rfusclient.exe\") or TargetProcessFileProduct =~ \"Remote Utilities\") and (not((TargetProcessName startswith \"C:\\\\Program Files\\\\Remote Utilities\" or TargetProcessName startswith \"C:\\\\Program Files (x86)\\\\Remote Utilities\"))))|extend RuleId=\"e01fa958-6893-41d4-ae03-182477c5e77d\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_remote_access_tools_rurat_non_default_location.yml\"|extend RuleTitle=\"Remote Access Tool - RURAT Execution From Unusual Location\"|extend RuleDescription=\"Detects execution of Remote Utilities RAT (RURAT) from an unusual location (outside of 'C:\\\\Program Files')\";\nlet q11=_Im_ProcessCreate\n| where (TargetProcessFileDescription =~ \"ScreenConnect Service\" or TargetProcessFileProduct =~ \"ScreenConnect\" or TargetProcessFileCompany =~ \"ScreenConnect Software\")|extend RuleId=\"57bff678-25d1-4d6c-8211-8ca106d12053\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_remote_access_tools_screenconnect.yml\"|extend RuleTitle=\"Remote Access Tool - ScreenConnect Execution\"|extend RuleDescription=\"An adversary may use legitimate desktop support and remote access software, such as Team Viewer, Go2Assist, LogMein, AmmyyAdmin, etc, to establish an interactive command and control channel to target systems within networks.\\nThese services are commonly used as legitimate technical support software, and may be allowed by application control within a target environment.\\nRemote access tools like VNC, Ammyy, and Teamviewer are used frequently when compared with other legitimate software commonly used by adversaries. (Citation: Symantec Living off the Land)\\n\";\nlet q12=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"e=Access&\" and TargetProcessCommandLine contains \"y=Guest&\" and TargetProcessCommandLine contains \"&p=\" and TargetProcessCommandLine contains \"&c=\" and TargetProcessCommandLine contains \"&k=\")|extend RuleId=\"75bfe6e6-cd8e-429e-91d3-03921e1d7962\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_remote_access_tools_screenconnect_installation_cli_param.yml\"|extend RuleTitle=\"Remote Access Tool - ScreenConnect Installation Execution\"|extend RuleDescription=\"Detects ScreenConnect program starts that establish a remote access to a system.\";\nlet q13=_Im_ProcessCreate\n| where ((ActingProcessCommandLine contains \":\\\\Windows\\\\TEMP\\\\ScreenConnect\\\\\" and ActingProcessCommandLine contains \"run.cmd\") and (TargetProcessName endswith \"\\\\bitsadmin.exe\" or TargetProcessName endswith \"\\\\cmd.exe\" or TargetProcessName endswith \"\\\\curl.exe\" or TargetProcessName endswith \"\\\\dllhost.exe\" or TargetProcessName endswith \"\\\\net.exe\" or TargetProcessName endswith \"\\\\nltest.exe\" or TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\" or TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessName endswith \"\\\\wevtutil.exe\"))|extend RuleId=\"7b582f1a-b318-4c6a-bf4e-66fe49bf55a5\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_remote_access_tools_screenconnect_remote_execution_susp.yml\"|extend RuleTitle=\"Remote Access Tool - ScreenConnect Potential Suspicious Remote Command Execution\"|extend RuleDescription=\"Detects potentially suspicious child processes launched via the ScreenConnect client service.\\n\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["DefenseEvasion", "CommandAndControl", "InitialAccess", "Persistence", "Discovery", "Execution"],
+                "techniques": ["T1133", "T1219", "T1562", "T1574", "T1518"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000119",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

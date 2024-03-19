@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000230')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000230')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation medium 30",
+                "description": "Sigma Windows Process Creation medium 30",
+                "severity": "medium",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where (((TargetProcessFilename =~ \"PingCastleReporting.exe\" or TargetProcessFilename =~ \"PingCastleCloud.exe\" or TargetProcessFilename =~ \"PingCastle.exe\") or (TargetProcessCommandLine contains \"--scanner aclcheck\" or TargetProcessCommandLine contains \"--scanner antivirus\" or TargetProcessCommandLine contains \"--scanner computerversion\" or TargetProcessCommandLine contains \"--scanner foreignusers\" or TargetProcessCommandLine contains \"--scanner laps_bitlocker\" or TargetProcessCommandLine contains \"--scanner localadmin\" or TargetProcessCommandLine contains \"--scanner nullsession\" or TargetProcessCommandLine contains \"--scanner nullsession-trust\" or TargetProcessCommandLine contains \"--scanner oxidbindings\" or TargetProcessCommandLine contains \"--scanner remote\" or TargetProcessCommandLine contains \"--scanner share\" or TargetProcessCommandLine contains \"--scanner smb\" or TargetProcessCommandLine contains \"--scanner smb3querynetwork\" or TargetProcessCommandLine contains \"--scanner spooler\" or TargetProcessCommandLine contains \"--scanner startup\" or TargetProcessCommandLine contains \"--scanner zerologon\") or TargetProcessCommandLine contains \"--no-enum-limit\" or (TargetProcessCommandLine contains \"--healthcheck\" and TargetProcessCommandLine contains \"--level Full\") or (TargetProcessCommandLine contains \"--healthcheck\" and TargetProcessCommandLine contains \"--server \")) and (not((TargetProcessName endswith \"\\\\PingCastleReporting.exe\" or TargetProcessName endswith \"\\\\PingCastleCloud.exe\" or TargetProcessName endswith \"\\\\PingCastle.exe\"))))|extend RuleId=\"2433a154-bb3d-42e4-86c3-a26bdac91c45\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_renamed_pingcastle.yml\"|extend RuleTitle=\"Renamed PingCastle Binary Execution\"|extend RuleDescription=\"Detects the execution of a renamed \\\"PingCastle\\\" binary based on the PE metadata fields.\";\nlet q1=_Im_ProcessCreate\n| where ((TargetProcessFilename =~ \"Plink\" or (TargetProcessCommandLine contains \" -l forward\" and TargetProcessCommandLine contains \" -P \" and TargetProcessCommandLine contains \" -R \")) and (not(TargetProcessName endswith \"\\\\plink.exe\")))|extend RuleId=\"1c12727d-02bf-45ff-a9f3-d49806a3cf43\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_renamed_plink.yml\"|extend RuleTitle=\"Renamed Plink Execution\"|extend RuleDescription=\"Detects the execution of a renamed version of the Plink binary\";\nlet q2=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"DllRegisterServer\" and (not(TargetProcessName endswith \"\\\\rundll32.exe\")))|extend RuleId=\"2569ed8c-1147-498a-9b8c-2ad3656b10ed\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_renamed_rundll32_dllregisterserver.yml\"|extend RuleTitle=\"Potential Renamed Rundll32 Execution\"|extend RuleDescription=\"Detects when 'DllRegisterServer' is called in the commandline and the image is not rundll32. This could mean that the 'rundll32' utility has been renamed in order to avoid detection\";\nlet q3=_Im_ProcessCreate\n| where (TargetProcessFileProduct =~ \"Sysinternals DebugView\" and (not((TargetProcessFilename =~ \"Dbgview.exe\" and TargetProcessName endswith \"\\\\Dbgview.exe\"))))|extend RuleId=\"cd764533-2e07-40d6-a718-cfeec7f2da7f\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_renamed_sysinternals_debugview.yml\"|extend RuleTitle=\"Renamed SysInternals DebugView Execution\"|extend RuleDescription=\"Detects suspicious renamed SysInternals DebugView execution\";\nlet q4=_Im_ProcessCreate\n| where ((TargetProcessFilename =~ \"procdump\" or ((TargetProcessCommandLine contains \" -ma \" or TargetProcessCommandLine contains \" /ma \") and (TargetProcessCommandLine contains \" -accepteula \" or TargetProcessCommandLine contains \" /accepteula \"))) and (not((TargetProcessName endswith \"\\\\procdump.exe\" or TargetProcessName endswith \"\\\\procdump64.exe\"))))|extend RuleId=\"4a0b2c7e-7cb2-495d-8b63-5f268e7bfd67\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_renamed_sysinternals_procdump.yml\"|extend RuleTitle=\"Renamed ProcDump Execution\"|extend RuleDescription=\"Detects the execution of a renamed ProcDump executable often used by attackers or malware\";\nlet q5=_Im_ProcessCreate\n| where (TargetProcessFilename =~ \"psexesvc.exe\" and (not(TargetProcessName =~ \"C:\\\\Windows\\\\PSEXESVC.exe\")))|extend RuleId=\"51ae86a2-e2e1-4097-ad85-c46cb6851de4\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_renamed_sysinternals_psexec_service.yml\"|extend RuleTitle=\"Renamed PsExec Service Execution\"|extend RuleDescription=\"Detects suspicious launch of a renamed version of the PSEXESVC service with, which is not often used by legitimate administrators\";\nlet q6=_Im_ProcessCreate\n| where (TargetProcessFilename =~ \"sdelete.exe\" and (not((TargetProcessName endswith \"\\\\sdelete.exe\" or TargetProcessName endswith \"\\\\sdelete64.exe\"))))|extend RuleId=\"c1d867fe-8d95-4487-aab4-e53f2d339f90\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_renamed_sysinternals_sdelete.yml\"|extend RuleTitle=\"Renamed Sysinternals Sdelete Execution\"|extend RuleDescription=\"Detects the use of a renamed SysInternals Sdelete, which is something an administrator shouldn't do (the renaming)\";\nlet q7=_Im_ProcessCreate\n| where (TargetProcessFilename =~ \"vmnat.exe\" and (not(TargetProcessName endswith \"vmnat.exe\")))|extend RuleId=\"7b4f794b-590a-4ad4-ba18-7964a2832205\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_renamed_vmnat.yml\"|extend RuleTitle=\"Renamed Vmnat.exe Execution\"|extend RuleDescription=\"Detects renamed vmnat.exe or portable version that can be used for DLL side-loading\";\nlet q8=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessFilename =~ \"RUNDLL32.EXE\") and TargetProcessCommandLine matches regex \"[Rr][Uu][Nn][Dd][Ll][Ll]32(\\\\.[Ee][Xx][Ee])? \\\\S+?\\\\w:\\\\S+?:\")|extend RuleId=\"9248c7e1-2bf3-4661-a22c-600a8040b446\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_ads_stored_dll_execution.yml\"|extend RuleTitle=\"Potential Rundll32 Execution With DLL Stored In ADS\"|extend RuleDescription=\"Detects execution of rundll32 where the DLL being called is stored in an Alternate Data Stream (ADS).\";\nlet q9=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessFilename =~ \"RUNDLL32.EXE\" or TargetProcessCommandLine contains \"rundll32\") and TargetProcessCommandLine contains \"advpack\" and ((TargetProcessCommandLine contains \"#+\" and TargetProcessCommandLine contains \"12\") or TargetProcessCommandLine contains \"#-\"))|extend RuleId=\"a1473adb-5338-4a20-b4c3-126763e2d3d3\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_advpack_obfuscated_ordinal_call.yml\"|extend RuleTitle=\"Suspicious Advpack Call Via Rundll32.EXE\"|extend RuleDescription=\"Detects execution of \\\"rundll32\\\" calling \\\"advpack.dll\\\" with potential obfuscated ordinal calls in order to leverage the \\\"RegisterOCX\\\" function\";\nlet q10=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessFilename =~ \"RUNDLL32.EXE\") and (TargetProcessCommandLine contains \",#\" or TargetProcessCommandLine contains \", #\" or TargetProcessCommandLine contains \".dll #\" or TargetProcessCommandLine contains \".ocx #\")) and (not(((TargetProcessCommandLine contains \"EDGEHTML.dll\" and TargetProcessCommandLine contains \"#141\") or ((ActingProcessName contains \"\\\\Msbuild\\\\Current\\\\Bin\\\\\" or ActingProcessName contains \"\\\\VC\\\\Tools\\\\MSVC\\\\\" or ActingProcessName contains \"\\\\Tracker.exe\") and (TargetProcessCommandLine contains \"\\\\FileTracker32.dll,#1\" or TargetProcessCommandLine contains \"\\\\FileTracker32.dll\\\",#1\" or TargetProcessCommandLine contains \"\\\\FileTracker64.dll,#1\" or TargetProcessCommandLine contains \"\\\\FileTracker64.dll\\\",#1\"))))))|extend RuleId=\"e79a9e79-eb72-4e78-a628-0e7e8f59e89c\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_by_ordinal.yml\"|extend RuleTitle=\"Suspicious Call by Ordinal\"|extend RuleDescription=\"Detects suspicious calls of DLLs in rundll32.dll exports by ordinal\";\nlet q11=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"rundll32.exe\" and TargetProcessCommandLine contains \"Execute\" and TargetProcessCommandLine contains \"RegRead\" and TargetProcessCommandLine contains \"window.close\")|extend RuleId=\"1cc50f3f-1fc8-4acf-b2e9-6f172e1fdebd\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_inline_vbs.yml\"|extend RuleTitle=\"Suspicious Rundll32 Invoking Inline VBScript\"|extend RuleDescription=\"Detects suspicious process related to rundll32 based on command line that invokes inline VBScript as seen being used by UNC2452\";\nlet q12=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessFilename =~ \"RUNDLL32.EXE\") and (TargetProcessCommandLine contains \"keymgr\" and TargetProcessCommandLine contains \"KRShowKeyMgr\"))|extend RuleId=\"a4694263-59a8-4608-a3a0-6f8d3a51664c\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_keymgr.yml\"|extend RuleTitle=\"Suspicious Key Manager Access\"|extend RuleDescription=\"Detects the invocation of the Stored User Names and Passwords dialogue (Key Manager)\";\nlet q13=_Im_ProcessCreate\n| where ((TargetProcessCommandLine contains \"\\\\..\\\\\" and TargetProcessCommandLine contains \"mshtml\") and (TargetProcessCommandLine contains \"#135\" or TargetProcessCommandLine contains \"RunHTMLApplication\"))|extend RuleId=\"4782eb5a-a513-4523-a0ac-f3082b26ac5c\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_mshtml_runhtmlapplication.yml\"|extend RuleTitle=\"Mshtml.DLL RunHTMLApplication Suspicious Usage\"|extend RuleDescription=\"Detects execution of commands that leverage the \\\"mshtml.dll\\\" RunHTMLApplication export to run arbitrary code via different protocol handlers (vbscript, javascript, file, http...)\\n\";\nlet q14=_Im_ProcessCreate\n| where ((TargetProcessCommandLine endswith \"\\\\rundll32.exe\" or TargetProcessCommandLine endswith \"\\\\rundll32.exe\\\"\" or TargetProcessCommandLine endswith \"\\\\rundll32\") and (not((ActingProcessName contains \"\\\\AppData\\\\Local\\\\\" or ActingProcessName contains \"\\\\Microsoft\\\\Edge\\\\\"))))|extend RuleId=\"1775e15e-b61b-4d14-a1a3-80981298085a\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_no_params.yml\"|extend RuleTitle=\"Rundll32 Execution Without CommandLine Parameters\"|extend RuleDescription=\"Detects suspicious start of rundll32.exe without any parameters as found in CobaltStrike beacon activity\";\nlet q15=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessFilename =~ \"RUNDLL32.EXE\") and ((TargetProcessCommandLine contains \"C:\\\\windows\\\\system32\\\\davclnt.dll,DavSetCookie\" and TargetProcessCommandLine contains \"http\") and (TargetProcessCommandLine contains \"spoolss\" or TargetProcessCommandLine contains \"srvsvc\" or TargetProcessCommandLine contains \"/print/pipe/\")))|extend RuleId=\"bb76d96b-821c-47cf-944b-7ce377864492\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_ntlmrelay.yml\"|extend RuleTitle=\"Suspicious NTLM Authentication on the Printer Spooler Service\"|extend RuleDescription=\"Detects a privilege elevation attempt by coercing NTLM authentication on the Printer Spooler service\";\nlet q16=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessFilename =~ \"RUNDLL32.EXE\" or TargetProcessCommandLine contains \"rundll32\") and ((TargetProcessCommandLine contains \"comsvcs\" and TargetProcessCommandLine contains \"full\") and (TargetProcessCommandLine contains \"#-\" or TargetProcessCommandLine contains \"#+\" or TargetProcessCommandLine contains \"#24\" or TargetProcessCommandLine contains \"24 \" or TargetProcessCommandLine contains \"MiniDump\"))) or ((TargetProcessCommandLine contains \"24\" and TargetProcessCommandLine contains \"comsvcs\" and TargetProcessCommandLine contains \"full\") and (TargetProcessCommandLine contains \" #\" or TargetProcessCommandLine contains \",#\" or TargetProcessCommandLine contains \", #\")))|extend RuleId=\"646ea171-dded-4578-8a4d-65e9822892e3\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_process_dump_via_comsvcs.yml\"|extend RuleTitle=\"Process Memory Dump Via Comsvcs.DLL\"|extend RuleDescription=\"Detects a process memory dump via \\\"comsvcs.dll\\\" using rundll32, covering multiple different techniques (ordinal, minidump function, etc.)\";\nlet q17=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\rundll32.exe\" or TargetProcessFilename =~ \"RUNDLL32.EXE\") and ((TargetProcessCommandLine contains \"-sta \" or TargetProcessCommandLine contains \"-localserver \") and (TargetProcessCommandLine contains \"{\" and TargetProcessCommandLine contains \"}\")))|extend RuleId=\"f1edd233-30b5-4823-9e6a-c4171b24d316\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rundll32_registered_com_objects.yml\"|extend RuleTitle=\"Rundll32 Registered COM Objects\"|extend RuleDescription=\"load malicious registered COM objects\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["Impact", "DefenseEvasion", "ResourceDevelopment", "CredentialAccess", "Persistence", "PrivilegeEscalation", "Execution"],
+                "techniques": ["T1003", "T1036", "T1202", "T1555", "T1485", "T1212", "T1055", "T1588", "T1546", "T1574", "T1059", "T1564", "T1218"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000230",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}

@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5163A000-5160-5160-5160-5163A0000001')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5163A000-5160-5160-5160-5163A0000001')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2022-11-01-preview",
+            "properties": {
+                "displayName": "Sigma Windows Process Creation informational 01",
+                "description": "Sigma Windows Process Creation informational 01",
+                "severity": "informational",
+                "enabled": false,
+                "query": "let q0=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\net.exe\" or TargetProcessName endswith \"\\\\net1.exe\") or (TargetProcessFilename =~ \"net.exe\" or TargetProcessFilename =~ \"net1.exe\")) and ((TargetProcessCommandLine endswith \" use\" or TargetProcessCommandLine endswith \" sessions\") or (TargetProcessCommandLine contains \" use \" or TargetProcessCommandLine contains \" sessions \")))|extend RuleId=\"1c67a717-32ba-409b-a45d-0fb704a73a81\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_net_use_network_connections_discovery.yml\"|extend RuleTitle=\"System Network Connections Discovery Via Net.EXE\"|extend RuleDescription=\"Adversaries may attempt to get a listing of network connections to or from the compromised system they are currently accessing or from remote systems by querying for information over the network.\";\nlet q1=_Im_ProcessCreate\n| where ((((TargetProcessName endswith \"\\\\net.exe\" or TargetProcessName endswith \"\\\\net1.exe\") or (TargetProcessFilename =~ \"net.exe\" or TargetProcessFilename =~ \"net1.exe\")) and TargetProcessCommandLine contains \"view\") and (not(TargetProcessCommandLine contains \"\\\\\\\\\")))|extend RuleId=\"62510e69-616b-4078-b371-847da438cc03\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_net_view_share_and_sessions_enum.yml\"|extend RuleTitle=\"Share And Session Enumeration Using Net.EXE\"|extend RuleDescription=\"Detects attempts to enumerate file shares, printer shares and sessions using \\\"net.exe\\\" with the \\\"view\\\" flag.\";\nlet q2=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\nltest.exe\" or TargetProcessFilename =~ \"nltestrk.exe\")|extend RuleId=\"903076ff-f442-475a-b667-4f246bcc203b\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_nltest_execution.yml\"|extend RuleTitle=\"Nltest.EXE Execution\"|extend RuleDescription=\"Detects nltest commands that can be used for information discovery\";\nlet q3=_Im_ProcessCreate\n| where (TargetProcessCommandLine contains \"New-Service\" and TargetProcessCommandLine contains \"-BinaryPathName\")|extend RuleId=\"c02e96b7-c63a-4c47-bd83-4a9f74afcfb2\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_create_service.yml\"|extend RuleTitle=\"New Service Creation Using PowerShell\"|extend RuleDescription=\"Detects the creation of a new service using powershell.\";\nlet q4=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\") or (TargetProcessFilename =~ \"PowerShell.EXE\" or TargetProcessFilename =~ \"pwsh.dll\")) and (((TargetProcessCommandLine contains \"ToInt\" or TargetProcessCommandLine contains \"ToDecimal\" or TargetProcessCommandLine contains \"ToByte\" or TargetProcessCommandLine contains \"ToUint\" or TargetProcessCommandLine contains \"ToSingle\" or TargetProcessCommandLine contains \"ToSByte\") and (TargetProcessCommandLine contains \"ToChar\" or TargetProcessCommandLine contains \"ToString\" or TargetProcessCommandLine contains \"String\")) or ((TargetProcessCommandLine contains \"char\" and TargetProcessCommandLine contains \"join\") or (TargetProcessCommandLine contains \"split\" and TargetProcessCommandLine contains \"join\"))))|extend RuleId=\"cdf05894-89e7-4ead-b2b0-0a5f97a90f2f\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_encoding_patterns.yml\"|extend RuleTitle=\"Potential Encoded PowerShell Patterns In CommandLine\"|extend RuleDescription=\"Detects specific combinations of encoding methods in PowerShell via the commandline\";\nlet q5=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\") or (TargetProcessFilename =~ \"PowerShell.EXE\" or TargetProcessFilename =~ \"pwsh.dll\")) and (not(((ActingProcessName endswith \":\\\\Windows\\\\explorer.exe\" or ActingProcessName endswith \":\\\\Windows\\\\System32\\\\CompatTelRunner.exe\" or ActingProcessName endswith \":\\\\Windows\\\\SysWOW64\\\\explorer.exe\") or ActingProcessName =~ \":\\\\$WINDOWS.~BT\\\\Sources\\\\SetupHost.exe\"))) and (not(((ActingProcessName endswith \"\\\\AppData\\\\Local\\\\Programs\\\\Microsoft VS Code\\\\Code.exe\" and ActingProcessCommandLine contains \" --ms-enable-electron-run-as-node \") or (ActingProcessName contains \":\\\\Program Files\\\\WindowsApps\\\\Microsoft.WindowsTerminal_\" and ActingProcessName endswith \"\\\\WindowsTerminal.exe\")))))|extend RuleId=\"f4bbd493-b796-416e-bbf2-121235348529\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_non_interactive_execution.yml\"|extend RuleTitle=\"Non Interactive PowerShell Process Spawned\"|extend RuleDescription=\"Detects non-interactive PowerShell activity by looking at the \\\"powershell\\\" process with a non-user GUI process such as \\\"explorer.exe\\\" as a parent.\";\nlet q6=_Im_ProcessCreate\n| where (((TargetProcessFilename =~ \"PowerShell.EXE\" or TargetProcessFilename =~ \"pwsh.dll\") or (TargetProcessName endswith \"\\\\powershell.exe\" or TargetProcessName endswith \"\\\\pwsh.exe\")) and TargetProcessCommandLine contains \"Stop-Service \")|extend RuleId=\"c49c5062-0966-4170-9efd-9968c913a6cf\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_stop_service.yml\"|extend RuleTitle=\"Stop Windows Service Via PowerShell Stop-Service\"|extend RuleDescription=\"Detects the stopping of a Windows service via the PowerShell Cmdlet \\\"Stop-Service\\\"\";\nlet q7=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\python.exe\" and TargetProcessCommandLine contains \"adidnsdump\")|extend RuleId=\"26d3f0a2-f514-4a3f-a8a7-e7e48a8d9160\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_python_adidnsdump.yml\"|extend RuleTitle=\"PUA - Adidnsdump Execution\"|extend RuleDescription=\"This tool enables enumeration and exporting of all DNS records in the zone for recon purposes of internal networks Python 3 and python.exe must be installed,\\nUsee to Query/modify DNS records for Active Directory integrated DNS via LDAP\\n\";\nlet q8=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\rar.exe\" and TargetProcessCommandLine contains \" a \")|extend RuleId=\"6f3e2987-db24-4c78-a860-b4f4095a7095\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_rar_compress_data.yml\"|extend RuleTitle=\"Files Added To An Archive Using Rar.EXE\"|extend RuleDescription=\"Detects usage of \\\"rar\\\" to add files to an archive for potential compression. An adversary may compress data (e.g. sensitive documents) that is collected prior to exfiltration in order to make it portable and minimize the amount of data sent over the network.\";\nlet q9=_Im_ProcessCreate\n| where TargetProcessCommandLine contains \" -E \"\n| where TargetProcessCommandLine contains \" /E \"\n| where (((TargetProcessName endswith \"\\\\regedit.exe\" or TargetProcessFilename =~ \"REGEDIT.EXE\") and ()) and (not(((TargetProcessCommandLine contains \"hklm\" or TargetProcessCommandLine contains \"hkey_local_machine\") and (TargetProcessCommandLine endswith \"\\\\system\" or TargetProcessCommandLine endswith \"\\\\sam\" or TargetProcessCommandLine endswith \"\\\\security\")))))|extend RuleId=\"f0e53e89-8d22-46ea-9db5-9d4796ee2f8a\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_regedit_export_keys.yml\"|extend RuleTitle=\"Exports Registry Key To a File\"|extend RuleDescription=\"Detects the export of the target Registry key to a file.\";\nlet q10=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\regini.exe\" or TargetProcessFilename =~ \"REGINI.EXE\") and (not(TargetProcessCommandLine matches regex \":[^ \\\\\\\\]\")))|extend RuleId=\"5f60740a-f57b-4e76-82a1-15b6ff2cb134\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_regini_execution.yml\"|extend RuleTitle=\"Registry Modification Via Regini.EXE\"|extend RuleDescription=\"Detects the execution of regini.exe which can be used to modify registry keys, the changes are imported from one or more text files.\";\nlet q11=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\reg.exe\" and (TargetProcessCommandLine contains \"SOFTWARE\\\\Microsoft\\\\Cryptography\" and TargetProcessCommandLine contains \"/v \" and TargetProcessCommandLine contains \"MachineGuid\"))|extend RuleId=\"f5240972-3938-4e56-8e4b-e33893176c1f\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_reg_machineguid.yml\"|extend RuleTitle=\"Suspicious Query of MachineGUID\"|extend RuleDescription=\"Use of reg to get MachineGuid information\";\nlet q12=_Im_ProcessCreate\n| where (ActingProcessName endswith \"\\\\ScreenConnect.ClientService.exe\" and (TargetProcessName endswith \"\\\\cmd.exe\" or TargetProcessFilename =~ \"Cmd.Exe\") and TargetProcessCommandLine contains \"\\\\TEMP\\\\ScreenConnect\\\\\")|extend RuleId=\"b1f73849-6329-4069-bc8f-78a604bb8b23\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_remote_access_tools_screenconnect_remote_execution.yml\"|extend RuleTitle=\"Remote Access Tool - ScreenConnect Remote Command Execution\"|extend RuleDescription=\"Detects the execution of a system command via the ScreenConnect RMM service.\";\nlet q13=_Im_ProcessCreate\n| where (TargetProcessName =~ \"TeamViewer_Desktop.exe\" and ActingProcessName =~ \"TeamViewer_Service.exe\" and TargetProcessCommandLine endswith \"TeamViewer_Desktop.exe --IPCport 5939 --Module 1\")|extend RuleId=\"ab70c354-d9ac-4e11-bbb6-ec8e3b153357\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_remote_access_tools_teamviewer_incoming_connection.yml\"|extend RuleTitle=\"Remote Access Tool - Team Viewer Session Started On Windows Host\"|extend RuleDescription=\"Detects the command line executed when TeamViewer starts a session started by a remote host.\\nOnce a connection has been started, an investigator can verify the connection details by viewing the \\\"incoming_connections.txt\\\" log file in the TeamViewer folder.\\n\";\nlet q14=_Im_ProcessCreate\n| where (((TargetProcessName endswith \"\\\\net.exe\" or TargetProcessName endswith \"\\\\net1.exe\") and TargetProcessCommandLine contains \"time\") or (TargetProcessName endswith \"\\\\w32tm.exe\" and TargetProcessCommandLine contains \"tz\"))|extend RuleId=\"b243b280-65fe-48df-ba07-6ddea7646427\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_remote_time_discovery.yml\"|extend RuleTitle=\"Discovery of a System Time\"|extend RuleDescription=\"Identifies use of various commands to query a systems time. This technique may be used before executing a scheduled task or to discover the time zone of a target system.\";\nlet q15=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\runonce.exe\" or TargetProcessFileDescription =~ \"Run Once Wrapper\") and (TargetProcessCommandLine contains \"/AlternateShellStartup\" or TargetProcessCommandLine endswith \"/r\"))|extend RuleId=\"198effb6-6c98-4d0c-9ea3-451fa143c45c\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_runonce_execution.yml\"|extend RuleTitle=\"Run Once Task Execution as Configured in Registry\"|extend RuleDescription=\"This rule detects the execution of Run Once task as configured in the registry\";\nlet q16=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\schtasks.exe\" and TargetProcessCommandLine contains \" /create \") and (not((TargetUsername contains \"AUTHORI\" or TargetUsername contains \"AUTORI\"))))|extend RuleId=\"92626ddd-662c-49e3-ac59-f6535f12d189\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_schtasks_creation.yml\"|extend RuleTitle=\"Scheduled Task Creation Via Schtasks.EXE\"|extend RuleDescription=\"Detects the creation of scheduled tasks by user accounts via the \\\"schtasks\\\" utility.\";\nlet q17=_Im_ProcessCreate\n| where (TargetProcessName endswith \"\\\\sc.exe\" and (TargetProcessCommandLine contains \"create\" and TargetProcessCommandLine contains \"binPath\"))|extend RuleId=\"85ff530b-261d-48c6-a441-facaa2e81e48\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sc_create_service.yml\"|extend RuleTitle=\"New Service Creation Using Sc.EXE\"|extend RuleDescription=\"Detects the creation of a new service using the \\\"sc.exe\\\" utility.\";\nlet q18=_Im_ProcessCreate\n| where ((TargetProcessName endswith \"\\\\sc.exe\" or TargetProcessFilename =~ \"sc.exe\") and TargetProcessCommandLine contains \"query\" and TargetProcessCommandLine contains \"termservice\")|extend RuleId=\"e83e8899-c9b2-483b-b355-5decc942b959\"|extend SourceURL=\"https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_sc_query_interesting_services.yml\"|extend RuleTitle=\"Interesting Service Enumeration Via Sc.EXE\"|extend RuleDescription=\"Detects the enumeration and query of interesting and in some cases sensitive services on the system via \\\"sc.exe\\\".\\nAttackers often try to enumerate the services currently running on a system in order to find different attack vectors.\\n\";\nunion q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18;",
+                "queryFrequency": "P1D",
+                "queryPeriod": "P1D",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT1H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": ["Exfiltration", "PrivilegeEscalation", "Discovery", "Impact", "DefenseEvasion", "InitialAccess", "CredentialAccess", "Collection", "Persistence", "Execution"],
+                "techniques": ["T1489", "T1124", "T1133", "T1003", "T1016", "T1482", "T1112", "T1012", "T1053", "T1543", "T1560", "T1027", "T1082", "T1018", "T1059", "T1049"],
+                "alertRuleTemplateName": "5163A000-5160-5160-5160-5163A0000001",
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": null,
+                        "groupByCustomDetails": null
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },                
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "{{RuleTitle}} ",
+                    "alertDescriptionFormat": "{{RuleDescription}} ",
+                    "alertDynamicProperties": [
+                        {
+                            "alertProperty": "ExtendedLinks",
+                            "value": "SourceURL"
+                        },
+                        {
+                            "alertProperty": "ProductComponentName",
+                            "value": "RuleId"
+                        }
+                    ]
+                },
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "ActorUsername"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "Dvc"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "TargetProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "TargetProcessCommandLine"
+                            },
+                            {
+                                "identifier": "ElevationToken",
+                                "columnName": "TargetProcessTokenElevation"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "FileHash",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Algorithm",
+                                "columnName": "HashType"
+                            },
+                            {
+                                "identifier": "Value",
+                                "columnName": "Hash"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "File",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Directory",
+                                "columnName": "TargetProcessCurrentDirectory"
+                            },
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetProcessName"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ActingProcessId"
+                            },
+                            {
+                                "identifier": "CommandLine",
+                                "columnName": "ActingProcessCommandLine"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": "1.0.0"
+            }
+        }
+    ]
+}
